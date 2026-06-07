@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "game": {
+    "id": "y26-divA-game1",
+    "date": "2026-06-06",
+    "season": "y26",
+    "division": "A",
+    "opponent": "test-opponent",
+    "youtubeUrl": "https://www.youtube.com/watch?v=yqoCezBgPdk",
+    "result": "TEST"
+  },
+  "segments": [
+    {
+      "id": "y26-divA-game1_30_45",
+      "start": 30,
+      "end": 45,
+      "label": "UG(O) matt: test segment 1 - first 15 seconds"
+    },
+    {
+      "id": "y26-divA-game1_60_75",
+      "start": 60,
+      "end": 75,
+      "label": "OB(D) : test segment 2 - middle chunk"
+    },
+    {
+      "id": "y26-divA-game1_120_140",
+      "start": 120,
+      "end": 140,
+      "label": "U(MAN) vong: test segment 3 - longer clip"
+    },
+    {
+      "id": "y26-divA-game1_200_215",
+      "start": 200,
+      "end": 215,
+      "label": "UG(O) matt,vong: test segment 4 - two-man action"
+    }
+  ]
+}
