@@ -14,7 +14,7 @@ export default function App() {
   const [activeIdx, setActiveIdx] = useState(-1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [autoplayNext, setAutoplayNext] = useState(false);
+  const [loopSegment, setLoopSegment] = useState(true);
   const [isMobile, setIsMobile] = useState(isMobileDevice());
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function App() {
           segments: [
             { id: 's1', start: 30, end: 45, label: 'UG(O) matt: drives and kicks for open three' },
             { id: 's2', start: 60, end: 75, label: 'OB(D) vong: lost rotation on weak side' },
-            { id: 's3', start: 120, end: 140, label: 'UG(MAN) george: solid help defense' },
+            { id: 's3', start: 120, end: 140, label: 'UG(MAN) george: solid help defense and a much longer label to test wrapping behavior on two lines' },
             { id: 's4', start: 200, end: 215, label: 'O(2-3) opponent runs 2-3 zone' },
             { id: 's5', start: 250, end: 268, label: 'UG(O) matt,vong: pick and roll for layup' },
             { id: 's6', start: 300, end: 315, label: 'UB(O) george: travel turnover' },
@@ -79,15 +79,12 @@ export default function App() {
           <VideoPlayer
             videoId={videoId}
             segments={segments}
-            parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
             isFullscreen={isFullscreen}
             setIsFullscreen={setIsFullscreen}
             isMobile={isMobile}
-            showHelp={showHelp}
-            setShowHelp={setShowHelp}
-            autoplayNext={autoplayNext}
+            loopSegment={loopSegment}
           />
         </div>
 
@@ -97,9 +94,10 @@ export default function App() {
             parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
-            autoplayNext={autoplayNext}
-            setAutoplayNext={setAutoplayNext}
+            loopSegment={loopSegment}
+            setLoopSegment={setLoopSegment}
             isMobile={isMobile}
+            onHelp={() => setShowHelp(true)}
           />
         )}
       </div>

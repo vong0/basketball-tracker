@@ -1,13 +1,15 @@
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main {
   flex: 1;
   display: flex;
   overflow: hidden;
+  min-height: 0;
 }
 
 .mainDesktop {
@@ -24,4 +26,5 @@
   flex-direction: column;
   background: #000;
   min-width: 0;
+  min-height: 0;
 }

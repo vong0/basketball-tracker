@@ -1,23 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { loadYouTubeAPI } from '../../lib/youtube';
-import { formatTime } from '../../lib/time';
-import TitleBar from './TitleBar';
 import ControlBar from './ControlBar';
-import SpeedIndicator from './SpeedIndicator';
 import styles from './VideoPlayer.module.css';
 
 export default function VideoPlayer({
   videoId,
   segments,
-  parsedSegments,
   activeIdx,
   setActiveIdx,
   isFullscreen,
   setIsFullscreen,
   isMobile,
-  showHelp,
-  setShowHelp,
-  autoplayNext
+  loopSegment
 }) {
   const ytPlayerRef = useRef(null);
   const containerRef = useRef(null);
@@ -25,18 +19,16 @@ export default function VideoPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [playerReady, setPlayerReady] = useState(false);
-  const [titleVisible, setTitleVisible] = useState(true);
-  const [controlsVisible, setControlsVisible] = useState(true);
-  const [speedIndicator, setSpeedIndicator] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const fadeTimerRef = useRef(null);
   const tickRef = useRef(null);
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
   const lastTapRef = useRef({ time: 0, side: null });
+  const loopRef = useRef(loopSegment);
+
+  useEffect(() => { loopRef.current = loopSegment; }, [loopSegment]);
 
   const activeSegment = activeIdx >= 0 ? segments[activeIdx] : null;
-  const activeParsed = activeIdx >= 0 ? parsedSegments[activeIdx] : null;
 
   // YouTube setup
   useEffect(() => {
@@ -54,9 +46,7 @@ export default function VideoPlayer({
         videoId,
         playerVars: {
           controls: 0,
-          modestbranding: 1,
           rel: 0,
-          showinfo: 0,
           fs: 0,
           disablekb: 1,
           iv_load_policy: 3,
@@ -66,18 +56,15 @@ export default function VideoPlayer({
         events: {
           onReady: (e) => {
             setPlayerReady(true);
-            try {
-              e.target.setPlaybackQuality('hd1080');
-            } catch (err) {}
+            try { e.target.setPlaybackQuality('hd1080'); } catch (err) {}
           },
           onStateChange: (e) => {
             if (e.data === 1) {
               setIsPlaying(true);
-              try {
-                ytPlayerRef.current?.setPlaybackQuality('hd1080');
-              } catch (err) {}
+              try { ytPlayerRef.current?.setPlaybackQuality('hd1080'); } catch (err) {}
+            } else if (e.data === 2 || e.data === 0) {
+              setIsPlaying(false);
             }
-            else if (e.data === 2 || e.data === 0) setIsPlaying(false);
           }
         }
       });
@@ -90,7 +77,7 @@ export default function VideoPlayer({
     };
   }, [videoId]);
 
-  // Tick: poll currentTime + auto-pause at segment end (once)
+  // Tick: poll currentTime + loop or pause at segment end
   useEffect(() => {
     if (!playerReady) return;
     let pausedAtEnd = false;
@@ -101,9 +88,9 @@ export default function VideoPlayer({
       setCurrentTime(t);
       if (activeSegment && !pausedAtEnd && t >= activeSegment.end - 0.05) {
         pausedAtEnd = true;
-        // Autoplay next or pause
-        if (autoplayNext && activeIdx < segments.length - 1) {
-          setActiveIdx(activeIdx + 1);
+        if (loopRef.current) {
+          try { p.seekTo(activeSegment.start, true); } catch (e) {}
+          pausedAtEnd = false;
         } else {
           try {
             p.pauseVideo();
@@ -116,9 +103,9 @@ export default function VideoPlayer({
       }
     }, 100);
     return () => clearInterval(tickRef.current);
-  }, [playerReady, activeIdx, activeSegment, autoplayNext, segments.length, setActiveIdx]);
+  }, [playerReady, activeIdx, activeSegment]);
 
-  // Seek to active segment when it changes (e.g. from playlist click or autoplay)
+  // Seek to active segment when it changes
   useEffect(() => {
     if (!playerReady || activeIdx < 0) return;
     const seg = segments[activeIdx];
@@ -139,10 +126,7 @@ export default function VideoPlayer({
   const togglePlay = useCallback(() => {
     const p = ytPlayerRef.current;
     if (!p) return;
-    if (activeIdx < 0) {
-      playSegment(0);
-      return;
-    }
+    if (activeIdx < 0) { playSegment(0); return; }
     if (isPlaying) {
       try { p.pauseVideo(); } catch (e) {}
     } else {
@@ -158,21 +142,16 @@ export default function VideoPlayer({
     if (!p || !p.getCurrentTime) return;
     const t = p.getCurrentTime();
     let nt = t + delta;
-    if (activeSegment) {
-      nt = Math.max(activeSegment.start, Math.min(activeSegment.end, nt));
-    }
+    if (activeSegment) nt = Math.max(activeSegment.start, Math.min(activeSegment.end, nt));
     try { p.seekTo(nt, true); } catch (e) {}
   }, [activeSegment]);
 
-  const frameStep = useCallback((dir) => {
-    seekDelta(dir * (1 / 30));
-  }, [seekDelta]);
+  const frameStep = useCallback((dir) => { seekDelta(dir * (1 / 30)); }, [seekDelta]);
 
   const setRate = useCallback((rate) => {
     const p = ytPlayerRef.current;
     if (!p || !p.setPlaybackRate) return;
     try { p.setPlaybackRate(rate); } catch (e) {}
-    setSpeedIndicator(rate === 1 ? null : rate);
   }, []);
 
   const navSegment = useCallback((dir) => {
@@ -198,175 +177,121 @@ export default function VideoPlayer({
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, [setIsFullscreen]);
 
-  const resetFadeTimer = useCallback(() => {
-    setTitleVisible(true);
-    setControlsVisible(true);
-    if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
-    fadeTimerRef.current = setTimeout(() => {
-      setTitleVisible(false);
-      if (isFullscreen || isMobile) setControlsVisible(false);
-    }, 3000);
-  }, [isFullscreen, isMobile]);
-
+  // Reset speed on blur / tab hidden (prevents stuck 2x or 0.5x)
   useEffect(() => {
-    resetFadeTimer();
-    return () => { if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current); };
-  }, [resetFadeTimer, activeIdx]);
+    const reset = () => {
+      if (speedKeyRef.current.shift || speedKeyRef.current.ctrl) {
+        speedKeyRef.current = { shift: false, ctrl: false };
+        setRate(1);
+      }
+      if (longPressRef.current.active) {
+        if (longPressRef.current.timer) clearTimeout(longPressRef.current.timer);
+        longPressRef.current = { timer: null, active: false, side: null };
+        setRate(1);
+      }
+    };
+    const onVis = () => { if (document.hidden) reset(); };
+    window.addEventListener('blur', reset);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('blur', reset);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [setRate]);
 
   // Keyboard shortcuts (desktop)
   useEffect(() => {
     if (isMobile) return;
-
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      if (e.key === '?' || e.key === '/') {
-        e.preventDefault();
-        setShowHelp(s => !s);
-        return;
-      }
-
       if (e.key === 'Escape') {
-        if (showHelp) { setShowHelp(false); return; }
         if (document.fullscreenElement) document.exitFullscreen?.();
         return;
       }
-
-      if (showHelp) return;
-
       if (e.key === 'Shift' && !speedKeyRef.current.shift) {
-        speedKeyRef.current.shift = true;
-        setRate(2);
-        return;
+        speedKeyRef.current.shift = true; setRate(2); return;
       }
       if (e.key === 'Control' && !speedKeyRef.current.ctrl) {
-        speedKeyRef.current.ctrl = true;
-        setRate(0.5);
-        return;
+        speedKeyRef.current.ctrl = true; setRate(0.5); return;
       }
-
       switch (e.key) {
-        case ' ':
-          e.preventDefault();
-          togglePlay();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          seekDelta(-1);
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          seekDelta(1);
-          break;
-        case ',':
-          e.preventDefault();
-          frameStep(-1);
-          break;
-        case '.':
-          e.preventDefault();
-          frameStep(1);
-          break;
-        case 'j':
-        case 'J':
-          e.preventDefault();
-          navSegment(-1);
-          break;
-        case 'k':
-        case 'K':
-          e.preventDefault();
-          navSegment(1);
-          break;
-        case 'f':
-        case 'F':
-          e.preventDefault();
-          toggleFullscreen();
-          break;
+        case ' ': e.preventDefault(); togglePlay(); break;
+        case 'ArrowLeft': e.preventDefault(); seekDelta(-1); break;
+        case 'ArrowRight': e.preventDefault(); seekDelta(1); break;
+        case ',': e.preventDefault(); frameStep(-1); break;
+        case '.': e.preventDefault(); frameStep(1); break;
+        case 'j': case 'J': e.preventDefault(); navSegment(-1); break;
+        case 'k': case 'K': e.preventDefault(); navSegment(1); break;
+        case 'f': case 'F': e.preventDefault(); toggleFullscreen(); break;
       }
-      resetFadeTimer();
     };
-
     const handleKeyUp = (e) => {
-      if (e.key === 'Shift' && speedKeyRef.current.shift) {
-        speedKeyRef.current.shift = false;
-        setRate(1);
-      }
-      if (e.key === 'Control' && speedKeyRef.current.ctrl) {
-        speedKeyRef.current.ctrl = false;
-        setRate(1);
-      }
+      if (e.key === 'Shift' && speedKeyRef.current.shift) { speedKeyRef.current.shift = false; setRate(1); }
+      if (e.key === 'Control' && speedKeyRef.current.ctrl) { speedKeyRef.current.ctrl = false; setRate(1); }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [isMobile, togglePlay, seekDelta, frameStep, navSegment, toggleFullscreen, setRate, resetFadeTimer, showHelp, setShowHelp]);
+  }, [isMobile, togglePlay, seekDelta, frameStep, navSegment, toggleFullscreen, setRate]);
 
-  // Mouse move resets fade timer (desktop)
-  useEffect(() => {
-    if (isMobile) return;
-    const onMove = () => resetFadeTimer();
-    const c = containerRef.current;
-    if (c) c.addEventListener('mousemove', onMove);
-    return () => { if (c) c.removeEventListener('mousemove', onMove); };
-  }, [isMobile, resetFadeTimer]);
-
-  // Mobile gestures
-  const onVideoPointerDown = (e) => {
-    if (!isMobile) return;
+  // Mobile fullscreen gestures
+  const onTapZonePointerDown = (e) => {
+    if (!(isMobile && isFullscreen)) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
     const side = x < rect.width / 2 ? 'left' : 'right';
-
     longPressRef.current.timer = setTimeout(() => {
       longPressRef.current.active = true;
       longPressRef.current.side = side;
       setRate(side === 'left' ? 0.5 : 2);
     }, 500);
   };
-
-  const onVideoPointerUp = (e) => {
-    if (!isMobile) return;
+  const onTapZonePointerUp = (e) => {
+    if (!(isMobile && isFullscreen)) return;
     if (longPressRef.current.timer) clearTimeout(longPressRef.current.timer);
-
     if (longPressRef.current.active) {
       longPressRef.current.active = false;
       longPressRef.current.side = null;
       setRate(1);
       return;
     }
-
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX || (e.changedTouches && e.changedTouches[0].clientX)) - rect.left;
     const side = x < rect.width / 2 ? 'left' : 'right';
     const now = Date.now();
-
     if (now - lastTapRef.current.time < 300 && lastTapRef.current.side === side) {
-      // Double-tap → seek
       seekDelta(side === 'left' ? -1 : 1);
       lastTapRef.current.time = 0;
     } else {
       lastTapRef.current = { time: now, side };
-      // If controls are visible, single tap = play/pause. Otherwise = show controls.
-      if (controlsVisible) {
-        togglePlay();
-      } else {
-        setControlsVisible(true);
-        setTitleVisible(true);
-        resetFadeTimer();
-      }
+      togglePlay();
     }
   };
 
   // Seekbar
   const seekbarRef = useRef(null);
+  const reelRef = useRef(null);
+  const handleSeekbarMove = useCallback((e, ref) => {
+    const node = ref?.current || seekbarRef.current;
+    if (!node || !activeSegment) return;
+    const rect = node.getBoundingClientRect();
+    const x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX)) - rect.left;
+    const pct = Math.max(0, Math.min(1, x / rect.width));
+    const duration = activeSegment.end - activeSegment.start;
+    const newTime = activeSegment.start + pct * duration;
+    const p = ytPlayerRef.current;
+    if (p && p.seekTo) try { p.seekTo(newTime, true); } catch (err) {}
+    setCurrentTime(newTime);
+  }, [activeSegment]);
+
   const handleSeekbarPointerDown = (e) => {
     e.preventDefault();
     setIsDragging(true);
-    handleSeekbarMove(e);
-    const onMove = (ev) => handleSeekbarMove(ev);
+    handleSeekbarMove(e, seekbarRef);
+    const onMove = (ev) => handleSeekbarMove(ev, seekbarRef);
     const onUp = () => {
       setIsDragging(false);
       window.removeEventListener('pointermove', onMove);
@@ -376,16 +301,17 @@ export default function VideoPlayer({
     window.addEventListener('pointerup', onUp);
   };
 
-  const handleSeekbarMove = (e) => {
-    if (!seekbarRef.current || !activeSegment) return;
-    const rect = seekbarRef.current.getBoundingClientRect();
-    const x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX)) - rect.left;
-    const pct = Math.max(0, Math.min(1, x / rect.width));
-    const duration = activeSegment.end - activeSegment.start;
-    const newTime = activeSegment.start + pct * duration;
-    const p = ytPlayerRef.current;
-    if (p && p.seekTo) try { p.seekTo(newTime, true); } catch (e) {}
-    setCurrentTime(newTime);
+  const handleReelPointerDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleSeekbarMove(e, reelRef);
+    const onMove = (ev) => handleSeekbarMove(ev, reelRef);
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
   };
 
   const segDuration = activeSegment ? activeSegment.end - activeSegment.start : 1;
@@ -393,114 +319,44 @@ export default function VideoPlayer({
     ? Math.max(0, Math.min(1, (currentTime - activeSegment.start) / segDuration))
     : 0;
 
-  const counterText = activeIdx >= 0 ? '[' + (activeIdx + 1) + '/' + segments.length + ']' : '';
-  const qualityDot = activeParsed
-    ? (activeParsed.quality === 'good' ? '🟢' : activeParsed.quality === 'bad' ? '🔴' : '⚪')
-    : '';
+  const showReel = isMobile && isFullscreen;
+  const showStandardBar = !showReel;
 
   return (
-    <div
-      ref={containerRef}
-      className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}
-    >
-      <div ref={iframeContainerRef} className={styles.iframeContainer} />
-
-      {/* Cover YouTube branding/title bar that appears on hover/pause */}
-      <div className={styles.ytTopCover} />
-
-      {/* Hide YouTube's center play/pause button when paused */}
-      <div className={`${styles.ytCenterCover} ${!isPlaying ? styles.active : ''}`} />
-
-      {/* Hide end-screen related videos grid */}
-      <div className={`${styles.ytEndCover} ${!isPlaying && activeSegment && currentTime >= activeSegment.end - 0.5 ? styles.active : ''}`} />
-
-      <div
-        className={styles.tapZone}
-        onPointerDown={onVideoPointerDown}
-        onPointerUp={onVideoPointerUp}
-        onClick={!isMobile ? togglePlay : undefined}
-        onDoubleClick={!isMobile ? toggleFullscreen : undefined}
-      />
-
-      <SpeedIndicator rate={speedIndicator} />
-
-      {!isMobile && !isFullscreen && activeIdx >= 0 && (
-        <TitleBar
-          counterText={counterText}
-          qualityDot={qualityDot}
-          title={activeParsed.title}
-          visible={titleVisible}
-          onHelp={() => setShowHelp(true)}
-        />
-      )}
-
-      {isFullscreen && !isMobile && (
-        <div className={`${styles.fsTopRight} ${titleVisible ? '' : styles.faded}`}>
-          <span className={styles.fsCounter}>
-            {counterText} {qualityDot}
-          </span>
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
-            className={styles.fsButton}
-          >
-            ?
-          </button>
-        </div>
-      )}
-
-      {isMobile && isFullscreen && controlsVisible && activeIdx >= 0 && (
-        <div className={styles.mobileTopOverlay}>
-          <span className={styles.mobileCounter}>{counterText}</span>
-          <span className={styles.mobileDot}>{qualityDot}</span>
-          <span className={styles.mobileTitle}>{activeParsed.title}</span>
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
-            className={styles.mobileButton}
-          >
-            ?
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
-            className={styles.mobileButton}
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      {isMobile && isFullscreen && activeSegment && (
-        <div className={styles.thinSeekbar}>
+    <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
+      <div className={styles.videoArea}>
+        <div ref={iframeContainerRef} className={styles.iframeContainer} />
+        {isMobile && isFullscreen && (
           <div
-            className={styles.thinSeekbarFill}
-            style={{ width: (segProgress * 100) + '%' }}
+            className={styles.tapZone}
+            onPointerDown={onTapZonePointerDown}
+            onPointerUp={onTapZonePointerUp}
           />
+        )}
+        {isMobile && isFullscreen && (
+          <button onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }} className={styles.fsExpandBtn}>
+            ⛶
+          </button>
+        )}
+      </div>
+
+      {showReel && activeSegment && (
+        <div ref={reelRef} className={styles.reelSeekbar} onPointerDown={handleReelPointerDown}>
+          <div className={styles.reelSeekbarFill} style={{ width: (segProgress * 100) + '%' }} />
         </div>
       )}
 
-      {(!isMobile || (isMobile && controlsVisible)) && activeSegment && (
+      {showStandardBar && (
         <ControlBar
           isPlaying={isPlaying}
           onTogglePlay={togglePlay}
-          currentTime={currentTime}
-          activeSegment={activeSegment}
-          segDuration={segDuration}
           segProgress={segProgress}
           isDragging={isDragging}
           seekbarRef={seekbarRef}
           onSeekbarPointerDown={handleSeekbarPointerDown}
           onToggleFullscreen={toggleFullscreen}
-          isFullscreen={isFullscreen}
-          visible={controlsVisible}
+          disabled={!activeSegment}
         />
-      )}
-
-      {isMobile && !isFullscreen && controlsVisible && activeSegment && (
-        <button
-          onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
-          className={styles.mobileHelpBtn}
-        >
-          ?
-        </button>
       )}
     </div>
   );

@@ -6,10 +6,10 @@ const desktopShortcuts = [
     title: 'Video',
     items: [
       ['Space', 'Play / pause'],
-      ['← / →', 'Back / forward 1s (hold to repeat)'],
+      ['\u2190 / \u2192', 'Back / forward 1s'],
       [', / .', 'Frame back / forward'],
-      ['Hold ⇧', '2× speed (while held)'],
-      ['Hold ⌃', '0.5× speed (while held)'],
+      ['Hold \u21E7', '2\u00d7 speed (while held)'],
+      ['Hold \u2303', '0.5\u00d7 speed (while held)'],
       ['J / K', 'Previous / next segment'],
       ['F', 'Toggle fullscreen']
     ]
@@ -17,18 +17,18 @@ const desktopShortcuts = [
   {
     title: 'Other',
     items: [
-      ['? / /', 'Toggle this overlay'],
-      ['Esc', 'Close / exit fullscreen']
+      ['Esc', 'Exit fullscreen']
     ]
   }
 ];
 
 const mobileGestures = [
-  ['Tap', 'Show / hide controls'],
+  ['Tap (fullscreen)', 'Play / pause'],
   ['Double-tap left', 'Back 1s'],
   ['Double-tap right', 'Forward 1s'],
-  ['Long-press left', '0.5× speed (while held)'],
-  ['Long-press right', '2× speed (while held)']
+  ['Long-press left', '0.5\u00d7 speed (while held)'],
+  ['Long-press right', '2\u00d7 speed (while held)'],
+  ['Reel bar', 'Tap or drag to seek']
 ];
 
 export default function ShortcutsModal({ open, onClose, isMobile }) {

@@ -7,9 +7,10 @@ export default function Playlist({
   parsedSegments,
   activeIdx,
   setActiveIdx,
-  autoplayNext,
-  setAutoplayNext,
-  isMobile
+  loopSegment,
+  setLoopSegment,
+  isMobile,
+  onHelp
 }) {
   return (
     <aside className={`${styles.playlist} ${isMobile ? styles.playlistMobile : ''}`}>
@@ -17,13 +18,14 @@ export default function Playlist({
         <div className={styles.title}>
           PLAYLIST <span className={styles.count}>({segments.length})</span>
         </div>
+        <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>
       </div>
 
       <div className={styles.toggleRow}>
         <Checkbox
-          label="autoplay next"
-          checked={autoplayNext}
-          onChange={(e) => setAutoplayNext(e.currentTarget.checked)}
+          label="loop segment"
+          checked={loopSegment}
+          onChange={(e) => setLoopSegment(e.currentTarget.checked)}
           size="xs"
           color="orange"
         />
