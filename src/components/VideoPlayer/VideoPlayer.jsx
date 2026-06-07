@@ -124,17 +124,17 @@ export default function VideoPlayer({
   }, [segments, setActiveIdx]);
 
   const togglePlay = useCallback(() => {
-    const p = ytPlayerRef.current;
-    if (!p) return;
-    if (activeIdx < 0) { playSegment(0); return; }
-    if (isPlaying) {
-      try { p.pauseVideo(); } catch (e) {}
-    } else {
-      if (activeSegment && currentTime >= activeSegment.end - 0.05) {
-        try { p.seekTo(activeSegment.start, true); } catch (e) {}
-      }
-      try { p.playVideo(); } catch (e) {}
-    }
+    // const p = ytPlayerRef.current;
+    // if (!p) return;
+    // if (activeIdx < 0) { playSegment(0); return; }
+    // if (isPlaying) {
+    //   try { p.pauseVideo(); } catch (e) {}
+    // } else {
+    //   if (activeSegment && currentTime >= activeSegment.end - 0.05) {
+    //     try { p.seekTo(activeSegment.start, true); } catch (e) {}
+    //   }
+    //   try { p.playVideo(); } catch (e) {}
+    // }
   }, [isPlaying, activeIdx, currentTime, activeSegment, playSegment]);
 
   const seekDelta = useCallback((delta) => {
