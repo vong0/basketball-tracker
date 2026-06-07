@@ -35,7 +35,6 @@ export default function VideoPlayer({
   const longPressRef = useRef({ timer: null, active: false, side: null });
   const lastTapRef = useRef({ time: 0, side: null });
 
-  const playbackQuality = 'hd1080;'
   const activeSegment = activeIdx >= 0 ? segments[activeIdx] : null;
   const activeParsed = activeIdx >= 0 ? parsedSegments[activeIdx] : null;
 
@@ -62,22 +61,20 @@ export default function VideoPlayer({
           disablekb: 1,
           iv_load_policy: 3,
           playsinline: 1,
-          vq: {playbackQuality},
+          vq: 'hd1080'
         },
         events: {
           onReady: (e) => {
             setPlayerReady(true);
-            // Request highest available quality
             try {
-              e.target.setPlaybackQuality({playbackQuality});
+              e.target.setPlaybackQuality('hd1080');
             } catch (err) {}
           },
           onStateChange: (e) => {
             if (e.data === 1) {
               setIsPlaying(true);
-              // Re-assert quality when playback starts (YouTube sometimes resets it)
               try {
-                ytPlayerRef.current?.setPlaybackQuality({playbackQuality});
+                ytPlayerRef.current?.setPlaybackQuality('hd1080');
               } catch (err) {}
             }
             else if (e.data === 2 || e.data === 0) setIsPlaying(false);
@@ -104,20 +101,24 @@ export default function VideoPlayer({
       setCurrentTime(t);
       if (activeSegment && !pausedAtEnd && t >= activeSegment.end - 0.05) {
         pausedAtEnd = true;
-        try {
-          p.pauseVideo();
-          p.seekTo(activeSegment.end, true);
-        } catch (e) {}
+        // Autoplay next or pause
+        if (autoplayNext && activeIdx < segments.length - 1) {
+          setActiveIdx(activeIdx + 1);
+        } else {
+          try {
+            p.pauseVideo();
+            p.seekTo(activeSegment.end, true);
+          } catch (e) {}
+        }
       }
-      // Reset the flag if user seeks back into the segment
       if (activeSegment && pausedAtEnd && t < activeSegment.end - 0.1) {
         pausedAtEnd = false;
       }
     }, 100);
     return () => clearInterval(tickRef.current);
-  }, [playerReady, activeIdx, activeSegment]);
+  }, [playerReady, activeIdx, activeSegment, autoplayNext, segments.length, setActiveIdx]);
 
-  // Seek to active segment when it changes (e.g. from playlist click)
+  // Seek to active segment when it changes (e.g. from playlist click or autoplay)
   useEffect(() => {
     if (!playerReady || activeIdx < 0) return;
     const seg = segments[activeIdx];
@@ -133,14 +134,6 @@ export default function VideoPlayer({
   const playSegment = useCallback((idx) => {
     if (idx < 0 || idx >= segments.length) return;
     setActiveIdx(idx);
-    const seg = segments[idx];
-    const p = ytPlayerRef.current;
-    if (p && p.seekTo && p.playVideo) {
-      try {
-        p.seekTo(seg.start, true);
-        p.playVideo();
-      } catch (e) {}
-    }
   }, [segments, setActiveIdx]);
 
   const togglePlay = useCallback(() => {
@@ -351,16 +344,19 @@ export default function VideoPlayer({
     const now = Date.now();
 
     if (now - lastTapRef.current.time < 300 && lastTapRef.current.side === side) {
+      // Double-tap → seek
       seekDelta(side === 'left' ? -1 : 1);
       lastTapRef.current.time = 0;
     } else {
       lastTapRef.current = { time: now, side };
-      setTimeout(() => {
-        if (lastTapRef.current.time === now) {
-          setControlsVisible(v => !v);
-          setTitleVisible(v => !v);
-        }
-      }, 300);
+      // If controls are visible, single tap = play/pause. Otherwise = show controls.
+      if (controlsVisible) {
+        togglePlay();
+      } else {
+        setControlsVisible(true);
+        setTitleVisible(true);
+        resetFadeTimer();
+      }
     }
   };
 
@@ -411,6 +407,9 @@ export default function VideoPlayer({
 
       {/* Cover YouTube branding/title bar that appears on hover/pause */}
       <div className={styles.ytTopCover} />
+
+      {/* Hide YouTube's center play/pause button when paused */}
+      <div className={`${styles.ytCenterCover} ${!isPlaying ? styles.active : ''}`} />
 
       {/* Hide end-screen related videos grid */}
       <div className={`${styles.ytEndCover} ${!isPlaying && activeSegment && currentTime >= activeSegment.end - 0.5 ? styles.active : ''}`} />

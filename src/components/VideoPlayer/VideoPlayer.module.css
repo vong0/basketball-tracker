@@ -4,6 +4,7 @@
   flex: 1;
   width: 100%;
   aspect-ratio: 16 / 9;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .fullscreen {
@@ -25,7 +26,7 @@
 }
 
 /* Cover ALL YouTube top chrome — title, share, watch-on-YouTube, channel name */
-/* .ytTopCover {
+.ytTopCover {
   position: absolute;
   top: 0;
   left: 0;
@@ -35,6 +36,27 @@
   z-index: 6;
   pointer-events: none;
 }
+
+/* Cover YouTube's center play/pause button when paused */
+.ytCenterCover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+  background: #000;
+  z-index: 7;
+  pointer-events: none;
+  display: none;
+  border-radius: 50%;
+}
+
+.ytCenterCover.active {
+  display: block;
+}
+
+/* Cover end-screen related videos grid */
 .ytEndCover {
   position: absolute;
   inset: 0;
@@ -43,16 +65,19 @@
   pointer-events: none;
   display: none;
 }
+
 .ytEndCover.active {
   display: block;
-} */
-
+}
 
 .tapZone {
   position: absolute;
   inset: 0;
   cursor: pointer;
   z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .faded {
