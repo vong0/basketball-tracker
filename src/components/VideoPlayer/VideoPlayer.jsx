@@ -20,6 +20,7 @@ export default function VideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [playerReady, setPlayerReady] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [currentRate, setCurrentRate] = useState(1);
   const tickRef = useRef(null);
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
@@ -82,6 +83,7 @@ export default function VideoPlayer({
     const p = ytPlayerRef.current;
     if (!p || !p.setPlaybackRate) return;
     try { p.setPlaybackRate(rate); } catch (e) {}
+    setCurrentRate(rate);
   }, []);
 
   // Tick: poll currentTime + loop or pause at segment end
@@ -336,6 +338,10 @@ export default function VideoPlayer({
           ref={iframeContainerRef}
           className={isMobile ? styles.iframeContainerMobile : styles.iframeContainer}
         />
+
+        {currentRate !== 1 && (
+          <div className={styles.speedBadge}>{currentRate}×</div>
+        )}
 
         {isMobile ? (
           <>
