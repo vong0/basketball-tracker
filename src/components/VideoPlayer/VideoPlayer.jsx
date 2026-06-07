@@ -25,6 +25,7 @@ export default function VideoPlayer({
   const longPressRef = useRef({ timer: null, active: false, side: null });
   const lastTapRef = useRef({ time: 0, side: null });
   const loopRef = useRef(loopSegment);
+  const clickTimerRef = useRef(null);
 
   useEffect(() => { loopRef.current = loopSegment; }, [loopSegment]);
 
@@ -77,6 +78,12 @@ export default function VideoPlayer({
     };
   }, [videoId]);
 
+  const setRate = useCallback((rate) => {
+    const p = ytPlayerRef.current;
+    if (!p || !p.setPlaybackRate) return;
+    try { p.setPlaybackRate(rate); } catch (e) {}
+  }, []);
+
   // Tick: poll currentTime + loop or pause at segment end
   useEffect(() => {
     if (!playerReady) return;
@@ -124,17 +131,17 @@ export default function VideoPlayer({
   }, [segments, setActiveIdx]);
 
   const togglePlay = useCallback(() => {
-    // const p = ytPlayerRef.current;
-    // if (!p) return;
-    // if (activeIdx < 0) { playSegment(0); return; }
-    // if (isPlaying) {
-    //   try { p.pauseVideo(); } catch (e) {}
-    // } else {
-    //   if (activeSegment && currentTime >= activeSegment.end - 0.05) {
-    //     try { p.seekTo(activeSegment.start, true); } catch (e) {}
-    //   }
-    //   try { p.playVideo(); } catch (e) {}
-    // }
+    const p = ytPlayerRef.current;
+    if (!p) return;
+    if (activeIdx < 0) { playSegment(0); return; }
+    if (isPlaying) {
+      try { p.pauseVideo(); } catch (e) {}
+    } else {
+      if (activeSegment && currentTime >= activeSegment.end - 0.05) {
+        try { p.seekTo(activeSegment.start, true); } catch (e) {}
+      }
+      try { p.playVideo(); } catch (e) {}
+    }
   }, [isPlaying, activeIdx, currentTime, activeSegment, playSegment]);
 
   const seekDelta = useCallback((delta) => {
@@ -146,14 +153,6 @@ export default function VideoPlayer({
     try { p.seekTo(nt, true); } catch (e) {}
   }, [activeSegment]);
 
-  const frameStep = useCallback((dir) => { seekDelta(dir * (1 / 30)); }, [seekDelta]);
-
-  const setRate = useCallback((rate) => {
-    const p = ytPlayerRef.current;
-    if (!p || !p.setPlaybackRate) return;
-    try { p.setPlaybackRate(rate); } catch (e) {}
-  }, []);
-
   const navSegment = useCallback((dir) => {
     const cur = activeIdx;
     const next = cur < 0 ? 0 : Math.max(0, Math.min(segments.length - 1, cur + dir));
@@ -164,12 +163,27 @@ export default function VideoPlayer({
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen?.();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen?.();
-      setIsFullscreen(false);
     }
-  }, [setIsFullscreen]);
+  }, []);
+
+  // Debounced single-click — cancelled by double-click (desktop)
+  const handleTapZoneClick = useCallback(() => {
+    if (clickTimerRef.current) return;
+    clickTimerRef.current = setTimeout(() => {
+      clickTimerRef.current = null;
+      togglePlay();
+    }, 250);
+  }, [togglePlay]);
+
+  const handleTapZoneDoubleClick = useCallback(() => {
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+    toggleFullscreen();
+  }, [toggleFullscreen]);
 
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -177,7 +191,7 @@ export default function VideoPlayer({
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, [setIsFullscreen]);
 
-  // Reset speed on blur / tab hidden (prevents stuck 2x or 0.5x)
+  // Reset speed on blur / tab hidden
   useEffect(() => {
     const reset = () => {
       if (speedKeyRef.current.shift || speedKeyRef.current.ctrl) {
@@ -218,8 +232,6 @@ export default function VideoPlayer({
         case ' ': e.preventDefault(); togglePlay(); break;
         case 'ArrowLeft': e.preventDefault(); seekDelta(-1); break;
         case 'ArrowRight': e.preventDefault(); seekDelta(1); break;
-        case ',': e.preventDefault(); frameStep(-1); break;
-        case '.': e.preventDefault(); frameStep(1); break;
         case 'j': case 'J': e.preventDefault(); navSegment(-1); break;
         case 'k': case 'K': e.preventDefault(); navSegment(1); break;
         case 'f': case 'F': e.preventDefault(); toggleFullscreen(); break;
@@ -235,22 +247,20 @@ export default function VideoPlayer({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [isMobile, togglePlay, seekDelta, frameStep, navSegment, toggleFullscreen, setRate]);
+  }, [isMobile, togglePlay, seekDelta, navSegment, toggleFullscreen, setRate]);
 
-  // Mobile fullscreen gestures
-  const onTapZonePointerDown = (e) => {
-    if (!(isMobile && isFullscreen)) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-    const side = x < rect.width / 2 ? 'left' : 'right';
+  // Mobile side-blocker gesture handlers
+  const onSideBlockerPointerDown = (side) => () => {
+    if (!isMobile) return;
     longPressRef.current.timer = setTimeout(() => {
       longPressRef.current.active = true;
       longPressRef.current.side = side;
       setRate(side === 'left' ? 0.5 : 2);
     }, 500);
   };
-  const onTapZonePointerUp = (e) => {
-    if (!(isMobile && isFullscreen)) return;
+
+  const onSideBlockerPointerUp = (side) => () => {
+    if (!isMobile) return;
     if (longPressRef.current.timer) clearTimeout(longPressRef.current.timer);
     if (longPressRef.current.active) {
       longPressRef.current.active = false;
@@ -258,16 +268,13 @@ export default function VideoPlayer({
       setRate(1);
       return;
     }
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX || (e.changedTouches && e.changedTouches[0].clientX)) - rect.left;
-    const side = x < rect.width / 2 ? 'left' : 'right';
     const now = Date.now();
     if (now - lastTapRef.current.time < 300 && lastTapRef.current.side === side) {
       seekDelta(side === 'left' ? -1 : 1);
       lastTapRef.current.time = 0;
     } else {
       lastTapRef.current = { time: now, side };
-      togglePlay();
+      // Single tap on side does nothing (user pauses via center → YT, or via side double-tap is skip)
     }
   };
 
@@ -325,16 +332,45 @@ export default function VideoPlayer({
   return (
     <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
       <div className={styles.videoArea}>
-        <div ref={iframeContainerRef} className={styles.iframeContainer} />
-        {isMobile && isFullscreen && (
+        <div
+          ref={iframeContainerRef}
+          className={isMobile ? styles.iframeContainerMobile : styles.iframeContainer}
+        />
+
+        {isMobile ? (
+          <>
+            {/* Top blocker - kills accidentally going to full Youtube video */}
+            <div className={styles.ytTopBlocker} />
+            <div className={styles.ytBottomBlocker} />
+            {/* Bottom blocker — kills YT seekbar drag/tap */}
+            <div className={styles.ytBottomBlocker} />
+            {/* Left side — gesture zone (double-tap skip, long-press speed). Single tap absorbed. */}
+            <div
+              className={styles.ytLeftBlocker}
+              onPointerDown={onSideBlockerPointerDown('left')}
+              onPointerUp={onSideBlockerPointerUp('left')}
+            />
+            {/* Right side — gesture zone */}
+            <div
+              className={styles.ytRightBlocker}
+              onPointerDown={onSideBlockerPointerDown('right')}
+              onPointerUp={onSideBlockerPointerUp('right')}
+            />
+            {/* Center is open — taps fall through to YT for native play/pause */}
+          </>
+        ) : (
           <div
             className={styles.tapZone}
-            onPointerDown={onTapZonePointerDown}
-            onPointerUp={onTapZonePointerUp}
+            onClick={handleTapZoneClick}
+            onDoubleClick={handleTapZoneDoubleClick}
           />
         )}
+
         {isMobile && isFullscreen && (
-          <button onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }} className={styles.fsExpandBtn}>
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
+            className={styles.fsExpandBtn}
+          >
             ⛶
           </button>
         )}

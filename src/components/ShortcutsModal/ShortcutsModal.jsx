@@ -7,9 +7,8 @@ const desktopShortcuts = [
     items: [
       ['Space', 'Play / pause'],
       ['\u2190 / \u2192', 'Back / forward 1s'],
-      [', / .', 'Frame back / forward'],
-      ['Hold \u21E7', '2\u00d7 speed (while held)'],
-      ['Hold \u2303', '0.5\u00d7 speed (while held)'],
+      ['Hold Shift', '2\u00d7 speed (while held)'],
+      ['Hold Ctrl', '0.5\u00d7 speed (while held)'],
       ['J / K', 'Previous / next segment'],
       ['F', 'Toggle fullscreen']
     ]
@@ -23,7 +22,7 @@ const desktopShortcuts = [
 ];
 
 const mobileGestures = [
-  ['Tap (fullscreen)', 'Play / pause'],
+  ['Tap center', 'Show play / pause'],
   ['Double-tap left', 'Back 1s'],
   ['Double-tap right', 'Forward 1s'],
   ['Long-press left', '0.5\u00d7 speed (while held)'],
@@ -47,7 +46,7 @@ export default function ShortcutsModal({ open, onClose, isMobile }) {
           <div className={styles.list}>
             {mobileGestures.map(([gesture, desc], i) => (
               <div key={i} className={styles.row}>
-                <span className={styles.kbd} style={{ minWidth: 140 }}>{gesture}</span>
+                <span className={styles.kbd}>{gesture}</span>
                 <span className={styles.desc}>{desc}</span>
               </div>
             ))}

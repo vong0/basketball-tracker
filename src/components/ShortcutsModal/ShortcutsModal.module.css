@@ -38,8 +38,9 @@
   font-size: 12px;
   font-weight: 500;
   border: 1px solid var(--border-strong);
-  min-width: 70px;
+  min-width: 110px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .desc {
