@@ -72,7 +72,7 @@ export default function App() {
 
   return (
     <div className={styles.app}>
-      {!isFullscreen && <Banner />}
+      {!isFullscreen && <Banner isMobile={isMobile} />}
 
       <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop}`}>
         <div className={styles.videoWrap}>

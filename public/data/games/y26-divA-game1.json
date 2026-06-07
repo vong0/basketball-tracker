@@ -10,29 +10,40 @@
     "result": "TEST"
   },
   "segments": [
-    {
-      "id": "y26-divA-game1_30_45",
-      "start": 30,
-      "end": 45,
-      "label": "UG(O) matt: test segment 1 - first 15 seconds"
-    },
-    {
-      "id": "y26-divA-game1_60_75",
-      "start": 60,
-      "end": 75,
-      "label": "OB(D) : test segment 2 - middle chunk"
-    },
-    {
-      "id": "y26-divA-game1_120_140",
-      "start": 120,
-      "end": 140,
-      "label": "U(MAN) vong: test segment 3 - longer clip"
-    },
-    {
-      "id": "y26-divA-game1_200_215",
-      "start": 200,
-      "end": 215,
-      "label": "UG(O) matt,vong: test segment 4 - two-man action"
-    }
+    { "id": "s1",  "start": 30,   "end": 45,   "label": "UG(O) matt: drives baseline and kicks for open three. Super dooper long text. george gets caught on screen, opponent free to shoot | UG(O) george,vong: pick and pop for open mid-range jumper" },
+    { "id": "s2",  "start": 50,   "end": 62,   "label": "OB(D) vong: lost rotation on weak side, easy layup" },
+    { "id": "s3",  "start": 70,   "end": 85,   "label": "UG(MAN) george: solid help defense forces tough shot" },
+    { "id": "s4",  "start": 95,   "end": 110,  "label": "O(2-3) opponent runs 2-3 zone, we get stuck on perimeter" },
+    { "id": "s5",  "start": 120,  "end": 138,  "label": "UG(O) matt,vong: pick and roll for an easy layup" },
+    { "id": "s6",  "start": 145,  "end": 158,  "label": "UB(O) george: travel turnover trying to spin baseline" },
+    { "id": "s7",  "start": 165,  "end": 185,  "label": "U(3-2) we switch to 3-2 zone, force shot clock violation" },
+    { "id": "s8",  "start": 195,  "end": 210,  "label": "UG(D) matt: blocked shot at the rim, transition opportunity" },
+    { "id": "s9",  "start": 220,  "end": 235,  "label": "OG(O) opponent: clean cut to the basket for a dunk" },
+    { "id": "s10", "start": 245,  "end": 260,  "label": "UG(O) vong: step-back three off ball screen action" },
+    { "id": "s11", "start": 270,  "end": 285,  "label": "OB(D) matt: weak closeout, opponent buries the corner three" },
+    { "id": "s12", "start": 295,  "end": 312,  "label": "UG(MAN) george,vong: hard hedge forces turnover" },
+    { "id": "s13", "start": 320,  "end": 335,  "label": "UB(D) matt: missed assignment, opponent gets and-1" },
+    { "id": "s14", "start": 345,  "end": 360,  "label": "UG(O) matt: nice handle into floater in the paint" },
+    { "id": "s15", "start": 370,  "end": 388,  "label": "U(2-3) zone defense locks down opponent for full possession" },
+    { "id": "s16", "start": 395,  "end": 410,  "label": "UG(O) george: cuts backdoor for easy layup" },
+    { "id": "s17", "start": 420,  "end": 435,  "label": "OB(O) opponent: turns ball over on offensive foul" },
+    { "id": "s18", "start": 445,  "end": 462,  "label": "UG(O) vong,matt: secondary break, drive and dish for three" },
+    { "id": "s19", "start": 470,  "end": 485,  "label": "UB(O) matt: bad pass intercepted in the half court" },
+    { "id": "s20", "start": 495,  "end": 510,  "label": "UG(D) george: great close-out and contest forces miss" },
+    { "id": "s21", "start": 520,  "end": 535,  "label": "U(MAN) full team rotation snuffs out drive and kick" },
+    { "id": "s22", "start": 545,  "end": 562,  "label": "UG(O) matt: pull-up jumper from elbow over closeout" },
+    { "id": "s23", "start": 570,  "end": 585,  "label": "OG(O) opponent: hits contested fadeaway, tough shot" },
+    { "id": "s24", "start": 595,  "end": 612,  "label": "UG(O) vong: euro step finish through contact" },
+    { "id": "s25", "start": 620,  "end": 638,  "label": "UB(D) george: gets caught on screen, opponent free to shoot" },
+    { "id": "s26", "start": 645,  "end": 660,  "label": "UG(MAN) matt: takes charge in transition, big momentum play" },
+    { "id": "s27", "start": 670,  "end": 685,  "label": "U(3-2) trap on the wing forces opponent into bad pass" },
+    { "id": "s28", "start": 695,  "end": 712,  "label": "UG(O) george,vong: pick and pop for open mid-range jumper" },
+    { "id": "s29", "start": 720,  "end": 735,  "label": "UB(O) matt: forces shot in traffic, no kickout option" },
+    { "id": "s30", "start": 745,  "end": 762,  "label": "UG(D) vong: anticipates pass, deflection leads to fast break" },
+    { "id": "s31", "start": 770,  "end": 785,  "label": "OG(O) opponent: sets back-screen action, clean dunk" },
+    { "id": "s32", "start": 795,  "end": 810,  "label": "UG(O) matt: high pick and roll, finds roller for finish" },
+    { "id": "s33", "start": 820,  "end": 838,  "label": "U(MAN) full team defense holds opponent to one shot, secure rebound" },
+    { "id": "s34", "start": 845,  "end": 860,  "label": "UG(O) george: corner three off skip pass swing-swing" },
+    { "id": "s35", "start": 870,  "end": 885,  "label": "UB(D) matt,vong: communication breakdown, opponent gets dunk" }
   ]
 }

@@ -11,16 +11,30 @@
   z-index: 40;
 }
 
+.bannerMobile {
+  height: 48px;
+  padding: 0 16px;
+  gap: 16px;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+.bannerMobile .brand {
+  gap: 8px;
+}
+
 .wordmark {
   font-family: var(--font-display);
   font-size: 24px;
   letter-spacing: 0.04em;
+}
+
+.bannerMobile .wordmark {
+  font-size: 18px;
 }
 
 .nav {
@@ -41,6 +55,11 @@
   cursor: pointer;
   transition: color 0.15s;
   font-family: inherit;
+}
+
+.bannerMobile .tab {
+  padding: 0 10px;
+  font-size: 13px;
 }
 
 .tab:hover {

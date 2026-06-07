@@ -347,7 +347,6 @@ export default function VideoPlayer({
           <>
             {/* Top blocker - kills accidentally going to full Youtube video */}
             <div className={styles.ytTopBlocker} />
-            <div className={styles.ytBottomBlocker} />
             {/* Bottom blocker — kills YT seekbar drag/tap */}
             <div className={styles.ytBottomBlocker} />
             {/* Left side — gesture zone (double-tap skip, long-press speed). Single tap absorbed. */}

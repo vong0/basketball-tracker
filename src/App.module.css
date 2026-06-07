@@ -20,6 +20,13 @@
   flex-direction: column;
 }
 
+.mainMobile .videoWrap {
+  flex: 0 0 auto;
+  height: 30vh;
+  min-height: 0;
+}
+
+
 .videoWrap {
   flex: 1;
   display: flex;
