@@ -11,7 +11,7 @@ import styles from './App.module.css';
 
 export default function App() {
   const [gameData, setGameData] = useState(null);
-  const [activeIdx, setActiveIdx] = useState(-1);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [loopSegment, setLoopSegment] = useState(true);
