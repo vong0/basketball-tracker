@@ -24,7 +24,6 @@ export default function VideoPlayer({
   const tickRef = useRef(null);
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
-  const lastTapRef = useRef({ time: 0, side: null });
   const clickTimerRef = useRef(null);
   const seekThrottleRef = useRef(0);
   const isDraggingRef = useRef(false);
@@ -333,27 +332,12 @@ export default function VideoPlayer({
     return false;
   }, [isMobile, setRate]);
 
-  const onSideBlockerPointerUp = (side) => () => {
+  const onSideBlockerPointerUp = () => () => {
     if (!isMobile) return;
+    // If long-press was active, end it (resets speed) and don't toggle play.
     if (endLongPress()) return;
-    const now = Date.now();
-    if (now - lastTapRef.current.time < 300 && lastTapRef.current.side === side) {
-      // Double-tap: skip ±1s. Cancel the pending single-tap pause.
-      if (clickTimerRef.current) {
-        clearTimeout(clickTimerRef.current);
-        clickTimerRef.current = null;
-      }
-      seekDelta(side === 'left' ? -1 : 1);
-      lastTapRef.current.time = 0;
-    } else {
-      lastTapRef.current = { time: now, side };
-      // Single tap → pause/play (debounced ~300ms to allow double-tap detection).
-      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-      clickTimerRef.current = setTimeout(() => {
-        clickTimerRef.current = null;
-        togglePlay();
-      }, 300);
-    }
+    // Otherwise, tap → pause/play instantly.
+    togglePlay();
   };
 
   const onSideBlockerPointerCancel = () => endLongPress();
@@ -462,7 +446,7 @@ export default function VideoPlayer({
             <div className={styles.ytTopBlocker} />
             {/* Bottom blocker — kills YT seekbar drag/tap */}
             <div className={styles.ytBottomBlocker} />
-            {/* Left side — gesture zone (double-tap skip, long-press speed). Single tap absorbed. */}
+            {/* Left side — tap = pause/play, long-press = 0.5x speed */}
             <div
               className={styles.ytLeftBlocker}
               onPointerDown={onSideBlockerPointerDown('left')}
@@ -470,7 +454,7 @@ export default function VideoPlayer({
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
-            {/* Right side — gesture zone */}
+            {/* Right side — tap = pause/play, long-press = 2x speed */}
             <div
               className={styles.ytRightBlocker}
               onPointerDown={onSideBlockerPointerDown('right')}

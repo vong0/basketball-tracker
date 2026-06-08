@@ -28,7 +28,7 @@ const mobileGestures = [
   ['Double-tap right', 'Forward 1s'],
   ['Long-press left', '0.5\u00d7 speed (while held)'],
   ['Long-press right', '2\u00d7 speed (while held)'],
-  ['Reel bar', 'Tap or drag to seek']
+  ['Seek bar', 'Tap or drag to seek']
 ];
 
 export default function ShortcutsModal({ open, onClose, isMobile }) {
