@@ -80,9 +80,12 @@ const VideoPlayer = forwardRef(function VideoPlayer({
         mountTarget.appendChild(div);
         // Force iframe to fill the wrapper after YT creates it.
         // YT sets width/height HTML attributes (640x360) that override CSS.
+        // Also force background black so the iframe's UA-default-white
+        // doesn't flash through on mobile during seek/dim transitions.
         const forceSize = () => {
           const iframe = mountTarget.querySelector('iframe');
           if (iframe) {
+            iframe.style.background = '#000';
             if (isMobile) {
               iframe.setAttribute('width', '1920');
               iframe.setAttribute('height', '1080');
@@ -269,13 +272,14 @@ const VideoPlayer = forwardRef(function VideoPlayer({
       wrap.style.transform = 'scale(' + scale + ')';
       wrap.style.left = ((cw - scaledW) / 2) + 'px';
       wrap.style.top = ((ch - scaledH) / 2) + 'px';
-      // Also force iframe size in case YT reset it
+      // Also force iframe size + background in case YT reset them
       const iframe = wrap.querySelector('iframe');
       if (iframe) {
         iframe.setAttribute('width', '1920');
         iframe.setAttribute('height', '1080');
         iframe.style.width = '1920px';
         iframe.style.height = '1080px';
+        iframe.style.background = '#000';
       }
     };
     recompute();

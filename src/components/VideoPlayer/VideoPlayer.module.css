@@ -30,21 +30,36 @@
   pointer-events: none;
 }
 
-/* Mobile: iframe receives center-region taps; side/bottom blockers cover the rest */
+/* Mobile: iframe receives center-region taps; side/bottom blockers cover the rest.
+   Explicit black background to prevent any flash showing through during
+   YT seek/dim/undim transitions. */
 .iframeContainerMobile {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  background: #000;
 }
 
 /* Mobile only: render iframe at 1920x1080 then scale down via JS-set transform.
-   Forces YouTube to serve HD by pretending we're a large player. */
+   Forces YouTube to serve HD by pretending we're a large player.
+   Black background prevents a white flash leaking through during YT
+   seeks (loop fires) and dim/undim - the transform creates a separate
+   compositor layer whose contents are briefly invalidated on mobile. */
 .iframeScaleWrap {
   position: absolute;
   width: 1920px;
   height: 1080px;
   transform-origin: top left;
+  background: #000;
   /* transform/left/top set dynamically by JS */
+}
+
+/* Force iframe element itself to paint black. The UA default for iframe
+   is transparent-but-renders-as-white on mobile WebKit during repaint
+   gaps; an explicit dark background eliminates the flash. */
+.iframeContainer iframe,
+.iframeScaleWrap iframe {
+  background: #000;
 }
 
 .iframeContainer iframe {
