@@ -350,6 +350,7 @@ export default function VideoPlayer({
 
   // Seekbar
   const seekbarRef = useRef(null);
+  const reelRef = useRef(null);
   // Compute new time from pointer event without seeking — for thumb updates
   const computeSeekTime = useCallback((e, ref) => {
     const node = ref?.current || seekbarRef.current;
@@ -400,10 +401,35 @@ export default function VideoPlayer({
     window.addEventListener('pointerup', onUp);
   };
 
+  const handleReelPointerDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDraggingRef.current = true;
+    seekThrottleRef.current = 0;
+    handleSeekbarMove(e, reelRef);
+    const onMove = (ev) => handleSeekbarMove(ev, reelRef);
+    const onUp = (ev) => {
+      const finalTime = computeSeekTime(ev, reelRef);
+      if (finalTime !== null) {
+        setCurrentTime(finalTime);
+        const p = ytPlayerRef.current;
+        if (p && p.seekTo) try { p.seekTo(finalTime, true); } catch (err) {}
+      }
+      isDraggingRef.current = false;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
+
   const segDuration = activeSegment ? activeSegment.end - activeSegment.start : 1;
   const segProgress = activeSegment
     ? Math.max(0, Math.min(1, (currentTime - activeSegment.start) / segDuration))
     : 0;
+
+  const showReel = isMobile && isFullscreen;
+  const showStandardBar = !showReel;
 
   return (
     <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
@@ -462,7 +488,14 @@ export default function VideoPlayer({
         )}
       </div>
 
-      <ControlBar
+      {showReel && activeSegment && (
+        <div ref={reelRef} className={styles.reelSeekbar} onPointerDown={handleReelPointerDown}>
+          <div className={styles.reelSeekbarFill} style={{ width: (segProgress * 100) + '%' }} />
+        </div>
+      )}
+
+      {showStandardBar && (
+        <ControlBar
           isPlaying={isPlaying}
           onTogglePlay={togglePlay}
           segProgress={segProgress}
@@ -472,6 +505,7 @@ export default function VideoPlayer({
           onToggleFullscreen={toggleFullscreen}
           disabled={!activeSegment}
         />
+      )}
     </div>
   );
 }

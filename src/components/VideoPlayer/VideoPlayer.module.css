@@ -71,10 +71,10 @@
    Bottom blocks YT seekbar entirely. */
 .ytBottomBlocker {
   position: absolute;
-  bottom: 0;
+  bottom: 18px;
   left: 0;
   right: 0;
-  height: 70px;
+  height: 52px;
   z-index: 10;
   background: transparent;
   pointer-events: auto;
@@ -137,21 +137,31 @@
   font-family: inherit;
 }
 
+/* Reel-style seekbar — mobile fullscreen only.
+   Full-width tap target at the bottom strip. Replaces ControlBar. */
 .reelSeekbar {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 15;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 18px;
+  background: rgba(0, 0, 0, 0.4);
   cursor: pointer;
   touch-action: none;
+  display: flex;
+  align-items: flex-end;
 }
 
 .reelSeekbarFill {
-  height: 100%;
+  height: 4px;
+  width: 0;
   background: var(--orange);
+  transition: height 0.1s ease;
+}
+
+.reelSeekbar:active .reelSeekbarFill {
+  height: 8px;
 }
 
 .controlBar {
