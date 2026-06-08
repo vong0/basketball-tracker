@@ -114,8 +114,8 @@ export default function VideoPlayer({
       if (!p || !p.getCurrentTime) return;
       const t = p.getCurrentTime();
       setCurrentTime(t);
-      if (activeSegment && t >= activeSegment.end - 0.2) {
-        try { p.seekTo(activeSegment.start, false); } catch (e) {}
+      if (activeSegment && t >= activeSegment.end - 0.2 && t > activeSegment.start + 0.5) {
+        try { p.seekTo(activeSegment.start, true); } catch (e) {}
       }
     }, 100);
     return () => clearInterval(tickRef.current);
