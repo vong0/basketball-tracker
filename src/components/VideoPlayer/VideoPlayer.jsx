@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Modal } from '@mantine/core';
 import { loadYouTubeAPI } from '../../lib/youtube';
+import { formatTime } from '../../lib/time';
+import { parseLabel } from '../../lib/parseLabel';
 import ControlBar from './ControlBar';
 import styles from './VideoPlayer.module.css';
 
@@ -11,6 +14,7 @@ const LOOP_LEAD = 0.2;
 export default function VideoPlayer({
   videoId,
   cutSegments,
+  parsedSegments,
   activeIdx,
   setActiveIdx,
   isFullscreen,
@@ -26,6 +30,7 @@ export default function VideoPlayer({
   const [playerReady, setPlayerReady] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [currentRate, setCurrentRate] = useState(1);
+  const [showInfo, setShowInfo] = useState(false);
   const tickRef = useRef(null);
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
@@ -578,8 +583,30 @@ export default function VideoPlayer({
     ? Math.max(0, Math.min(1, (currentTime - activeSegment.start) / visibleDuration))
     : 0;
 
-  const showReel = isMobile && isFullscreen;
-  const showStandardBar = !showReel;
+  // Mobile fullscreen uses a custom bottom bar (seekbar + fullscreen button)
+  // and a top-right counter pill. Everywhere else uses the standard ControlBar.
+  const useFsMobileChrome = isMobile && isFullscreen;
+  const showStandardBar = !useFsMobileChrome;
+
+  const activeParsed = parsedSegments && activeIdx >= 0
+    ? parsedSegments[activeIdx]
+    : null;
+  const counterDotClass =
+    activeParsed?.quality === 'good'
+      ? styles.dotGood
+      : activeParsed?.quality === 'bad'
+      ? styles.dotBad
+      : styles.dotNeutral;
+
+  const handleOpenInfo = () => {
+    // Pause video when opening the info dialog. Do NOT auto-resume on close;
+    // user un-pauses themselves when ready.
+    const p = ytPlayerRef.current;
+    if (p && p.pauseVideo) {
+      try { p.pauseVideo(); } catch (e) {}
+    }
+    setShowInfo(true);
+  };
 
   return (
     <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
@@ -665,20 +692,32 @@ export default function VideoPlayer({
           />
         )}
 
-        {isMobile && isFullscreen && (
+        {useFsMobileChrome && cutSegments.length > 0 && (
           <button
-            onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
-            className={styles.fsExpandBtn}
+            onClick={(e) => { e.stopPropagation(); handleOpenInfo(); }}
+            className={styles.fsTopCounter}
+            aria-label="Clip info"
           >
-            ⛶
+            <span className={`${styles.fsTopCounterDot} ${counterDotClass}`} />
+            <span>{Math.max(0, activeIdx) + 1}/{cutSegments.length}</span>
           </button>
         )}
       </div>
 
-      {showReel && activeSegment && (
+      {useFsMobileChrome && activeSegment && (
         <div ref={reelRef} className={styles.reelSeekbar} onPointerDown={handleReelPointerDown}>
           <div className={styles.reelSeekbarFill} style={{ width: (segProgress * 100) + '%' }} />
         </div>
+      )}
+
+      {useFsMobileChrome && (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
+          className={styles.fsBottomExpandBtn}
+          aria-label="Exit fullscreen"
+        >
+          ⛶
+        </button>
       )}
 
       {showStandardBar && (
@@ -693,6 +732,82 @@ export default function VideoPlayer({
           disabled={!activeSegment}
         />
       )}
+
+      <Modal
+        opened={showInfo}
+        onClose={() => setShowInfo(false)}
+        title={activeSegment
+          ? `CLIP ${Math.max(0, activeIdx) + 1} / ${cutSegments.length}`
+          : 'CLIP INFO'}
+        centered
+        size="md"
+        classNames={{ title: styles.infoModalTitle }}
+      >
+        {activeSegment && (() => {
+          const parsed = activeParsed || parseLabel(activeSegment.name || '');
+          const dur = activeSegment.end - activeSegment.start;
+          const qLabel = parsed.quality === 'good'
+            ? 'GOOD'
+            : parsed.quality === 'bad'
+            ? 'BAD'
+            : 'NEUTRAL';
+          const qClass = parsed.quality === 'good'
+            ? styles.infoQualityGood
+            : parsed.quality === 'bad'
+            ? styles.infoQualityBad
+            : styles.infoQualityNeutral;
+          return (
+            <div>
+              <div className={styles.infoMetaRow}>
+                <span className={`${styles.infoQualityBadge} ${qClass}`}>{qLabel}</span>
+                <span className={styles.infoTimeRange}>
+                  {formatTime(activeSegment.start)} → {formatTime(activeSegment.end)}
+                  <span className={styles.infoDuration}> · {formatTime(dur)}</span>
+                </span>
+              </div>
+
+              {parsed.actions && parsed.actions.length > 0 && (
+                <div className={styles.infoSection}>
+                  <div className={styles.infoSectionTitle}>ACTIONS</div>
+                  <ul className={styles.infoActionList}>
+                    {parsed.actions.map((a, i) => {
+                      const dotCls = a.quality === 'good'
+                        ? styles.dotGood
+                        : a.quality === 'bad'
+                        ? styles.dotBad
+                        : styles.dotNeutral;
+                      return (
+                        <li key={i} className={styles.infoActionRow}>
+                          <span className={`${styles.infoActionDot} ${dotCls}`} />
+                          <div className={styles.infoActionBody}>
+                            <div className={styles.infoActionHead}>
+                              <span className={styles.infoActionType}>{a.type}</span>
+                              <span className={styles.infoActionTeam}>
+                                {a.team === 'opponent' ? 'OPP' : 'US'}
+                              </span>
+                              {a.players && a.players.length > 0 && (
+                                <span className={styles.infoActionPlayers}>
+                                  {a.players.join(', ')}
+                                </span>
+                              )}
+                            </div>
+                            {a.note && <div className={styles.infoActionNote}>{a.note}</div>}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
+              <div className={styles.infoSection}>
+                <div className={styles.infoSectionTitle}>RAW LABEL</div>
+                <div className={styles.infoRaw}>{activeSegment.name || '(empty)'}</div>
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
     </div>
   );
 }

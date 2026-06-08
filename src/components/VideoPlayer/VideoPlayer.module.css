@@ -213,7 +213,9 @@
   user-select: none;
 }
 
-.fsExpandBtn {
+/* Mobile fullscreen top-right: clip counter pill that opens the info dialog.
+   Reuses the visual weight of the old fsExpandBtn so it reads as a button. */
+.fsTopCounter {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -221,25 +223,43 @@
   background: rgba(0, 0, 0, 0.55);
   border: none;
   color: #fff;
-  width: 40px;
-  height: 40px;
+  height: 36px;
+  padding: 0 12px;
   border-radius: 6px;
-  font-size: 18px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Reel-style seekbar - mobile fullscreen only.
-   Floating translucent pill, lifted off bottom edge for thumb reach. */
+.fsTopCounter:active {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.fsTopCounterDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Mobile fullscreen: thin floating seekbar pill - the original slim
+   reel-seekbar look. Cylindrical (fully rounded). The fullscreen button
+   sits beside it, vertically centered to the seekbar. */
 .reelSeekbar {
   position: absolute;
   bottom: 16px;
   left: 16px;
-  right: 16px;
+  right: 56px;
   z-index: 15;
   height: 16px;
   padding: 6px 8px;
-  border-radius: 8px;
+  border-radius: 999px;
   background: rgba(16, 20, 39, 0.7);
   cursor: pointer;
   touch-action: none;
@@ -259,6 +279,186 @@
 .reelSeekbar:active .reelSeekbarFill {
   height: 6px;
 }
+
+/* Mobile fullscreen: separate floating fullscreen button. Vertically
+   centered against the seekbar's center (seekbar center is at
+   bottom: 16 + 8 = 24px, so button center also at 24px -> button
+   bottom = 24 - 14 = 10px for a 28px button). */
+.fsBottomExpandBtn {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  z-index: 15;
+  background: rgba(16, 20, 39, 0.7);
+  border: none;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.fsBottomExpandBtn:active {
+  background: rgba(16, 20, 39, 0.9);
+}
+
+/* Info dialog */
+.infoModalTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.06em;
+}
+
+.infoMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.infoQualityBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.infoQualityGood {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+}
+
+.infoQualityBad {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--red);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.infoQualityNeutral {
+  background: rgba(156, 163, 175, 0.15);
+  color: var(--gray-dot);
+  border: 1px solid rgba(156, 163, 175, 0.4);
+}
+
+.infoTimeRange {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.infoDuration {
+  color: var(--text-faint);
+}
+
+.infoSection {
+  margin-top: 16px;
+}
+
+.infoSectionTitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--orange);
+  margin-bottom: 10px;
+}
+
+.infoActionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.infoActionRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.infoActionDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.infoActionBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.infoActionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.infoActionType {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--orange);
+  background: rgba(255, 92, 26, 0.12);
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+
+.infoActionTeam {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+}
+
+.infoActionPlayers {
+  color: #fff;
+  font-weight: 600;
+}
+
+.infoActionNote {
+  margin-top: 3px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+.infoRaw {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-faint);
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* Local quality dot classes used by the top counter pill and info dialog
+   action list (mirrors the playlist dot styles so colors stay consistent). */
+.dotGood { background: var(--green); box-shadow: 0 0 6px rgba(74, 222, 128, 0.5); }
+.dotBad { background: var(--red); box-shadow: 0 0 6px rgba(248, 113, 113, 0.5); }
+.dotNeutral { background: var(--gray-dot); }
 
 .controlBar {
   flex-shrink: 0;

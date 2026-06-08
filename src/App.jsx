@@ -82,6 +82,7 @@ export default function App() {
             key={isMobile ? 'mobile' : 'desktop'}
             videoId={videoId}
             cutSegments={cutSegments}
+            parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
             isFullscreen={isFullscreen}

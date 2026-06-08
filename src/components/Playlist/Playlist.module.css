@@ -97,6 +97,10 @@
 .rowActive .rowLabel {
   color: #fff;
   font-weight: 600;
+  /* Active row: show the full label, no 2-line clamp. */
+  -webkit-line-clamp: unset;
+  display: block;
+  overflow: visible;
 }
 
 .rowIndex {
