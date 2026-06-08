@@ -741,6 +741,10 @@ export default function VideoPlayer({
           : 'CLIP INFO'}
         centered
         size="md"
+        // Render inline (not in a body portal) so the modal stays inside the
+        // fullscreen subtree. Otherwise it'd be hidden by the browser when
+        // the video container is fullscreened.
+        withinPortal={false}
         classNames={{ title: styles.infoModalTitle }}
       >
         {activeSegment && (() => {
