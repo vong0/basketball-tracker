@@ -79,6 +79,7 @@ export default function App() {
       <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop}`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
+            key={isMobile ? 'mobile' : 'desktop'}
             videoId={videoId}
             cutSegments={cutSegments}
             activeIdx={activeIdx}

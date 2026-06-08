@@ -3,6 +3,11 @@ import { loadYouTubeAPI } from '../../lib/youtube';
 import ControlBar from './ControlBar';
 import styles from './VideoPlayer.module.css';
 
+// How many seconds before segment.end the loop fires. Used by both the
+// tick-based loop trigger and the seekbar progress rescale so the bar
+// reaches 100% exactly when the loop kicks in.
+const LOOP_LEAD = 0.2;
+
 export default function VideoPlayer({
   videoId,
   cutSegments,
@@ -114,6 +119,7 @@ export default function VideoPlayer({
       cancelled = true;
       if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
         try { ytPlayerRef.current.destroy(); } catch (e) {}
+        ytPlayerRef.current = null;
       }
     };
   }, [videoId]);
@@ -133,7 +139,7 @@ export default function VideoPlayer({
       if (!p || !p.getCurrentTime) return;
       const t = p.getCurrentTime();
       if (!isDraggingRef.current) setCurrentTime(t);
-      if (activeSegment && t >= activeSegment.end - 0.2 && t > activeSegment.start + 0.5) {
+      if (activeSegment && t >= activeSegment.end - LOOP_LEAD && t > activeSegment.start + 0.5) {
         try { p.seekTo(activeSegment.start, true); } catch (e) {}
       }
     }, 100);
@@ -561,9 +567,15 @@ export default function VideoPlayer({
     window.addEventListener('pointerup', onUp);
   };
 
+  // Loop trigger is at end - LOOP_LEAD (see tick effect), so currentTime
+  // never actually reaches end. Scale the bar against the *visible* duration
+  // so progress hits 1.0 exactly when the loop fires.
   const segDuration = activeSegment ? activeSegment.end - activeSegment.start : 1;
+  const visibleDuration = activeSegment
+    ? Math.max(0.01, segDuration - LOOP_LEAD)
+    : 1;
   const segProgress = activeSegment
-    ? Math.max(0, Math.min(1, (currentTime - activeSegment.start) / segDuration))
+    ? Math.max(0, Math.min(1, (currentTime - activeSegment.start) / visibleDuration))
     : 0;
 
   const showReel = isMobile && isFullscreen;
