@@ -20,6 +20,7 @@
   flex: 1;
   min-height: 0;
   background: #000;
+  overflow: hidden;
 }
 
 /* Desktop: tapZone on top captures clicks; iframe ignores pointer events */
@@ -56,6 +57,66 @@
   height: 1080px;
 }
 
+/* Mobile only: wraps the video + neighbor placeholders so we can translate
+   the whole row horizontally for reel-style swipe between segments. */
+.swipeWrap {
+  position: absolute;
+  /* Width = 3 viewports + 2 gaps. videoSlot is the middle child; when dx=0
+     the wrapper is shifted so the middle aligns with the container. */
+  top: 0;
+  bottom: 0;
+  left: calc(-100% - 24px);  /* shift left by one viewport + one gap */
+  width: calc(300% + 48px);  /* three viewports + two gaps */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 24px;
+  will-change: transform;
+}
+
+.videoSlot {
+  position: relative;
+  flex: 0 0 calc(33.333% - 16px);  /* one viewport, accounting for gap distribution */
+  height: 100%;
+}
+
+.neighborSlot {
+  position: relative;
+  flex: 0 0 calc(33.333% - 16px);
+  height: 100%;
+  background: #0a0a0a;
+}
+
+.neighborInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+  border: 1px solid var(--border);
+}
+
+/* Pin labels to the inner edge of each neighbor (closest to current video).
+   This makes the label visible the moment the neighbor starts to slide in,
+   instead of being centered and only readable after a full swipe. */
+.neighborPrev .neighborInner {
+  justify-content: flex-end;
+  padding-right: 24px;
+}
+
+.neighborNext .neighborInner {
+  justify-content: flex-start;
+  padding-left: 24px;
+}
+
+.neighborLabel {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .tapZone {
   position: absolute;
   inset: 0;
@@ -67,8 +128,8 @@
   touch-action: manipulation;
 }
 
-/* Mobile regional blockers — sides absorb single taps, handle gestures.
-   Bottom blocks YT seekbar entirely. */
+/* Mobile regional blockers - sides absorb taps + handle gestures.
+   Bottom kills YT seekbar entirely. Top kills "Watch on YouTube" link. */
 .ytBottomBlocker {
   position: absolute;
   bottom: 0;
@@ -121,8 +182,8 @@
   user-select: none;
 }
 
-/* Lower corners — fill the dead strip beside the YT-passthrough gap.
-   Bottom 50-130px (above the seekbar blocker, below the main side blockers).
+/* Lower corners - fill the dead strip beside the YT-passthrough gap.
+   Bottom 50-130px (above seekbar blocker, below main side blockers).
    35% wide each, leaving a 30% gap in the center for YT passthrough. */
 .ytLowerLeftBlocker {
   position: absolute;
@@ -168,7 +229,7 @@
   font-family: inherit;
 }
 
-/* Reel-style seekbar — mobile fullscreen only.
+/* Reel-style seekbar - mobile fullscreen only.
    Floating translucent pill, lifted off bottom edge for thumb reach. */
 .reelSeekbar {
   position: absolute;

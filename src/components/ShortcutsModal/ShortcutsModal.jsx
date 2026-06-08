@@ -24,6 +24,7 @@ const desktopShortcuts = [
 const mobileGestures = [
   ['Tap bottom-center', 'Clear YouTube dim overlay'],
   ['Tap anywhere else', 'Play / pause'],
+  ['Swipe left / right', 'Next / previous clip'],
   ['Long-press left', '0.5\u00d7 speed (while held)'],
   ['Long-press right', '2\u00d7 speed (while held)'],
   ['Seek bar', 'Tap or drag to seek']

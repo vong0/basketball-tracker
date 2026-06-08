@@ -27,8 +27,26 @@ export default function VideoPlayer({
   const clickTimerRef = useRef(null);
   const seekThrottleRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const swipeWrapRef = useRef(null);
+  const swipeStateRef = useRef({
+    pointerDown: false,
+    startX: 0,
+    startY: 0,
+    dx: 0,
+    swiping: false,
+    side: null,
+  });
 
   const activeSegment = activeIdx >= 0 ? cutSegments[activeIdx] : null;
+
+  // Swipe gesture tuning (mobile only)
+  const SWIPE_COMMIT_PX = 80;        // horizontal travel to commit a segment change
+  const SWIPE_MOVE_THRESHOLD_PX = 10; // movement that promotes pointerdown -> swipe
+  const SWIPE_EDGE_RESIST = 0.15;    // drag follows finger at 15% past first/last
+  const SWIPE_EDGE_CAP_PX = 60;      // hard cap on edge drag distance
+  const SWIPE_SNAP_MS = 250;         // snap-back animation duration
+  const SWIPE_COMMIT_MS = 280;       // slide-off animation duration on commit
+  const SWIPE_NEIGHBOR_GAP_PX = 24;  // gap between video and neighbor placeholder
 
   // YouTube setup
   useEffect(() => {
@@ -62,7 +80,7 @@ export default function VideoPlayer({
             }
           }
         };
-        // Run now and after a tick — YT may set attrs after onReady
+        // Run now and after a tick - YT may set attrs after onReady
         forceSize();
         setTimeout(forceSize, 0);
         setTimeout(forceSize, 300);
@@ -178,7 +196,7 @@ export default function VideoPlayer({
     }
   }, []);
 
-  // Debounced single-click — cancelled by double-click (desktop)
+  // Debounced single-click - cancelled by double-click (desktop)
   const handleTapZoneClick = useCallback(() => {
     if (clickTimerRef.current) return;
     clickTimerRef.current = setTimeout(() => {
@@ -236,7 +254,7 @@ export default function VideoPlayer({
     if (iframeContainerRef.current) ro.observe(iframeContainerRef.current);
     window.addEventListener('resize', recompute);
     document.addEventListener('fullscreenchange', recompute);
-    // Multiple recomputes — fullscreen + iframe load both settle late
+    // Multiple recomputes - fullscreen + iframe load both settle late
     const t1 = setTimeout(recompute, 100);
     const t2 = setTimeout(recompute, 500);
     const t3 = setTimeout(recompute, 1000);
@@ -257,9 +275,13 @@ export default function VideoPlayer({
         speedKeyRef.current = { shift: false, ctrl: false };
         setRate(1);
       }
+      if (longPressRef.current.timer) {
+        clearTimeout(longPressRef.current.timer);
+        longPressRef.current.timer = null;
+      }
       if (longPressRef.current.active) {
-        if (longPressRef.current.timer) clearTimeout(longPressRef.current.timer);
-        longPressRef.current = { timer: null, active: false, side: null };
+        longPressRef.current.active = false;
+        longPressRef.current.side = null;
         setRate(1);
       }
     };
@@ -309,8 +331,20 @@ export default function VideoPlayer({
   }, [isMobile, togglePlay, seekDelta, navSegment, toggleFullscreen, setRate]);
 
   // Mobile side-blocker gesture handlers
-  const onSideBlockerPointerDown = (side) => () => {
+  const onSideBlockerPointerDown = (side) => (e) => {
     if (!isMobile) return;
+    // Record swipe start
+    const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0]?.clientX) || 0;
+    const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0]?.clientY) || 0;
+    swipeStateRef.current = {
+      pointerDown: true,
+      startX: clientX,
+      startY: clientY,
+      dx: 0,
+      swiping: false,
+      side,
+    };
+    // Long-press timer (cancelled if swipe is detected)
     longPressRef.current.timer = setTimeout(() => {
       longPressRef.current.active = true;
       longPressRef.current.side = side;
@@ -332,20 +366,130 @@ export default function VideoPlayer({
     return false;
   }, [isMobile, setRate]);
 
+  // Apply transform to swipe wrapper (no transition during drag)
+  const setSwipeOffset = (dx, animated) => {
+    const wrap = swipeWrapRef.current;
+    if (!wrap) return;
+    wrap.style.transition = animated ? `transform ${SWIPE_SNAP_MS}ms ease-out` : 'none';
+    wrap.style.transform = `translate3d(${dx}px, 0, 0)`;
+  };
+
+  // Commit a swipe: animate the wrapper fully off-screen so the neighbor
+  // placeholder slides into view. setActiveIdx fires immediately so YT seeks
+  // in parallel with the slide animation; by the time the wrapper resets,
+  // the new segment is loaded and visible.
+  const commitSwipe = useCallback((dir) => {
+    const cur = activeIdx;
+    const next = cur + dir;
+    if (next < 0 || next >= cutSegments.length) {
+      // Edge - snap back (resistance already capped how far we dragged)
+      setSwipeOffset(0, true);
+      return;
+    }
+    const wrap = swipeWrapRef.current;
+    if (!wrap) {
+      setActiveIdx(next);
+      return;
+    }
+    // Slide the wrapper fully off in the direction of the swipe.
+    // dir = +1 -> next clip -> wrapper slides LEFT (negative dx).
+    // dir = -1 -> prev clip -> wrapper slides RIGHT (positive dx).
+    const containerW = wrap.parentElement?.clientWidth || window.innerWidth;
+    const slideDistance = containerW + SWIPE_NEIGHBOR_GAP_PX;
+    const targetDx = dir > 0 ? -slideDistance : slideDistance;
+    wrap.style.transition = `transform ${SWIPE_COMMIT_MS}ms ease-out`;
+    wrap.style.transform = `translate3d(${targetDx}px, 0, 0)`;
+    // Commit segment change IMMEDIATELY so YT starts seeking in parallel
+    // with the slide-off animation. By the time the wrapper resets, the
+    // new segment is loaded and visible.
+    setActiveIdx(next);
+    // After the slide finishes, reset transform without animation.
+    setTimeout(() => {
+      const w = swipeWrapRef.current;
+      if (w) {
+        w.style.transition = 'none';
+        w.style.transform = 'translate3d(0, 0, 0)';
+      }
+    }, SWIPE_COMMIT_MS);
+  }, [activeIdx, cutSegments.length, setActiveIdx]);
+
+  const onSideBlockerPointerMove = (e) => {
+    if (!isMobile) return;
+    const s = swipeStateRef.current;
+    if (!s.pointerDown) return;
+    const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0]?.clientX);
+    const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0]?.clientY);
+    if (clientX === undefined || clientY === undefined) return;
+    const rawDx = clientX - s.startX;
+    const rawDy = clientY - s.startY;
+    // Promote to swipe only if horizontal movement dominates and exceeds threshold
+    if (!s.swiping) {
+      if (Math.abs(rawDx) > SWIPE_MOVE_THRESHOLD_PX && Math.abs(rawDx) > Math.abs(rawDy)) {
+        s.swiping = true;
+        // Cancel long-press timer so it doesn't fire mid-swipe
+        if (longPressRef.current.timer) {
+          clearTimeout(longPressRef.current.timer);
+          longPressRef.current.timer = null;
+        }
+      } else {
+        return;
+      }
+    }
+    // Apply edge resistance + cap: at first clip dragging right resists,
+    // at last clip dragging left resists. Past the cap, motion stops entirely.
+    let dx = rawDx;
+    const atStart = activeIdx <= 0;
+    const atEnd = activeIdx >= cutSegments.length - 1;
+    if (atStart && dx > 0) {
+      dx = Math.min(dx * SWIPE_EDGE_RESIST, SWIPE_EDGE_CAP_PX);
+    }
+    if (atEnd && dx < 0) {
+      dx = Math.max(dx * SWIPE_EDGE_RESIST, -SWIPE_EDGE_CAP_PX);
+    }
+    s.dx = dx;
+    setSwipeOffset(dx, false);
+  };
+
   const onSideBlockerPointerUp = () => {
     if (!isMobile) return;
-    // If long-press was active, end it (resets speed) and don't toggle play.
+    const s = swipeStateRef.current;
+    const wasSwiping = s.swiping;
+    const dx = s.dx;
+    // Reset swipe state
+    swipeStateRef.current = { pointerDown: false, startX: 0, startY: 0, dx: 0, swiping: false, side: null };
+
+    // 1) Swipe path
+    if (wasSwiping) {
+      // Long-press timer was already cancelled when swipe started
+      if (Math.abs(dx) > SWIPE_COMMIT_PX) {
+        // dx > 0 -> finger moved right -> previous segment (dir = -1)
+        // dx < 0 -> finger moved left -> next segment (dir = +1)
+        commitSwipe(dx > 0 ? -1 : 1);
+      } else {
+        setSwipeOffset(0, true);
+      }
+      return;
+    }
+    // 2) Long-press path: end speed boost, don't toggle play
     if (endLongPress()) return;
-    // Otherwise, tap → pause/play instantly.
+    // 3) Tap path: pause/play
     togglePlay();
   };
 
-  const onSideBlockerPointerCancel = () => endLongPress();
+  const onSideBlockerPointerCancel = () => {
+    // Snap back if swiping was in progress
+    const s = swipeStateRef.current;
+    if (s.swiping) {
+      setSwipeOffset(0, true);
+    }
+    swipeStateRef.current = { pointerDown: false, startX: 0, startY: 0, dx: 0, swiping: false, side: null };
+    endLongPress();
+  };
 
   // Seekbar
   const seekbarRef = useRef(null);
   const reelRef = useRef(null);
-  // Compute new time from pointer event without seeking — for thumb updates
+  // Compute new time from pointer event without seeking - for thumb updates
   const computeSeekTime = useCallback((e, ref) => {
     const node = ref?.current || seekbarRef.current;
     if (!node || !activeSegment) return null;
@@ -358,7 +502,7 @@ export default function VideoPlayer({
     return activeSegment.start + pct * duration;
   }, [activeSegment]);
 
-  // Throttled seek — visual thumb is always immediate, YT seekTo is rate-limited
+  // Throttled seek - visual thumb is always immediate, YT seekTo is rate-limited
   const handleSeekbarMove = useCallback((e, ref) => {
     const newTime = computeSeekTime(e, ref);
     if (newTime === null) return;
@@ -429,8 +573,26 @@ export default function VideoPlayer({
     <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
       <div className={styles.videoArea}>
         {isMobile ? (
-          <div ref={iframeContainerRef} className={styles.iframeContainerMobile}>
-            <div ref={iframeScaleWrapRef} className={styles.iframeScaleWrap} />
+          <div ref={swipeWrapRef} className={styles.swipeWrap}>
+            <div className={styles.neighborSlot + ' ' + styles.neighborPrev} aria-hidden="true">
+              <div className={styles.neighborInner}>
+                {activeIdx > 0 && (
+                  <div className={styles.neighborLabel}>← Prev Clip</div>
+                )}
+              </div>
+            </div>
+            <div className={styles.videoSlot}>
+              <div ref={iframeContainerRef} className={styles.iframeContainerMobile}>
+                <div ref={iframeScaleWrapRef} className={styles.iframeScaleWrap} />
+              </div>
+            </div>
+            <div className={styles.neighborSlot + ' ' + styles.neighborNext} aria-hidden="true">
+              <div className={styles.neighborInner}>
+                {activeIdx < cutSegments.length - 1 && (
+                  <div className={styles.neighborLabel}>Next clip →</div>
+                )}
+              </div>
+            </div>
           </div>
         ) : (
           <div ref={iframeContainerRef} className={styles.iframeContainer} />
@@ -444,28 +606,31 @@ export default function VideoPlayer({
           <>
             {/* Top blocker - kills accidentally going to full Youtube video */}
             <div className={styles.ytTopBlocker} />
-            {/* Bottom blocker — kills YT seekbar drag/tap */}
+            {/* Bottom blocker - kills YT seekbar drag/tap */}
             <div className={styles.ytBottomBlocker} />
-            {/* Left side — tap = pause/play, long-press = 0.5x speed */}
+            {/* Left side - tap = pause/play, long-press = 0.5x speed, swipe = nav */}
             <div
               className={styles.ytLeftBlocker}
               onPointerDown={onSideBlockerPointerDown('left')}
+              onPointerMove={onSideBlockerPointerMove}
               onPointerUp={onSideBlockerPointerUp}
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
-            {/* Right side — tap = pause/play, long-press = 2x speed */}
+            {/* Right side - tap = pause/play, long-press = 2x speed, swipe = nav */}
             <div
               className={styles.ytRightBlocker}
               onPointerDown={onSideBlockerPointerDown('right')}
+              onPointerMove={onSideBlockerPointerMove}
               onPointerUp={onSideBlockerPointerUp}
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
-            {/* Lower corners — fill bottom 50-130px on left/right 35%, leaving center 30% gap for YT passthrough */}
+            {/* Lower corners - fill bottom 50-130px on left/right 35%, leaving center 30% gap for YT passthrough */}
             <div
               className={styles.ytLowerLeftBlocker}
               onPointerDown={onSideBlockerPointerDown('left')}
+              onPointerMove={onSideBlockerPointerMove}
               onPointerUp={onSideBlockerPointerUp}
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
@@ -473,11 +638,12 @@ export default function VideoPlayer({
             <div
               className={styles.ytLowerRightBlocker}
               onPointerDown={onSideBlockerPointerDown('right')}
+              onPointerMove={onSideBlockerPointerMove}
               onPointerUp={onSideBlockerPointerUp}
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
-            {/* Bottom-center 30% × 80px is uncovered → YT passthrough for dim/undim */}
+            {/* Bottom-center 30% x 80px is uncovered -> YT passthrough for dim/undim */}
           </>
         ) : (
           <div
