@@ -26,6 +26,8 @@ export default function VideoPlayer({
   const longPressRef = useRef({ timer: null, active: false, side: null });
   const lastTapRef = useRef({ time: 0, side: null });
   const clickTimerRef = useRef(null);
+  const seekThrottleRef = useRef(0);
+  const isDraggingRef = useRef(false);
 
   const activeSegment = activeIdx >= 0 ? cutSegments[activeIdx] : null;
 
@@ -113,7 +115,7 @@ export default function VideoPlayer({
       const p = ytPlayerRef.current;
       if (!p || !p.getCurrentTime) return;
       const t = p.getCurrentTime();
-      setCurrentTime(t);
+      if (!isDraggingRef.current) setCurrentTime(t);
       if (activeSegment && t >= activeSegment.end - 0.2 && t > activeSegment.start + 0.5) {
         try { p.seekTo(activeSegment.start, true); } catch (e) {}
       }
@@ -348,40 +350,49 @@ export default function VideoPlayer({
 
   // Seekbar
   const seekbarRef = useRef(null);
-  const reelRef = useRef(null);
-  const handleSeekbarMove = useCallback((e, ref) => {
+  // Compute new time from pointer event without seeking — for thumb updates
+  const computeSeekTime = useCallback((e, ref) => {
     const node = ref?.current || seekbarRef.current;
-    if (!node || !activeSegment) return;
+    if (!node || !activeSegment) return null;
     const rect = node.getBoundingClientRect();
-    const x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX)) - rect.left;
+    const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0]?.clientX);
+    if (clientX === undefined) return null;
+    const x = clientX - rect.left;
     const pct = Math.max(0, Math.min(1, x / rect.width));
     const duration = activeSegment.end - activeSegment.start;
-    const newTime = activeSegment.start + pct * duration;
-    const p = ytPlayerRef.current;
-    if (p && p.seekTo) try { p.seekTo(newTime, true); } catch (err) {}
-    setCurrentTime(newTime);
+    return activeSegment.start + pct * duration;
   }, [activeSegment]);
+
+  // Throttled seek — visual thumb is always immediate, YT seekTo is rate-limited
+  const handleSeekbarMove = useCallback((e, ref) => {
+    const newTime = computeSeekTime(e, ref);
+    if (newTime === null) return;
+    setCurrentTime(newTime); // immediate visual update
+    const now = performance.now();
+    if (now - seekThrottleRef.current >= 50) {
+      seekThrottleRef.current = now;
+      const p = ytPlayerRef.current;
+      if (p && p.seekTo) try { p.seekTo(newTime, true); } catch (err) {}
+    }
+  }, [computeSeekTime]);
 
   const handleSeekbarPointerDown = (e) => {
     e.preventDefault();
     setIsDragging(true);
+    isDraggingRef.current = true;
+    seekThrottleRef.current = 0; // force first seek to fire immediately
     handleSeekbarMove(e, seekbarRef);
     const onMove = (ev) => handleSeekbarMove(ev, seekbarRef);
-    const onUp = () => {
+    const onUp = (ev) => {
+      // Final seek to exact landing position (un-throttled)
+      const finalTime = computeSeekTime(ev, seekbarRef);
+      if (finalTime !== null) {
+        setCurrentTime(finalTime);
+        const p = ytPlayerRef.current;
+        if (p && p.seekTo) try { p.seekTo(finalTime, true); } catch (err) {}
+      }
+      isDraggingRef.current = false;
       setIsDragging(false);
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  };
-
-  const handleReelPointerDown = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleSeekbarMove(e, reelRef);
-    const onMove = (ev) => handleSeekbarMove(ev, reelRef);
-    const onUp = () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
@@ -393,9 +404,6 @@ export default function VideoPlayer({
   const segProgress = activeSegment
     ? Math.max(0, Math.min(1, (currentTime - activeSegment.start) / segDuration))
     : 0;
-
-  const showReel = isMobile && isFullscreen;
-  const showStandardBar = !showReel;
 
   return (
     <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
@@ -454,14 +462,7 @@ export default function VideoPlayer({
         )}
       </div>
 
-      {showReel && activeSegment && (
-        <div ref={reelRef} className={styles.reelSeekbar} onPointerDown={handleReelPointerDown}>
-          <div className={styles.reelSeekbarFill} style={{ width: (segProgress * 100) + '%' }} />
-        </div>
-      )}
-
-      {showStandardBar && (
-        <ControlBar
+      <ControlBar
           isPlaying={isPlaying}
           onTogglePlay={togglePlay}
           segProgress={segProgress}
@@ -471,7 +472,6 @@ export default function VideoPlayer({
           onToggleFullscreen={toggleFullscreen}
           disabled={!activeSegment}
         />
-      )}
     </div>
   );
 }
