@@ -96,9 +96,9 @@
 .ytLeftBlocker {
   position: absolute;
   top: 0;
-  bottom: 50px;
+  bottom: 130px;
   left: 0;
-  width: 40%;
+  width: 50%;
   z-index: 10;
   background: transparent;
   pointer-events: auto;
@@ -110,9 +110,40 @@
 .ytRightBlocker {
   position: absolute;
   top: 0;
+  bottom: 130px;
+  right: 0;
+  width: 50%;
+  z-index: 10;
+  background: transparent;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+}
+
+/* Lower corners — fill the dead strip beside the YT-passthrough gap.
+   Bottom 50-130px (above the seekbar blocker, below the main side blockers).
+   35% wide each, leaving a 30% gap in the center for YT passthrough. */
+.ytLowerLeftBlocker {
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  width: 35%;
+  height: 80px;
+  z-index: 10;
+  background: transparent;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+}
+
+.ytLowerRightBlocker {
+  position: absolute;
   bottom: 50px;
   right: 0;
-  width: 40%;
+  width: 35%;
+  height: 80px;
   z-index: 10;
   background: transparent;
   pointer-events: auto;

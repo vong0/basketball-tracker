@@ -332,7 +332,7 @@ export default function VideoPlayer({
     return false;
   }, [isMobile, setRate]);
 
-  const onSideBlockerPointerUp = () => () => {
+  const onSideBlockerPointerUp = () => {
     if (!isMobile) return;
     // If long-press was active, end it (resets speed) and don't toggle play.
     if (endLongPress()) return;
@@ -450,7 +450,7 @@ export default function VideoPlayer({
             <div
               className={styles.ytLeftBlocker}
               onPointerDown={onSideBlockerPointerDown('left')}
-              onPointerUp={onSideBlockerPointerUp('left')}
+              onPointerUp={onSideBlockerPointerUp}
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
@@ -458,11 +458,26 @@ export default function VideoPlayer({
             <div
               className={styles.ytRightBlocker}
               onPointerDown={onSideBlockerPointerDown('right')}
-              onPointerUp={onSideBlockerPointerUp('right')}
+              onPointerUp={onSideBlockerPointerUp}
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
-            {/* Center is open — taps fall through to YT for native play/pause */}
+            {/* Lower corners — fill bottom 50-130px on left/right 35%, leaving center 30% gap for YT passthrough */}
+            <div
+              className={styles.ytLowerLeftBlocker}
+              onPointerDown={onSideBlockerPointerDown('left')}
+              onPointerUp={onSideBlockerPointerUp}
+              onPointerCancel={onSideBlockerPointerCancel}
+              onPointerLeave={onSideBlockerPointerCancel}
+            />
+            <div
+              className={styles.ytLowerRightBlocker}
+              onPointerDown={onSideBlockerPointerDown('right')}
+              onPointerUp={onSideBlockerPointerUp}
+              onPointerCancel={onSideBlockerPointerCancel}
+              onPointerLeave={onSideBlockerPointerCancel}
+            />
+            {/* Bottom-center 30% × 80px is uncovered → YT passthrough for dim/undim */}
           </>
         ) : (
           <div

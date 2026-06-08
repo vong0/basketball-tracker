@@ -23,7 +23,8 @@
 }
 
 .row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 150px 1fr;
   align-items: center;
   gap: 12px;
 }
@@ -38,9 +39,10 @@
   font-size: 12px;
   font-weight: 500;
   border: 1px solid var(--border-strong);
-  min-width: 110px;
   text-align: center;
-  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .desc {
