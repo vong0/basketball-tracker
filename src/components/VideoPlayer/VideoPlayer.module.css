@@ -33,12 +33,27 @@
 .iframeContainerMobile {
   position: absolute;
   inset: 0;
+  overflow: hidden;
 }
 
-.iframeContainer iframe,
-.iframeContainerMobile iframe {
+/* Mobile only: render iframe at 1920x1080 then scale down via JS-set transform.
+   Forces YouTube to serve HD by pretending we're a large player. */
+.iframeScaleWrap {
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  /* transform/left/top set dynamically by JS */
+}
+
+.iframeContainer iframe {
   width: 100%;
   height: 100%;
+}
+
+.iframeScaleWrap iframe {
+  width: 1920px;
+  height: 1080px;
 }
 
 .tapZone {

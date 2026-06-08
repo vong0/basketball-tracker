@@ -15,6 +15,7 @@ export default function VideoPlayer({
   const ytPlayerRef = useRef(null);
   const containerRef = useRef(null);
   const iframeContainerRef = useRef(null);
+  const iframeScaleWrapRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [playerReady, setPlayerReady] = useState(false);
@@ -36,9 +37,34 @@ export default function VideoPlayer({
       if (cancelled) return;
       const div = document.createElement('div');
       div.id = 'yt-player-' + Math.random().toString(36).slice(2);
-      if (iframeContainerRef.current) {
-        iframeContainerRef.current.innerHTML = '';
-        iframeContainerRef.current.appendChild(div);
+      // On mobile, mount inside the scale wrapper so the 1920x1080 iframe
+      // gets scaled. On desktop, mount directly in the container.
+      const mountTarget = (isMobile && iframeScaleWrapRef.current)
+        ? iframeScaleWrapRef.current
+        : iframeContainerRef.current;
+      if (mountTarget) {
+        mountTarget.innerHTML = '';
+        mountTarget.appendChild(div);
+        // Force iframe to fill the wrapper after YT creates it.
+        // YT sets width/height HTML attributes (640x360) that override CSS.
+        const forceSize = () => {
+          const iframe = mountTarget.querySelector('iframe');
+          if (iframe) {
+            if (isMobile) {
+              iframe.setAttribute('width', '1920');
+              iframe.setAttribute('height', '1080');
+              iframe.style.width = '1920px';
+              iframe.style.height = '1080px';
+            } else {
+              iframe.style.width = '100%';
+              iframe.style.height = '100%';
+            }
+          }
+        };
+        // Run now and after a tick — YT may set attrs after onReady
+        forceSize();
+        setTimeout(forceSize, 0);
+        setTimeout(forceSize, 300);
       }
       ytPlayerRef.current = new YT.Player(div.id, {
         videoId,
@@ -54,12 +80,10 @@ export default function VideoPlayer({
         events: {
           onReady: (e) => {
             setPlayerReady(true);
-            try { e.target.setPlaybackQuality('hd1080'); } catch (err) {}
           },
           onStateChange: (e) => {
             if (e.data === 1) {
               setIsPlaying(true);
-              try { ytPlayerRef.current?.setPlaybackQuality('hd1080'); } catch (err) {}
             } else if (e.data === 2 || e.data === 0) {
               setIsPlaying(false);
             }
@@ -90,8 +114,8 @@ export default function VideoPlayer({
       if (!p || !p.getCurrentTime) return;
       const t = p.getCurrentTime();
       setCurrentTime(t);
-      if (activeSegment && t >= activeSegment.end - 0.05) {
-        try { p.seekTo(activeSegment.start, true); } catch (e) {}
+      if (activeSegment && t >= activeSegment.end - 0.2) {
+        try { p.seekTo(activeSegment.start, false); } catch (e) {}
       }
     }, 100);
     return () => clearInterval(tickRef.current);
@@ -175,6 +199,55 @@ export default function VideoPlayer({
     document.addEventListener('fullscreenchange', onFsChange);
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, [setIsFullscreen]);
+
+  // Mobile only: scale the 1920x1080 iframe to COVER the container.
+  // Tricks YouTube into serving HD because it sees a "large" player,
+  // and crops overflow so video fills edge-to-edge.
+  useEffect(() => {
+    if (!isMobile) return;
+    const recompute = () => {
+      const wrap = iframeScaleWrapRef.current;
+      const container = iframeContainerRef.current;
+      if (!wrap || !container) return;
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      if (cw === 0 || ch === 0) return;
+      // COVER: pick the LARGER scale so iframe fills container in both axes
+      const scale = Math.max(cw / 1920, ch / 1080);
+      const scaledW = 1920 * scale;
+      const scaledH = 1080 * scale;
+      // Center: with cover, scaledW >= cw and scaledH >= ch, so offsets
+      // are <= 0, shifting the wrapper to center the overflow.
+      wrap.style.transform = 'scale(' + scale + ')';
+      wrap.style.left = ((cw - scaledW) / 2) + 'px';
+      wrap.style.top = ((ch - scaledH) / 2) + 'px';
+      // Also force iframe size in case YT reset it
+      const iframe = wrap.querySelector('iframe');
+      if (iframe) {
+        iframe.setAttribute('width', '1920');
+        iframe.setAttribute('height', '1080');
+        iframe.style.width = '1920px';
+        iframe.style.height = '1080px';
+      }
+    };
+    recompute();
+    const ro = new ResizeObserver(recompute);
+    if (iframeContainerRef.current) ro.observe(iframeContainerRef.current);
+    window.addEventListener('resize', recompute);
+    document.addEventListener('fullscreenchange', recompute);
+    // Multiple recomputes — fullscreen + iframe load both settle late
+    const t1 = setTimeout(recompute, 100);
+    const t2 = setTimeout(recompute, 500);
+    const t3 = setTimeout(recompute, 1000);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', recompute);
+      document.removeEventListener('fullscreenchange', recompute);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [isMobile, isFullscreen, playerReady]);
 
   // Reset speed on blur / tab hidden
   useEffect(() => {
@@ -327,10 +400,13 @@ export default function VideoPlayer({
   return (
     <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
       <div className={styles.videoArea}>
-        <div
-          ref={iframeContainerRef}
-          className={isMobile ? styles.iframeContainerMobile : styles.iframeContainer}
-        />
+        {isMobile ? (
+          <div ref={iframeContainerRef} className={styles.iframeContainerMobile}>
+            <div ref={iframeScaleWrapRef} className={styles.iframeScaleWrap} />
+          </div>
+        ) : (
+          <div ref={iframeContainerRef} className={styles.iframeContainer} />
+        )}
 
         {currentRate !== 1 && (
           <div className={styles.speedBadge}>{currentRate}×</div>
