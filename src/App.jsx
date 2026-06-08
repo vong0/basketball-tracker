@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Loader, Center } from '@mantine/core';
+import JSON5 from 'json5';
 import Banner from './components/Banner/Banner';
 import VideoPlayer from './components/VideoPlayer/VideoPlayer';
 import Playlist from './components/Playlist/Playlist';
@@ -14,33 +15,34 @@ export default function App() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [loopSegment, setLoopSegment] = useState(true);
   const [isMobile, setIsMobile] = useState(isMobileDevice());
 
   useEffect(() => {
     fetch('./data/games/y26-divA-game1.json')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(r => r.ok ? r.text() : Promise.reject(r.status))
+      .then(text => {
+        try {
+          return JSON.parse(text);
+        } catch {
+          return JSON5.parse(text);
+        }
+      })
       .then(setGameData)
       .catch(err => {
         console.warn('Using demo data:', err);
         setGameData({
-          schemaVersion: 1,
           game: {
-            id: 'demo-game',
-            date: '2026-06-06',
-            opponent: 'Demo',
-            youtubeUrl: 'https://www.youtube.com/watch?v=yqoCezBgPdk',
-            result: 'DEMO'
+            youtubeUrl: 'https://www.youtube.com/watch?v=yqoCezBgPdk'
           },
-          segments: [
-            { id: 's1', start: 30, end: 45, label: 'UG(O) matt: drives and kicks for open three' },
-            { id: 's2', start: 60, end: 75, label: 'OB(D) vong: lost rotation on weak side' },
-            { id: 's3', start: 120, end: 140, label: 'UG(MAN) george: solid help defense and a much longer label to test wrapping behavior on two lines' },
-            { id: 's4', start: 200, end: 215, label: 'O(2-3) opponent runs 2-3 zone' },
-            { id: 's5', start: 250, end: 268, label: 'UG(O) matt,vong: pick and roll for layup' },
-            { id: 's6', start: 300, end: 315, label: 'UB(O) george: travel turnover' },
-            { id: 's7', start: 360, end: 380, label: 'U(3-2) we switch to 3-2 zone' },
-            { id: 's8', start: 420, end: 438, label: 'UG(D) matt: blocked shot at the rim' }
+          cutSegments: [
+            { start: 30, end: 45, name: 'UG(O) matt: drives and kicks for open three' },
+            { start: 60, end: 75, name: 'OB(D) vong: lost rotation on weak side' },
+            { start: 120, end: 140, name: 'UG(MAN) george: solid help defense and a much longer label to test wrapping behavior on two lines' },
+            { start: 200, end: 215, name: 'O(2-3) opponent runs 2-3 zone' },
+            { start: 250, end: 268, name: 'UG(O) matt,vong: pick and roll for layup' },
+            { start: 300, end: 315, name: 'UB(O) george: travel turnover' },
+            { start: 360, end: 380, name: 'U(3-2) we switch to 3-2 zone' },
+            { start: 420, end: 438, name: 'UG(D) matt: blocked shot at the rim' }
           ]
         });
       });
@@ -52,10 +54,10 @@ export default function App() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const segments = gameData?.segments || [];
+  const cutSegments = gameData?.cutSegments || [];
   const parsedSegments = useMemo(
-    () => segments.map(s => parseLabel(s.label || '')),
-    [segments]
+    () => cutSegments.map(s => parseLabel(s.name || '')),
+    [cutSegments]
   );
   const videoId = useMemo(
     () => gameData ? getYouTubeId(gameData.game?.youtubeUrl) : null,
@@ -78,24 +80,21 @@ export default function App() {
         <div className={styles.videoWrap}>
           <VideoPlayer
             videoId={videoId}
-            segments={segments}
+            cutSegments={cutSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
             isFullscreen={isFullscreen}
             setIsFullscreen={setIsFullscreen}
             isMobile={isMobile}
-            loopSegment={loopSegment}
           />
         </div>
 
         {!isFullscreen && (
           <Playlist
-            segments={segments}
+            cutSegments={cutSegments}
             parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
-            loopSegment={loopSegment}
-            setLoopSegment={setLoopSegment}
             isMobile={isMobile}
             onHelp={() => setShowHelp(true)}
           />

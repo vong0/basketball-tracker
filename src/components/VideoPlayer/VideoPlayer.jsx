@@ -5,13 +5,12 @@ import styles from './VideoPlayer.module.css';
 
 export default function VideoPlayer({
   videoId,
-  segments,
+  cutSegments,
   activeIdx,
   setActiveIdx,
   isFullscreen,
   setIsFullscreen,
-  isMobile,
-  loopSegment
+  isMobile
 }) {
   const ytPlayerRef = useRef(null);
   const containerRef = useRef(null);
@@ -25,12 +24,9 @@ export default function VideoPlayer({
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
   const lastTapRef = useRef({ time: 0, side: null });
-  const loopRef = useRef(loopSegment);
   const clickTimerRef = useRef(null);
 
-  useEffect(() => { loopRef.current = loopSegment; }, [loopSegment]);
-
-  const activeSegment = activeIdx >= 0 ? segments[activeIdx] : null;
+  const activeSegment = activeIdx >= 0 ? cutSegments[activeIdx] : null;
 
   // YouTube setup
   useEffect(() => {
@@ -86,29 +82,16 @@ export default function VideoPlayer({
     setCurrentRate(rate);
   }, []);
 
-  // Tick: poll currentTime + loop or pause at segment end
+  // Tick: poll currentTime + always loop at segment end
   useEffect(() => {
     if (!playerReady) return;
-    let pausedAtEnd = false;
     tickRef.current = setInterval(() => {
       const p = ytPlayerRef.current;
       if (!p || !p.getCurrentTime) return;
       const t = p.getCurrentTime();
       setCurrentTime(t);
-      if (activeSegment && !pausedAtEnd && t >= activeSegment.end - 0.05) {
-        pausedAtEnd = true;
-        if (loopRef.current) {
-          try { p.seekTo(activeSegment.start, true); } catch (e) {}
-          pausedAtEnd = false;
-        } else {
-          try {
-            p.pauseVideo();
-            p.seekTo(activeSegment.end, true);
-          } catch (e) {}
-        }
-      }
-      if (activeSegment && pausedAtEnd && t < activeSegment.end - 0.1) {
-        pausedAtEnd = false;
+      if (activeSegment && t >= activeSegment.end - 0.05) {
+        try { p.seekTo(activeSegment.start, true); } catch (e) {}
       }
     }, 100);
     return () => clearInterval(tickRef.current);
@@ -117,7 +100,7 @@ export default function VideoPlayer({
   // Seek to active segment when it changes
   useEffect(() => {
     if (!playerReady || activeIdx < 0) return;
-    const seg = segments[activeIdx];
+    const seg = cutSegments[activeIdx];
     if (!seg) return;
     const p = ytPlayerRef.current;
     if (!p || !p.seekTo) return;
@@ -125,12 +108,12 @@ export default function VideoPlayer({
       p.seekTo(seg.start, true);
       p.playVideo();
     } catch (e) {}
-  }, [activeIdx, playerReady, segments]);
+  }, [activeIdx, playerReady, cutSegments]);
 
   const playSegment = useCallback((idx) => {
-    if (idx < 0 || idx >= segments.length) return;
+    if (idx < 0 || idx >= cutSegments.length) return;
     setActiveIdx(idx);
-  }, [segments, setActiveIdx]);
+  }, [cutSegments, setActiveIdx]);
 
   const togglePlay = useCallback(() => {
     const p = ytPlayerRef.current;
@@ -157,9 +140,9 @@ export default function VideoPlayer({
 
   const navSegment = useCallback((dir) => {
     const cur = activeIdx;
-    const next = cur < 0 ? 0 : Math.max(0, Math.min(segments.length - 1, cur + dir));
+    const next = cur < 0 ? 0 : Math.max(0, Math.min(cutSegments.length - 1, cur + dir));
     if (next !== cur || cur < 0) playSegment(next);
-  }, [activeIdx, segments.length, playSegment]);
+  }, [activeIdx, cutSegments.length, playSegment]);
 
   const toggleFullscreen = useCallback(() => {
     if (!containerRef.current) return;
@@ -261,15 +244,23 @@ export default function VideoPlayer({
     }, 500);
   };
 
-  const onSideBlockerPointerUp = (side) => () => {
-    if (!isMobile) return;
+  const endLongPress = useCallback(() => {
+    if (!isMobile) return false;
     if (longPressRef.current.timer) clearTimeout(longPressRef.current.timer);
     if (longPressRef.current.active) {
+      longPressRef.current.timer = null;
       longPressRef.current.active = false;
       longPressRef.current.side = null;
       setRate(1);
-      return;
+      return true;
     }
+    longPressRef.current.timer = null;
+    return false;
+  }, [isMobile, setRate]);
+
+  const onSideBlockerPointerUp = (side) => () => {
+    if (!isMobile) return;
+    if (endLongPress()) return;
     const now = Date.now();
     if (now - lastTapRef.current.time < 300 && lastTapRef.current.side === side) {
       seekDelta(side === 'left' ? -1 : 1);
@@ -279,6 +270,8 @@ export default function VideoPlayer({
       // Single tap on side does nothing (user pauses via center → YT, or via side double-tap is skip)
     }
   };
+
+  const onSideBlockerPointerCancel = () => endLongPress();
 
   // Seekbar
   const seekbarRef = useRef(null);
@@ -354,12 +347,16 @@ export default function VideoPlayer({
               className={styles.ytLeftBlocker}
               onPointerDown={onSideBlockerPointerDown('left')}
               onPointerUp={onSideBlockerPointerUp('left')}
+              onPointerCancel={onSideBlockerPointerCancel}
+              onPointerLeave={onSideBlockerPointerCancel}
             />
             {/* Right side — gesture zone */}
             <div
               className={styles.ytRightBlocker}
               onPointerDown={onSideBlockerPointerDown('right')}
               onPointerUp={onSideBlockerPointerUp('right')}
+              onPointerCancel={onSideBlockerPointerCancel}
+              onPointerLeave={onSideBlockerPointerCancel}
             />
             {/* Center is open — taps fall through to YT for native play/pause */}
           </>

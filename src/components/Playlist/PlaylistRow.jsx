@@ -36,7 +36,7 @@ export default function PlaylistRow({ segment, parsed, index, isActive, onClick 
       <span className={styles.rowIndex}>{index + 1}</span>
       <span className={`${styles.dot} ${dotClass}`} />
       <div className={styles.rowBody}>
-        <div className={styles.rowLabel}>{parsed.title}</div>
+        <div className={styles.rowLabel}>{parsed.title || segment.name}</div>
         <div className={styles.rowTime}>
           {formatTime(segment.start)} / {formatTime(duration)}
         </div>
