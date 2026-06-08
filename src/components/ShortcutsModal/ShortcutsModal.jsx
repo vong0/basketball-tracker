@@ -24,11 +24,11 @@ const desktopShortcuts = [
 ];
 
 const mobileGestures = [
-  ['Tap bottom-center', 'Clear YouTube dim overlay'],
-  ['Tap anywhere else', 'Play / pause'],
-  ['Swipe left / right', 'Next / previous clip'],
-  ['Long-press left', '0.5\u00d7 speed (while held)'],
-  ['Long-press right', '2\u00d7 speed (while held)'],
+  ['Tap', 'Play / pause'],
+  ['Hold left', '0.5\u00d7 speed'],
+  ['Hold right', '2\u00d7 speed'],
+  ['Swipe left', 'Previous clip'],
+  ['Swipe right', 'Next clip'],
   ['Seek bar', 'Tap or drag to seek'],
   ['Tap clip counter', 'Open clip info']
 ];
@@ -45,7 +45,6 @@ export default function ShortcutsModal({ open, onClose, isMobile }) {
     >
       {isMobile ? (
         <div>
-          <div className={styles.sectionTitle}>VIDEO</div>
           <div className={styles.list}>
             {mobileGestures.map(([gesture, desc], i) => (
               <div key={i} className={styles.row}>
