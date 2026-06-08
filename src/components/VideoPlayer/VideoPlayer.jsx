@@ -338,11 +338,21 @@ export default function VideoPlayer({
     if (endLongPress()) return;
     const now = Date.now();
     if (now - lastTapRef.current.time < 300 && lastTapRef.current.side === side) {
+      // Double-tap: skip ±1s. Cancel the pending single-tap pause.
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
       seekDelta(side === 'left' ? -1 : 1);
       lastTapRef.current.time = 0;
     } else {
       lastTapRef.current = { time: now, side };
-      // Single tap on side does nothing (user pauses via center → YT, or via side double-tap is skip)
+      // Single tap → pause/play (debounced ~300ms to allow double-tap detection).
+      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = setTimeout(() => {
+        clickTimerRef.current = null;
+        togglePlay();
+      }, 300);
     }
   };
 

@@ -22,7 +22,8 @@ const desktopShortcuts = [
 ];
 
 const mobileGestures = [
-  ['Tap center', 'Show play / pause'],
+  ['Tap sides', 'Play / pause'],
+  ['Tap center', 'Clear YT overlay'],
   ['Double-tap left', 'Back 1s'],
   ['Double-tap right', 'Forward 1s'],
   ['Long-press left', '0.5\u00d7 speed (while held)'],
