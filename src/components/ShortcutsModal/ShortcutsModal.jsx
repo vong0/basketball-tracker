@@ -14,8 +14,10 @@ const desktopShortcuts = [
     ]
   },
   {
-    title: 'Other',
+    title: 'Info & Help',
     items: [
+      ['I', 'Toggle clip info'],
+      ['/', 'Toggle this shortcuts list'],
       ['Esc', 'Exit fullscreen']
     ]
   }
@@ -27,7 +29,8 @@ const mobileGestures = [
   ['Swipe left / right', 'Next / previous clip'],
   ['Long-press left', '0.5\u00d7 speed (while held)'],
   ['Long-press right', '2\u00d7 speed (while held)'],
-  ['Seek bar', 'Tap or drag to seek']
+  ['Seek bar', 'Tap or drag to seek'],
+  ['Tap clip counter', 'Open clip info']
 ];
 
 export default function ShortcutsModal({ open, onClose, isMobile }) {

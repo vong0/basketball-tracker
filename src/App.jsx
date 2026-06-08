@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Loader, Center } from '@mantine/core';
 import JSON5 from 'json5';
 import Banner from './components/Banner/Banner';
@@ -16,6 +16,31 @@ export default function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [isMobile, setIsMobile] = useState(isMobileDevice());
+  const videoPlayerRef = useRef(null);
+
+  const openHelp = useCallback(() => {
+    videoPlayerRef.current?.pauseAndRemember?.();
+    setShowHelp(true);
+  }, []);
+
+  const closeHelp = useCallback(() => {
+    setShowHelp(false);
+    videoPlayerRef.current?.resumeIfWasPlaying?.();
+  }, []);
+
+  // Global `/` toggles the shortcuts modal. `i` is handled inside VideoPlayer.
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === '/') {
+        e.preventDefault();
+        if (showHelp) closeHelp();
+        else openHelp();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showHelp, openHelp, closeHelp]);
 
   useEffect(() => {
     fetch('./data/games/y26-divA-game1.json')
@@ -79,6 +104,7 @@ export default function App() {
       <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop}`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
+            ref={videoPlayerRef}
             key={isMobile ? 'mobile' : 'desktop'}
             videoId={videoId}
             cutSegments={cutSegments}
@@ -98,14 +124,14 @@ export default function App() {
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
             isMobile={isMobile}
-            onHelp={() => setShowHelp(true)}
+            onHelp={openHelp}
           />
         )}
       </div>
 
       <ShortcutsModal
         open={showHelp}
-        onClose={() => setShowHelp(false)}
+        onClose={closeHelp}
         isMobile={isMobile}
       />
     </div>

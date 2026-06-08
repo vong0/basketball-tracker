@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Modal } from '@mantine/core';
 import { loadYouTubeAPI } from '../../lib/youtube';
 import { formatTime } from '../../lib/time';
@@ -11,7 +11,7 @@ import styles from './VideoPlayer.module.css';
 // reaches 100% exactly when the loop kicks in.
 const LOOP_LEAD = 0.2;
 
-export default function VideoPlayer({
+const VideoPlayer = forwardRef(function VideoPlayer({
   videoId,
   cutSegments,
   parsedSegments,
@@ -20,7 +20,7 @@ export default function VideoPlayer({
   isFullscreen,
   setIsFullscreen,
   isMobile
-}) {
+}, ref) {
   const ytPlayerRef = useRef(null);
   const containerRef = useRef(null);
   const iframeContainerRef = useRef(null);
@@ -31,6 +31,10 @@ export default function VideoPlayer({
   const [isDragging, setIsDragging] = useState(false);
   const [currentRate, setCurrentRate] = useState(1);
   const [showInfo, setShowInfo] = useState(false);
+  // Tracks whether playback was active when a modal opened, so we can
+  // resume on close. Used by both the in-component info dialog and the
+  // App-level shortcuts modal (via the imperative handle below).
+  const wasPlayingBeforeModalRef = useRef(false);
   const tickRef = useRef(null);
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
@@ -198,14 +202,28 @@ export default function VideoPlayer({
     if (next !== cur || cur < 0) playSegment(next);
   }, [activeIdx, cutSegments.length, playSegment]);
 
-  const toggleFullscreen = useCallback(() => {
+  const toggleFullscreen = useCallback(async () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen?.();
+      try {
+        const req = containerRef.current.requestFullscreen?.();
+        if (req && req.then) await req;
+        // Try to lock landscape on mobile. Works on Android Chrome/Firefox.
+        // Silently fails on iOS Safari (no orientation lock support) and
+        // on desktop (nothing to lock). Non-fatal.
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          try { await screen.orientation.lock('landscape'); } catch (e) {}
+        }
+      } catch (e) {}
     } else {
-      document.exitFullscreen?.();
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          try { screen.orientation.unlock(); } catch (e) {}
+        }
+        await document.exitFullscreen?.();
+      } catch (e) {}
     }
-  }, []);
+  }, [isMobile]);
 
   // Debounced single-click - cancelled by double-click (desktop)
   const handleTapZoneClick = useCallback(() => {
@@ -310,6 +328,16 @@ export default function VideoPlayer({
     if (isMobile) return;
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      // `i` toggles the info dialog - must run BEFORE the showInfo guard
+      // so it can close the dialog when open.
+      if ((e.key === 'i' || e.key === 'I') && cutSegments.length > 0) {
+        e.preventDefault();
+        if (showInfo) handleCloseInfo();
+        else handleOpenInfo();
+        return;
+      }
+      // While the info dialog is open, swallow all other shortcuts.
+      if (showInfo) return;
       if (e.key === 'Escape') {
         if (document.fullscreenElement) document.exitFullscreen?.();
         return;
@@ -339,7 +367,7 @@ export default function VideoPlayer({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [isMobile, togglePlay, seekDelta, navSegment, toggleFullscreen, setRate]);
+  }, [isMobile, togglePlay, seekDelta, navSegment, toggleFullscreen, setRate, showInfo, cutSegments.length]);
 
   // Mobile side-blocker gesture handlers
   const onSideBlockerPointerDown = (side) => (e) => {
@@ -598,14 +626,42 @@ export default function VideoPlayer({
       ? styles.dotBad
       : styles.dotNeutral;
 
-  const handleOpenInfo = () => {
-    // Pause video when opening the info dialog. Do NOT auto-resume on close;
-    // user un-pauses themselves when ready.
+  // Pause + remember whether playback was active. Used by info dialog,
+  // shortcuts modal (via imperative handle), and any future modal.
+  // We always call pauseVideo() (never gate on isPlaying) because the
+  // isPlaying state can lag the actual player state by a tick, and a
+  // redundant pause on an already-paused player is a no-op.
+  const pauseAndRemember = useCallback(() => {
     const p = ytPlayerRef.current;
+    wasPlayingBeforeModalRef.current = isPlaying;
     if (p && p.pauseVideo) {
       try { p.pauseVideo(); } catch (e) {}
     }
+  }, [isPlaying]);
+
+  const resumeIfWasPlaying = useCallback(() => {
+    const p = ytPlayerRef.current;
+    if (p && p.playVideo && wasPlayingBeforeModalRef.current) {
+      try { p.playVideo(); } catch (e) {}
+    }
+    wasPlayingBeforeModalRef.current = false;
+  }, []);
+
+  // Expose pause/resume so App can wrap the shortcuts modal with the
+  // same pause-and-resume behavior as the info dialog.
+  useImperativeHandle(ref, () => ({
+    pauseAndRemember,
+    resumeIfWasPlaying,
+  }), [pauseAndRemember, resumeIfWasPlaying]);
+
+  const handleOpenInfo = () => {
+    pauseAndRemember();
     setShowInfo(true);
+  };
+
+  const handleCloseInfo = () => {
+    setShowInfo(false);
+    resumeIfWasPlaying();
   };
 
   return (
@@ -692,7 +748,7 @@ export default function VideoPlayer({
           />
         )}
 
-        {useFsMobileChrome && cutSegments.length > 0 && (
+        {cutSegments.length > 0 && (
           <button
             onClick={(e) => { e.stopPropagation(); handleOpenInfo(); }}
             className={styles.fsTopCounter}
@@ -735,7 +791,7 @@ export default function VideoPlayer({
 
       <Modal
         opened={showInfo}
-        onClose={() => setShowInfo(false)}
+        onClose={handleCloseInfo}
         title={activeSegment
           ? `CLIP ${Math.max(0, activeIdx) + 1} / ${cutSegments.length}`
           : 'CLIP INFO'}
@@ -814,4 +870,6 @@ export default function VideoPlayer({
       </Modal>
     </div>
   );
-}
+});
+
+export default VideoPlayer;
