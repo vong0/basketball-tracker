@@ -110,7 +110,12 @@
   font-family: inherit;
 }
 
-.row:hover { background: rgba(255, 255, 255, 0.04); }
+/* Scope hover to devices with real hover (desktop mice). On touch devices
+   :hover sticks after tap and visually overrides .rowActive's orange tint,
+   making the active row look grey. (hover: hover) excludes touchscreens. */
+@media (hover: hover) {
+  .row:hover { background: rgba(255, 255, 255, 0.04); }
+}
 
 .rowActive {
   background: rgba(255, 92, 26, 0.08);

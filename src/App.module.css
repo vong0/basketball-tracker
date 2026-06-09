@@ -23,8 +23,15 @@
 
 .mainMobile .videoWrap {
   flex: 0 0 auto;
-  height: 32vh;         /* fallback */
-  height: 28dvh;        /* portrait: smaller video, more room for playlist */
+  /* Height-driven sizing in portrait: 16/9 width-based was too small on
+     phones (a 412px-wide phone -> only ~232px tall video). Going back to
+     dvh-based, but bigger than before. 40dvh on a typical phone (~915px
+     visible) = ~366px — substantially bigger than 16:9, and the playlist
+     still gets ~50% of the screen. The iframe scale-cover logic crops the
+     video to fill, so we don't get letterboxing even though our wrapper
+     isn't 16:9. */
+  height: 45vh;        /* fallback */
+  height: 40dvh;
   min-height: 0;
   transition: height 0.2s ease;
 }
