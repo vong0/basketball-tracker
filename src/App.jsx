@@ -43,8 +43,9 @@ export default function App() {
   }, [showHelp, openHelp, closeHelp]);
 
   useEffect(() => {
-    fetch('./data/games/nba-game.json')
+    // fetch('./data/games/nba-game.json')
     // fetch('./data/games/y26-divA-game1.json')
+    fetch('./data/games/y26-edit.json')
       .then(r => r.ok ? r.text() : Promise.reject(r.status))
       .then(text => {
         try {
@@ -52,6 +53,20 @@ export default function App() {
         } catch {
           return JSON5.parse(text);
         }
+      })
+      .then(data => {
+        // Drop marker-only entries (no end) and round times so YouTube's
+        // seekTo lands a hair before/after the keyframe instead of truncating.
+        if (data && Array.isArray(data.cutSegments)) {
+          data.cutSegments = data.cutSegments
+            .filter(s => typeof s.start === 'number' && typeof s.end === 'number')
+            .map(s => ({
+              ...s,
+              start: Math.floor(s.start),
+              end: Math.ceil(s.end),
+            }));
+        }
+        return data;
       })
       .then(setGameData)
       .catch(err => {

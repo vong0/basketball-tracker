@@ -6,6 +6,7 @@ import styles from './Playlist.module.css';
 const INACTIVE_VISIBLE_ACTIONS = 2;
 
 /**
+
  * Format a single action's body text:
  *   players + note  ->  "matt: drives baseline"
  *   players only    ->  "matt"
@@ -23,6 +24,7 @@ function actionLineText(action) {
 }
 
 /**
+
  * Pick the dot CSS class for an action.
  *   Opponent (T) -> blue, regardless of G/B.
  *   Us (U) -> green/red/gray by quality.
@@ -36,32 +38,13 @@ function dotClassFor(action, styles) {
 }
 
 /**
+
  * Scheme-only action with no quality letter — render without a dot.
  */
 function isSchemeOnlyNoQuality(action) {
   if (!action) return false;
   const isScheme = action.type === 'MAN' || action.type === '2-3' || action.type === '3-2';
   return isScheme && !action.quality;
-}
-
-/**
- * Type badge text — first action's TYPE wrapped in brackets.
- */
-function rowBadge(parsed) {
-  const first = parsed?.actions?.[0];
-  if (!first) return '';
-  return '[' + first.type + ']';
-}
-
-/**
- * Type badge color class based on the first action's type.
- */
-function badgeClassFor(parsed, styles) {
-  const first = parsed?.actions?.[0];
-  if (!first) return styles.badgeNeutral;
-  if (first.type === 'O') return styles.badgeOffense;
-  if (first.type === 'D') return styles.badgeDefense;
-  return styles.badgeScheme;
 }
 
 export default function PlaylistRow({ segment, parsed, index, isActive, onClick }) {
@@ -83,8 +66,6 @@ export default function PlaylistRow({ segment, parsed, index, isActive, onClick 
 
   const actions = parsed?.actions || [];
   const summary = parsed?.summary || '';
-  const badge = rowBadge(parsed);
-  const badgeCls = badgeClassFor(parsed, styles);
 
   // ---------- ACTIVE ROW ----------
   // Always full disclosure: every action on its own line, no clamp.
@@ -97,7 +78,6 @@ export default function PlaylistRow({ segment, parsed, index, isActive, onClick 
         className={`${styles.row} ${styles.rowActive}`}
       >
         <span className={styles.rowTime}>{formatTime(segment.start)}</span>
-        {badge && <span className={`${styles.badge} ${badgeCls}`}>{badge}</span>}
         <div className={styles.rowBody}>
           {summary && (
             <div className={`${styles.actionLine} ${styles.summaryLine}`}>
@@ -136,7 +116,6 @@ export default function PlaylistRow({ segment, parsed, index, isActive, onClick 
         className={styles.row}
       >
         <span className={styles.rowTime}>{formatTime(segment.start)}</span>
-        {badge && <span className={`${styles.badge} ${badgeCls}`}>{badge}</span>}
         <div className={styles.rowBody}>
           <div className={`${styles.actionLine} ${styles.summaryLine} ${styles.lineClamp}`}>
             {summary}
@@ -157,7 +136,6 @@ export default function PlaylistRow({ segment, parsed, index, isActive, onClick 
       className={styles.row}
     >
       <span className={styles.rowTime}>{formatTime(segment.start)}</span>
-      {badge && <span className={`${styles.badge} ${badgeCls}`}>{badge}</span>}
       <div className={styles.rowBody}>
         {visible.length === 0 ? (
           <div className={`${styles.actionLine} ${styles.lineClamp}`}>

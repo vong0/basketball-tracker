@@ -1,7 +1,8 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh;        /* fallback for browsers without dvh */
+  height: 100dvh;       /* dynamic viewport: accounts for mobile URL bar */
   overflow: hidden;
 }
 
@@ -22,7 +23,8 @@
 
 .mainMobile .videoWrap {
   flex: 0 0 auto;
-  height: 40vh;
+  height: 40vh;         /* fallback for browsers without dvh */
+  height: 35dvh;        /* slightly smaller in portrait, dynamic viewport */
   min-height: 0;
 }
 

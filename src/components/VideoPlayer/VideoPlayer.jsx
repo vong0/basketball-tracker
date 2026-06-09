@@ -115,6 +115,11 @@ const VideoPlayer = forwardRef(function VideoPlayer({
         },
         events: {
           onReady: (e) => {
+            // Always mute on ready. Mobile browsers require muted for
+            // autoplay to work. Our videos have no audio so this has
+            // no UX cost. Done at runtime (not via playerVars) so it
+            // can be unmuted later if we ever want to.
+            try { e.target.mute(); } catch (err) {}
             setPlayerReady(true);
           },
           onStateChange: (e) => {
@@ -545,7 +550,10 @@ const VideoPlayer = forwardRef(function VideoPlayer({
     return activeSegment.start + pct * duration;
   }, [activeSegment]);
 
-  // Throttled seek - visual thumb is always immediate, YT seekTo is rate-limited
+  // Throttled seek - visual thumb is always immediate, YT seekTo is rate-limited.
+  // Per YT API docs: pass allowSeekAhead=false during drag to avoid new
+  // server requests when scrolling past unbuffered points. Final seek on
+  // release uses true so the landing position is committed accurately.
   const handleSeekbarMove = useCallback((e, ref) => {
     const newTime = computeSeekTime(e, ref);
     if (newTime === null) return;
@@ -554,12 +562,21 @@ const VideoPlayer = forwardRef(function VideoPlayer({
     if (now - seekThrottleRef.current >= 50) {
       seekThrottleRef.current = now;
       const p = ytPlayerRef.current;
-      if (p && p.seekTo) try { p.seekTo(newTime, true); } catch (err) {}
+      if (p && p.seekTo) try { p.seekTo(newTime, false); } catch (err) {}
     }
   }, [computeSeekTime]);
 
   const handleSeekbarPointerDown = (e) => {
     e.preventDefault();
+    // Capture the pointer so move events keep firing on our handler even
+    // if the finger drifts off the track. Critical on mobile where browsers
+    // otherwise steal the gesture for scrolling.
+    if (e.pointerId !== undefined && e.currentTarget.setPointerCapture) {
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    // Remember play state so we can force-resume on release. YT pauses
+    // internally during rapid seekTo() calls; we counteract that.
+    const wasPlaying = isPlaying;
     setIsDragging(true);
     isDraggingRef.current = true;
     seekThrottleRef.current = 0; // force first seek to fire immediately
@@ -568,10 +585,14 @@ const VideoPlayer = forwardRef(function VideoPlayer({
     const onUp = (ev) => {
       // Final seek to exact landing position (un-throttled)
       const finalTime = computeSeekTime(ev, seekbarRef);
+      const p = ytPlayerRef.current;
       if (finalTime !== null) {
         setCurrentTime(finalTime);
-        const p = ytPlayerRef.current;
         if (p && p.seekTo) try { p.seekTo(finalTime, true); } catch (err) {}
+      }
+      // Force-resume if we were playing before drag started.
+      if (wasPlaying && p && p.playVideo) {
+        try { p.playVideo(); } catch (err) {}
       }
       isDraggingRef.current = false;
       setIsDragging(false);
@@ -585,16 +606,25 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   const handleReelPointerDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    // Capture pointer so drag stays on our handler on mobile.
+    if (e.pointerId !== undefined && e.currentTarget.setPointerCapture) {
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    // Remember play state so we can force-resume on release.
+    const wasPlaying = isPlaying;
     isDraggingRef.current = true;
     seekThrottleRef.current = 0;
     handleSeekbarMove(e, reelRef);
     const onMove = (ev) => handleSeekbarMove(ev, reelRef);
     const onUp = (ev) => {
       const finalTime = computeSeekTime(ev, reelRef);
+      const p = ytPlayerRef.current;
       if (finalTime !== null) {
         setCurrentTime(finalTime);
-        const p = ytPlayerRef.current;
         if (p && p.seekTo) try { p.seekTo(finalTime, true); } catch (err) {}
+      }
+      if (wasPlaying && p && p.playVideo) {
+        try { p.playVideo(); } catch (err) {}
       }
       isDraggingRef.current = false;
       window.removeEventListener('pointermove', onMove);
