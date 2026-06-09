@@ -88,9 +88,9 @@
 /* ============================================================================
    ROW LAYOUT
    ============================================================================
-   Inactive: time | badge | body (1-2 truncated lines)
-   Active:   time | badge | body (full unclamped, all actions)
-   Dots are per-action, inside each action line.
+   All rows render identically: time | body (summary + every action, full
+   disclosure, wrapping). Active rows are visually distinguished only by
+   the orange tint + left border, not by their content shape.
    ============================================================================ */
 
 .row {
@@ -162,18 +162,15 @@
   color: #fff;
 }
 
-/* Inactive rows clamp each action line to a single visual line. */
-.lineClamp {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+/* Action text wraps to multiple lines when long. word-break + overflow-wrap
+   together catch the rare unbroken token (long #tag, URL-ish string) so it
+   can't blow the row width and force horizontal scroll. */
 .actionText {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .summaryLine {
@@ -184,14 +181,6 @@
 .rowActive .summaryLine {
   color: #fff;
   margin-bottom: 2px;
-}
-
-.moreCount {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  flex-shrink: 0;
-  margin-left: 4px;
 }
 
 /* ============================================================================
