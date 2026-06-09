@@ -847,7 +847,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({
                             <div className={styles.infoActionHead}>
                               <span className={styles.infoActionType}>{a.type}</span>
                               <span className={styles.infoActionTeam}>
-                                {a.team === 'opponent' ? 'OPP' : 'US'}
+                                {a.team === 'T' ? 'OPP' : 'US'}
                               </span>
                               {a.players && a.players.length > 0 && (
                                 <span className={styles.infoActionPlayers}>
