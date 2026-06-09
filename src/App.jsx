@@ -16,7 +16,13 @@ export default function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [isMobile, setIsMobile] = useState(isMobileDevice());
+  const [videoCollapsed, setVideoCollapsed] = useState(false);
   const videoPlayerRef = useRef(null);
+
+  const toggleVideoCollapsed = useCallback(
+    () => setVideoCollapsed(v => !v),
+    []
+  );
 
   const openHelp = useCallback(() => {
     videoPlayerRef.current?.pauseAndRemember?.();
@@ -102,7 +108,7 @@ export default function App() {
     <div className={styles.app}>
       {!isFullscreen && <Banner isMobile={isMobile} />}
 
-      <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop}`}>
+      <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop} ${isMobile && videoCollapsed ? styles.videoCollapsed : ''}`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
             ref={videoPlayerRef}
@@ -126,6 +132,8 @@ export default function App() {
             setActiveIdx={setActiveIdx}
             isMobile={isMobile}
             onHelp={openHelp}
+            videoCollapsed={videoCollapsed}
+            onToggleVideoCollapsed={toggleVideoCollapsed}
           />
         )}
       </div>

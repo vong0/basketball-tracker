@@ -23,9 +23,16 @@
 
 .mainMobile .videoWrap {
   flex: 0 0 auto;
-  height: 40vh;         /* fallback for browsers without dvh */
-  height: 35dvh;        /* slightly smaller in portrait, dynamic viewport */
+  height: 32vh;         /* fallback */
+  height: 28dvh;        /* portrait: smaller video, more room for playlist */
   min-height: 0;
+  transition: height 0.2s ease;
+}
+
+/* Collapsed: video shrinks to a thumbnail strip so the playlist owns the
+   screen. Useful for browsing 50+ clips on a phone. */
+.mainMobile.videoCollapsed .videoWrap {
+  height: 80px;
 }
 
 

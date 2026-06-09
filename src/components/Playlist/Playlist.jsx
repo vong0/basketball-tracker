@@ -7,7 +7,9 @@ export default function Playlist({
   activeIdx,
   setActiveIdx,
   isMobile,
-  onHelp
+  onHelp,
+  videoCollapsed,
+  onToggleVideoCollapsed,
 }) {
   return (
     <aside className={`${styles.playlist} ${isMobile ? styles.playlistMobile : ''}`}>
@@ -15,7 +17,19 @@ export default function Playlist({
         <div className={styles.title}>
           PLAYLIST <span className={styles.count}>({cutSegments.length})</span>
         </div>
-        <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>
+        <div className={styles.headerActions}>
+          {isMobile && onToggleVideoCollapsed && (
+            <button
+              className={styles.collapseBtn}
+              onClick={onToggleVideoCollapsed}
+              aria-label={videoCollapsed ? 'Expand video' : 'Collapse video'}
+              title={videoCollapsed ? 'Expand video' : 'Collapse video'}
+            >
+              {videoCollapsed ? '▼' : '▲'}
+            </button>
+          )}
+          <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>
+        </div>
       </div>
 
       <div className={styles.scroll}>

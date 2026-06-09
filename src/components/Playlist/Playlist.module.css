@@ -37,7 +37,15 @@
   font-size: 12px;
 }
 
-.helpBtn {
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.helpBtn,
+.collapseBtn {
   background: none;
   border: 1px solid var(--border-strong);
   color: var(--text-dim);
@@ -51,11 +59,18 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
 }
 
-.helpBtn:hover {
+.helpBtn:hover,
+.collapseBtn:hover {
   color: #fff;
   border-color: var(--orange);
+}
+
+.collapseBtn {
+  font-size: 10px;
 }
 
 .scroll {
