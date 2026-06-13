@@ -32,7 +32,7 @@
 .kbd {
   display: inline-block;
   padding: 2px 8px;
-  background: #1a1a1a;
+  background: var(--bg-hover);
   color: var(--text);
   border-radius: 4px;
   font-family: var(--font-mono);

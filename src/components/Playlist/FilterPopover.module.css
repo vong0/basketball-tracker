@@ -37,7 +37,7 @@
    on light backgrounds but blends in too much on our dark theme — bump
    the contrast on the input border and dropdown background. */
 .selectInput {
-  background: #0a0a0a;
+  background: var(--bg);
   border: 1px solid var(--border-strong);
   color: rgba(255, 255, 255, 0.9);
   font-family: inherit;

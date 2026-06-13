@@ -1,23 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
 
+/* =============================================================================
+   Slate + Amber theme — "coach's clipboard, modernized"
+
+   - Slate surfaces (cool undertone, pairs with warm accent)
+   - Amber accent (#f59e0b) — athletic but refined, not orange-cliche
+   - Same green/red/white dot system as before
+   - Three real surface tiers with ~7-pt luminance gaps that actually read
+   ============================================================================= */
+
 :root {
-  --bg: #0a0a0d;
-  --bg-elevated: #131318;
-  --bg-hover: #1a1a20;
-  --border: #1f1f24;
-  --border-strong: #2e2e35;
-  --orange-soft: rgba(255, 92, 26, 0.15);
-  --text: #f5f5f5;
-  --text-dim: rgba(255, 255, 255, 0.6);
-  --text-faint: rgba(255, 255, 255, 0.4);
-  --orange: #ff5c1a;
-  --green: #4ade80;
-  --red: #f87171;
+  /* Surfaces — slate family. Warm-cool tension makes amber pop. */
+  --bg:           #0b0e14;   /* page bg, banner — deepest slate */
+  --bg-elevated:  #11151c;   /* playlist, panels — one step lifted */
+  --bg-hover:     #171c26;   /* cards resting, row hover */
+  --bg-active:    #1f2530;   /* card hover, active states */
+
+  /* Borders — slate-toned, subtle */
+  --border:        #1f2530;
+  --border-strong: #2d3441;
+
+  /* Text — neutral-cool off-white. Survives Opera night-mode warming. */
+  --text:       #e8eaed;
+  --text-dim:   rgba(232, 234, 237, 0.65);
+  --text-faint: rgba(232, 234, 237, 0.42);
+
+  /* Accent — amber. Replaces the old --orange tokens. */
+  --orange:      #f59e0b;                       /* legacy name kept for compat */
+  --orange-soft: rgba(245, 158, 11, 0.14);      /* active row tint */
+  --accent:      #f59e0b;
+  --accent-soft: rgba(245, 158, 11, 0.14);
+  --accent-glow: rgba(245, 158, 11, 0.45);
+
+  /* Dot system — unchanged */
+  --green:    #4ade80;
+  --red:      #f87171;
   --gray-dot: #9ca3af;
 
+  /* Fonts — unchanged */
   --font-display: 'Bebas Neue', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-body: 'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-body:    'Inter', sans-serif;
 }
 
 html, body {

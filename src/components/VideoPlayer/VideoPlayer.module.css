@@ -99,7 +99,7 @@
   position: relative;
   flex: 0 0 calc(33.333% - 16px);
   height: 100%;
-  background: #0a0a0a;
+  background: var(--bg);
 }
 
 .neighborInner {
@@ -107,7 +107,7 @@
   inset: 0;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-hover) 100%);
   border: 1px solid var(--border);
 }
 
@@ -338,7 +338,7 @@
   height: 16px;
   padding: 6px 8px;
   border-radius: 999px;
-  background: rgba(16, 20, 39, 0.7);
+  background: rgba(0, 0, 0, 0.55);
   cursor: pointer;
   touch-action: none;
   display: flex;
@@ -366,7 +366,7 @@
   bottom: 10px;
   right: 14px;
   z-index: 15;
-  background: rgba(16, 20, 39, 0.7);
+  background: rgba(0, 0, 0, 0.55);
   border: none;
   color: #fff;
   width: 28px;
@@ -385,7 +385,7 @@
 }
 
 .fsBottomExpandBtn:active {
-  background: rgba(16, 20, 39, 0.9);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 /* Info dialog */
@@ -523,7 +523,7 @@
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-faint);
-  background: #0a0a0a;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 8px 10px;

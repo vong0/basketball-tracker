@@ -19,7 +19,7 @@
   .card:hover {
     border-color: var(--border-strong);
     border-left-color: var(--orange);
-    background: #1f1f26;
+    background: var(--bg-active);
   }
 }
 
