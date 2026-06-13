@@ -5,9 +5,10 @@ import Banner from '../Banner/Banner';
 import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import Playlist from '../Playlist/Playlist';
 import ShortcutsModal from '../ShortcutsModal/ShortcutsModal';
-import { parseLabel } from '../../lib/parseLabel';
+import { parseLabel, segmentMatchesFilter } from '../../lib/parseLabel';
 import { getYouTubeId } from '../../lib/youtube';
 import { navigate } from '../../lib/routing';
+import { deriveFilterOptions, buildFilter, EMPTY_CHOICE } from '../../lib/deriveFilterOptions';
 import styles from './Player.module.css';
 
 export default function Player({ gameId, isMobile }) {
@@ -18,6 +19,7 @@ export default function Player({ gameId, isMobile }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [videoCollapsed, setVideoCollapsed] = useState(false);
+  const [filterChoice, setFilterChoice] = useState(EMPTY_CHOICE);
   const videoPlayerRef = useRef(null);
 
   const toggleVideoCollapsed = useCallback(
@@ -105,6 +107,34 @@ export default function Player({ gameId, isMobile }) {
     () => cutSegments.map(s => parseLabel(s.name || '')),
     [cutSegments]
   );
+  const filterOptions = useMemo(
+    () => deriveFilterOptions(parsedSegments),
+    [parsedSegments]
+  );
+
+  const filter = useMemo(() => buildFilter(filterChoice), [filterChoice]);
+
+  // visibleIndices: indices into the ORIGINAL cutSegments array that
+  // pass the active filter. activeIdx still indexes the original array;
+  // navigation helpers walk this list.
+  const visibleIndices = useMemo(() => {
+    if (!filter) return cutSegments.map((_, i) => i);
+    const out = [];
+    for (let i = 0; i < cutSegments.length; i++) {
+      if (segmentMatchesFilter(parsedSegments[i], filter)) out.push(i);
+    }
+    return out;
+  }, [cutSegments, parsedSegments, filter]);
+
+  // When the filter changes, jump to the first visible clip (or -1 if
+  // none). Skip on initial mount when nothing is filtered yet.
+  const prevFilterRef = useRef(filter);
+  useEffect(() => {
+    if (prevFilterRef.current === filter) return;
+    prevFilterRef.current = filter;
+    setActiveIdx(visibleIndices.length > 0 ? visibleIndices[0] : -1);
+  }, [filter, visibleIndices]);
+
   const videoId = useMemo(
     () => gameMeta ? getYouTubeId(gameMeta.youtubeUrl) : null,
     [gameMeta]
@@ -146,6 +176,7 @@ export default function Player({ gameId, isMobile }) {
             parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
+            visibleIndices={visibleIndices}
             isFullscreen={isFullscreen}
             setIsFullscreen={setIsFullscreen}
             isMobile={isMobile}
@@ -158,8 +189,14 @@ export default function Player({ gameId, isMobile }) {
             parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
+            visibleIndices={visibleIndices}
+            filterChoice={filterChoice}
+            setFilterChoice={setFilterChoice}
+            filterOptions={filterOptions}
             isMobile={isMobile}
             onHelp={openHelp}
+            onFilterOpen={() => videoPlayerRef.current?.pauseAndRemember?.()}
+            onFilterClose={() => videoPlayerRef.current?.resumeIfWasPlaying?.()}
             videoCollapsed={videoCollapsed}
             onToggleVideoCollapsed={toggleVideoCollapsed}
           />

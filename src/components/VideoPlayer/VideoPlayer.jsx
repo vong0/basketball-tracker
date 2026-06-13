@@ -17,6 +17,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   parsedSegments,
   activeIdx,
   setActiveIdx,
+  visibleIndices,
   isFullscreen,
   setIsFullscreen,
   isMobile
@@ -34,7 +35,11 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   // Tracks whether playback was active when a modal opened, so we can
   // resume on close. Used by both the in-component info dialog and the
   // App-level shortcuts modal (via the imperative handle below).
-  const wasPlayingBeforeModalRef = useRef(false);
+const wasPlayingBeforeModalRef = useRef(false);
+  // True while a modal/popover has explicitly paused us. The seek-on-
+  // activeIdx-change effect checks this so filter changes (which move
+  // activeIdx) don't auto-resume playback behind the modal.
+  const modalSuppressPlayRef = useRef(false);
   const tickRef = useRef(null);
   const speedKeyRef = useRef({ shift: false, ctrl: false });
   const longPressRef = useRef({ timer: null, active: false, side: null });
@@ -170,11 +175,23 @@ const VideoPlayer = forwardRef(function VideoPlayer({
     if (!seg) return;
     const p = ytPlayerRef.current;
     if (!p || !p.seekTo) return;
-    try {
+try {
       p.seekTo(seg.start, true);
-      p.playVideo();
+      // Don't resume playback if a modal/popover is currently
+      // suppressing it. The user opened the filter expecting playback
+      // to stay paused; auto-playing on activeIdx change (e.g. filter
+      // jumped us to the first visible clip) would violate that.
+      if (!modalSuppressPlayRef.current) {
+        p.playVideo();
+      }
     } catch (e) {}
   }, [activeIdx, playerReady, cutSegments]);
+
+  // The list of indices the user can navigate. When no filter is set
+  // this is every index; when filtered, only matching ones.
+  const navList = visibleIndices && visibleIndices.length
+    ? visibleIndices
+    : cutSegments.map((_, i) => i);
 
   const playSegment = useCallback((idx) => {
     if (idx < 0 || idx >= cutSegments.length) return;
@@ -205,10 +222,26 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   }, [activeSegment]);
 
   const navSegment = useCallback((dir) => {
-    const cur = activeIdx;
-    const next = cur < 0 ? 0 : Math.max(0, Math.min(cutSegments.length - 1, cur + dir));
-    if (next !== cur || cur < 0) playSegment(next);
-  }, [activeIdx, cutSegments.length, playSegment]);
+    if (navList.length === 0) return;
+    // Find current position within the visible navList. If activeIdx
+    // is hidden (e.g. just filtered out), pick a sensible neighbor:
+    //   dir > 0 -> first visible >= activeIdx
+    //   dir < 0 -> last visible <= activeIdx
+    let pos = navList.indexOf(activeIdx);
+    if (pos === -1) {
+      if (dir > 0) {
+        const found = navList.findIndex(i => i > activeIdx);
+        pos = found === -1 ? navList.length - 1 : found - 1;
+      } else {
+        const found = [...navList].reverse().findIndex(i => i < activeIdx);
+        const idxInOrig = found === -1 ? 0 : navList.length - 1 - found;
+        pos = idxInOrig + 1;
+      }
+    }
+    const nextPos = Math.max(0, Math.min(navList.length - 1, pos + dir));
+    const nextIdx = navList[nextPos];
+    if (nextIdx !== activeIdx) playSegment(nextIdx);
+  }, [activeIdx, navList, playSegment]);
 
   const toggleFullscreen = useCallback(async () => {
     if (!containerRef.current) return;
@@ -428,8 +461,12 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   // the new segment is loaded and visible.
   const commitSwipe = useCallback((dir) => {
     const cur = activeIdx;
-    const next = cur + dir;
-    if (next < 0 || next >= cutSegments.length) {
+    // Walk the visible nav list, not the raw cutSegments array.
+    let pos = navList.indexOf(cur);
+    if (pos === -1) pos = 0;
+    const nextPos = pos + dir;
+    const next = nextPos >= 0 && nextPos < navList.length ? navList[nextPos] : -1;
+    if (next < 0) {
       // Edge - snap back (resistance already capped how far we dragged)
       setSwipeOffset(0, true);
       return;
@@ -459,7 +496,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({
         w.style.transform = 'translate3d(0, 0, 0)';
       }
     }, SWIPE_COMMIT_MS);
-  }, [activeIdx, cutSegments.length, setActiveIdx]);
+  }, [activeIdx, navList, setActiveIdx]);
 
   const onSideBlockerPointerMove = (e) => {
     if (!isMobile) return;
@@ -486,8 +523,10 @@ const VideoPlayer = forwardRef(function VideoPlayer({
     // Apply edge resistance + cap: at first clip dragging right resists,
     // at last clip dragging left resists. Past the cap, motion stops entirely.
     let dx = rawDx;
-    const atStart = activeIdx <= 0;
-    const atEnd = activeIdx >= cutSegments.length - 1;
+    // Edge detection now in terms of the visible nav list.
+    const navPos = navList.indexOf(activeIdx);
+    const atStart = navPos <= 0;
+    const atEnd = navPos === -1 || navPos >= navList.length - 1;
     if (atStart && dx > 0) {
       dx = Math.min(dx * SWIPE_EDGE_RESIST, SWIPE_EDGE_CAP_PX);
     }
@@ -667,13 +706,33 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   // redundant pause on an already-paused player is a no-op.
   const pauseAndRemember = useCallback(() => {
     const p = ytPlayerRef.current;
-    wasPlayingBeforeModalRef.current = isPlaying;
+    // Capture play state BEFORE pausing. Use the YT player's own state
+    // (state 1 = playing) rather than React's `isPlaying` which can lag
+    // by a tick — that lag was causing desktop popovers to record
+    // wasPlayingBeforeModal = false even when video was actually playing,
+    // so resumeIfWasPlaying did nothing and the pause appeared to fail.
+    let wasPlaying = isPlaying;
+    try {
+      if (p && p.getPlayerState) {
+        const s = p.getPlayerState();
+        if (s === 1) wasPlaying = true;
+      }
+    } catch (e) {}
+wasPlayingBeforeModalRef.current = wasPlaying;
+    modalSuppressPlayRef.current = true;
     if (p && p.pauseVideo) {
       try { p.pauseVideo(); } catch (e) {}
+      // Defensive re-pause on next tick: YT occasionally auto-resumes
+      // after a state-change settling event. A second pauseVideo() is
+      // a no-op when already paused.
+      setTimeout(() => {
+        try { p.pauseVideo(); } catch (e) {}
+      }, 50);
     }
   }, [isPlaying]);
 
-  const resumeIfWasPlaying = useCallback(() => {
+const resumeIfWasPlaying = useCallback(() => {
+    modalSuppressPlayRef.current = false;
     const p = ytPlayerRef.current;
     if (p && p.playVideo && wasPlayingBeforeModalRef.current) {
       try { p.playVideo(); } catch (e) {}
@@ -782,16 +841,23 @@ const VideoPlayer = forwardRef(function VideoPlayer({
           />
         )}
 
-        {cutSegments.length > 0 && (
-          <button
-            onClick={(e) => { e.stopPropagation(); handleOpenInfo(); }}
-            className={styles.fsTopCounter}
-            aria-label="Clip info"
-          >
-            <span className={`${styles.fsTopCounterDot} ${counterDotClass}`} />
-            <span>{Math.max(0, activeIdx) + 1}/{cutSegments.length}</span>
-          </button>
-        )}
+        {navList.length > 0 && (() => {
+          // Position within the VISIBLE nav list, not the raw cutSegments
+          // array. When filtered to 5 of 23 clips, this should read "3/5"
+          // not "3/23".
+          const navPos = navList.indexOf(activeIdx);
+          const display = navPos === -1 ? 1 : navPos + 1;
+          return (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleOpenInfo(); }}
+              className={styles.fsTopCounter}
+              aria-label="Clip info"
+            >
+              <span className={`${styles.fsTopCounterDot} ${counterDotClass}`} />
+              <span>{display}/{navList.length}</span>
+            </button>
+          );
+        })()}
       </div>
 
       {useFsMobileChrome && activeSegment && (
