@@ -187,9 +187,20 @@ try {
     } catch (e) {}
   }, [activeIdx, playerReady, cutSegments]);
 
+  // When no clip is selected (e.g. filter matched zero clips), pause
+  // the player so the previous clip doesn't keep looping in the
+  // background behind the empty state.
+  useEffect(() => {
+    if (!playerReady || activeIdx >= 0) return;
+    const p = ytPlayerRef.current;
+    if (p && p.pauseVideo) {
+      try { p.pauseVideo(); } catch (e) {}
+    }
+  }, [activeIdx, playerReady]);
+
   // The list of indices the user can navigate. When no filter is set
   // this is every index; when filtered, only matching ones.
-  const navList = visibleIndices && visibleIndices.length
+  const navList = visibleIndices
     ? visibleIndices
     : cutSegments.map((_, i) => i);
 
@@ -880,7 +891,7 @@ const resumeIfWasPlaying = useCallback(() => {
           />
         )}
 
-        {navList.length > 0 && (() => {
+        {navList.length > 0 && activeIdx >= 0 && (() => {
           // Position within the VISIBLE nav list, not the raw cutSegments
           // array. When filtered to 5 of 23 clips, this should read "3/5"
           // not "3/23".
@@ -897,6 +908,15 @@ const resumeIfWasPlaying = useCallback(() => {
             </button>
           );
         })()}
+        {activeIdx < 0 && (
+          <div className={styles.emptyOverlay}>
+            <div className={styles.emptyOverlayInner}>
+              <div className={styles.emptyOverlayTitle}>No clip selected</div>
+              <div className={styles.emptyOverlaySub}>No clips match the current filter.</div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {useFsMobileChrome && activeSegment && (

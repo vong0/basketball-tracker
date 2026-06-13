@@ -95,7 +95,6 @@ export default function Playlist({
               total={total}
             />
           )}
-          <span className={styles.divider} aria-hidden="true" />
           <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>
         </div>
       </div>
