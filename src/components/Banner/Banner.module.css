@@ -61,9 +61,10 @@
 }
 
 .divider {
-  width: 1px;
-  height: 22px;
-  background: var(--border-strong);
+  width: 2px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 1px;
   flex-shrink: 0;
 }
 
