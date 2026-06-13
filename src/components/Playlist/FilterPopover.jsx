@@ -61,6 +61,8 @@ function FilterBody({ choice, setChoice, options, visible, total }) {
             value={choice.player ?? ''}
             onChange={onPlayerChange}
             allowDeselect={false}
+            maxDropdownHeight={200}
+            scrollAreaProps={{ type: 'always' }}
             classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
             comboboxProps={{ withinPortal: false }}
           />
@@ -75,6 +77,7 @@ function FilterBody({ choice, setChoice, options, visible, total }) {
             value={choice.rating ?? ''}
             onChange={onRatingChange}
             allowDeselect={false}
+            maxDropdownHeight={200}
             classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
             comboboxProps={{ withinPortal: false }}
           />
@@ -89,6 +92,7 @@ function FilterBody({ choice, setChoice, options, visible, total }) {
             value={choice.possession ?? ''}
             onChange={onPossessionChange}
             allowDeselect={false}
+            maxDropdownHeight={200}
             classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
             comboboxProps={{ withinPortal: false }}
           />
