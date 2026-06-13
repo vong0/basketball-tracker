@@ -260,4 +260,4 @@
 .dotGood     { background: var(--green);   box-shadow: 0 0 6px rgba(74, 222, 128, 0.5); }
 .dotBad      { background: var(--red);     box-shadow: 0 0 6px rgba(248, 113, 113, 0.5); }
 .dotNeutral  { background: var(--gray-dot); }
-.dotOpponent { background: var(--gray-dot); }
+.dotOpponent { background: #fff; }

@@ -693,7 +693,9 @@ try {
     ? parsedSegments[activeIdx]
     : null;
   const counterDotClass =
-    activeParsed?.quality === 'good'
+    activeParsed?.team === 'opponent'
+      ? styles.dotOpponent
+      : activeParsed?.quality === 'good'
       ? styles.dotGood
       : activeParsed?.quality === 'bad'
       ? styles.dotBad
@@ -893,7 +895,11 @@ const resumeIfWasPlaying = useCallback(() => {
         opened={showInfo}
         onClose={handleCloseInfo}
         title={activeSegment
-          ? `CLIP ${Math.max(0, activeIdx) + 1} / ${cutSegments.length}`
+          ? (() => {
+              const navPos = navList.indexOf(activeIdx);
+              const display = navPos === -1 ? 1 : navPos + 1;
+              return `CLIP ${display} / ${navList.length}`;
+            })()
           : 'CLIP INFO'}
         centered
         size="md"
@@ -916,6 +922,39 @@ const resumeIfWasPlaying = useCallback(() => {
             : parsed.quality === 'bad'
             ? styles.infoQualityBad
             : styles.infoQualityNeutral;
+
+          // Mirror the playlist row format: summary line (if any) + one line
+          // per action with a colored dot. Same text-formatting rules as
+          // PlaylistRow so the modal reads as a zoomed-in version of the row.
+          const actions = parsed.actions || [];
+          const summary = parsed.summary || '';
+
+          const actionLineText = (a) => {
+            const players = a.players && a.players.length ? a.players.join(', ') : '';
+            const note = a.note || '';
+            const isOpp = a.team === 'O';
+            if (isOpp) {
+              const head = players ? 'opp ' + players : 'opp';
+              return note ? head + ': ' + note : head;
+            }
+            if (players && note) return players + ': ' + note;
+            if (players) return players;
+            if (note) return 'all: ' + note;
+            return 'all';
+          };
+
+          const dotClassFor = (a) => {
+            if (a.team === 'O') return styles.dotOpponent;
+            if (a.quality === 'G') return styles.dotGood;
+            if (a.quality === 'B') return styles.dotBad;
+            return styles.dotNeutral;
+          };
+
+          const isSchemeOnlyNoQuality = (a) => {
+            const isScheme = a.type === 'MAN' || a.type === '2-3' || a.type === '3-2';
+            return isScheme && !a.quality;
+          };
+
           return (
             <div>
               <div className={styles.infoMetaRow}>
@@ -925,44 +964,24 @@ const resumeIfWasPlaying = useCallback(() => {
                   <span className={styles.infoDuration}> · {formatTime(dur)}</span>
                 </span>
               </div>
-
-              {parsed.actions && parsed.actions.length > 0 && (
-                <div className={styles.infoSection}>
-                  <div className={styles.infoSectionTitle}>ACTIONS</div>
-                  <ul className={styles.infoActionList}>
-                    {parsed.actions.map((a, i) => {
-                      const dotCls = a.quality === 'good'
-                        ? styles.dotGood
-                        : a.quality === 'bad'
-                        ? styles.dotBad
-                        : styles.dotNeutral;
-                      return (
-                        <li key={i} className={styles.infoActionRow}>
-                          <span className={`${styles.infoActionDot} ${dotCls}`} />
-                          <div className={styles.infoActionBody}>
-                            <div className={styles.infoActionHead}>
-                              <span className={styles.infoActionType}>{a.type}</span>
-                              <span className={styles.infoActionTeam}>
-                                {a.team === 'O' ? 'OPP' : 'US'}
-                              </span>
-                              {a.players && a.players.length > 0 && (
-                                <span className={styles.infoActionPlayers}>
-                                  {a.players.join(', ')}
-                                </span>
-                              )}
-                            </div>
-                            {a.note && <div className={styles.infoActionNote}>{a.note}</div>}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              )}
-
-              <div className={styles.infoSection}>
-                <div className={styles.infoSectionTitle}>RAW LABEL</div>
-                <div className={styles.infoRaw}>{activeSegment.name || '(empty)'}</div>
+              <div className={styles.infoBody}>
+                {actions.map((a, i) => {
+                  const text = actionLineText(a);
+                  const noDot = isSchemeOnlyNoQuality(a);
+                  return (
+                    <div key={i} className={styles.infoActionLine}>
+                      {!noDot && (
+                        <span className={`${styles.infoLineDot} ${dotClassFor(a)}`} />
+                      )}
+                      <span className={styles.infoActionText}>{text || activeSegment.name}</span>
+                    </div>
+                  );
+                })}
+                {actions.length === 0 && !summary && (
+                  <div className={styles.infoActionLine}>
+                    <span className={styles.infoActionText}>{activeSegment.name}</span>
+                  </div>
+                )}
               </div>
             </div>
           );
