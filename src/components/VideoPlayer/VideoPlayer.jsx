@@ -796,8 +796,17 @@ const resumeIfWasPlaying = useCallback(() => {
           <>
             {/* Top blocker - kills accidentally going to full Youtube video */}
             <div className={styles.ytTopBlocker} />
-            {/* Bottom blocker - kills YT seekbar drag/tap */}
-            <div className={styles.ytBottomBlocker} />
+            {/* Bottom blocker - kills YT seekbar drag/tap, also handles
+                tap=play/pause and horizontal swipe=clip nav like the side
+                blockers. Side is arbitrarily 'right' (long-press = 2x). */}
+            <div
+              className={styles.ytBottomBlocker}
+              onPointerDown={onSideBlockerPointerDown('right')}
+              onPointerMove={onSideBlockerPointerMove}
+              onPointerUp={onSideBlockerPointerUp}
+              onPointerCancel={onSideBlockerPointerCancel}
+              onPointerLeave={onSideBlockerPointerCancel}
+            />
             {/* Left side - tap = pause/play, long-press = 0.5x speed, swipe = nav */}
             <div
               className={styles.ytLeftBlocker}
@@ -833,7 +842,35 @@ const resumeIfWasPlaying = useCallback(() => {
               onPointerCancel={onSideBlockerPointerCancel}
               onPointerLeave={onSideBlockerPointerCancel}
             />
-            {/* Bottom-center 30% x 80px is uncovered -> YT passthrough for dim/undim */}
+            {/* Center-bottom blocker: fills the 30% YT-passthrough gap when
+                NOT fullscreen. In non-fullscreen the video is small and users
+                tend to swipe from the middle, so the passthrough was leaking
+                gestures to YT. In fullscreen landscape thumbs sit at the
+                sides, so the center gap stays open for YT dim/undim. */}
+            {!isFullscreen && (
+              <>
+                {/* Split the center 30% gap into two 15% halves so the
+                    left/right long-press rule (0.5x vs 2x) stays consistent
+                    with the rest of the screen — holding the bottom-middle-
+                    left gives 0.5x, bottom-middle-right gives 2x. */}
+                <div
+                  className={styles.ytLowerCenterLeftBlocker}
+                  onPointerDown={onSideBlockerPointerDown('left')}
+                  onPointerMove={onSideBlockerPointerMove}
+                  onPointerUp={onSideBlockerPointerUp}
+                  onPointerCancel={onSideBlockerPointerCancel}
+                  onPointerLeave={onSideBlockerPointerCancel}
+                />
+                <div
+                  className={styles.ytLowerCenterRightBlocker}
+                  onPointerDown={onSideBlockerPointerDown('right')}
+                  onPointerMove={onSideBlockerPointerMove}
+                  onPointerUp={onSideBlockerPointerUp}
+                  onPointerCancel={onSideBlockerPointerCancel}
+                  onPointerLeave={onSideBlockerPointerCancel}
+                />
+              </>
+            )}
           </>
         ) : (
           <div

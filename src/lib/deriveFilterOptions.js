@@ -65,7 +65,10 @@ export function buildFilter(choice) {
   if (choice.player === 'opponents') {
     f.team = 'O';
   } else if (choice.player) {
-    f.players = [choice.player];
+    // 'all' actions are team-wide, so they should match every specific-
+    // player filter. Filtering by 'adam' matches actions tagged with
+    // adam OR with 'all'.
+    f.players = [choice.player, 'all'];
   }
   if (choice.rating) {
     f.quality = choice.rating;

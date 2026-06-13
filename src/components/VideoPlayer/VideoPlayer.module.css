@@ -228,6 +228,38 @@
   user-select: none;
 }
 
+/* Non-fullscreen only: closes the 30% center gap between the lower
+   left/right blockers, split into two 15% halves so left/right long-
+   press semantics stay consistent across the whole screen. Rendered
+   conditionally in JSX. */
+.ytLowerCenterLeftBlocker {
+  position: absolute;
+  bottom: 50px;
+  left: 35%;
+  width: 15%;
+  height: 80px;
+  z-index: 10;
+  background: transparent;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+}
+
+.ytLowerCenterRightBlocker {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  width: 15%;
+  height: 80px;
+  z-index: 10;
+  background: transparent;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+}
+
 /* Mobile fullscreen top-right: clip counter pill that opens the info dialog.
    Reuses the visual weight of the old fsExpandBtn so it reads as a button. */
 .fsTopCounter {
