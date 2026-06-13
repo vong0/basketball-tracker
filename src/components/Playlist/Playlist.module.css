@@ -175,6 +175,27 @@
   .row:hover { background: rgba(255, 255, 255, 0.04); }
 }
 
+/* Kill all interaction-state greys on mobile. Real touch devices
+   apply :active AND keep :focus on the button after tap, and
+   Mantine's global button styles paint a grey focus background
+   that overrides .rowActive's orange tint. Force transparent on
+   inactive rows for every interaction state, and force orange on
+   the active row for every interaction state. */
+.row:active,
+.row:focus,
+.row:focus-visible,
+.row:focus-within {
+  background: transparent;
+  outline: none;
+}
+.rowActive,
+.rowActive:active,
+.rowActive:focus,
+.rowActive:focus-visible,
+.rowActive:focus-within {
+  background: rgba(255, 92, 26, 0.08);
+}
+
 .rowActive {
   background: var(--orange-soft);
   border-left-color: var(--orange);

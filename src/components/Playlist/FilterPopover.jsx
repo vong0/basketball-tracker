@@ -18,7 +18,7 @@ function FilterBody({ choice, setChoice, options, visible, total }) {
   const playerData = [
     { value: '', label: 'Any' },
     ...(options.hasOpponents ? [{ value: 'opponents', label: 'Opponents' }] : []),
-    ...options.players.map(p => ({ value: p, label: p })),
+    ...options.players.map(p => ({ value: p, label: p.charAt(0).toUpperCase() + p.slice(1) })),
   ];
 
   const ratingData = [

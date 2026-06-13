@@ -50,7 +50,7 @@ export default function LandingPage({ isMobile }) {
             <h1 className={styles.heading}>Games</h1>
             <a
             className={styles.statsLink}
-            href="./public/data/stats.html"
+            href="./data/stats.html"
             target="_blank"
             rel="noopener noreferrer"
           >
