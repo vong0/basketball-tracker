@@ -57,18 +57,28 @@ export default function Playlist({
           </div>
         </div>
         <div className={styles.headerActions}>
-          {filterOptions && (
-            <button
-              ref={filterBtnRef}
-              className={filterActive ? `${styles.filterBtn} ${styles.filterBtnActive}` : styles.filterBtn}
-              onClick={() => filterOpen ? closeFilter() : openFilter()}
-              aria-label="Filter clips"
-              title="Filter clips"
-            >
-              ⚲
-              {filterActive && <span className={styles.filterDot} />}
-            </button>
-          )}
+          {filterOptions && (() => {
+            // Count how many dimensions are actively filtered, so the
+            // button can read 'Filters' / 'Filters · 2' etc. Helps users
+            // see at a glance whether/how much is filtered.
+            const activeCount =
+              (filterChoice.player ? 1 : 0) +
+              (filterChoice.rating ? 1 : 0) +
+              (filterChoice.possession ? 1 : 0);
+            return (
+              <button
+                ref={filterBtnRef}
+                className={filterActive ? `${styles.filterBtn} ${styles.filterBtnActive}` : styles.filterBtn}
+                onClick={() => filterOpen ? closeFilter() : openFilter()}
+                aria-label="Filter clips"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                <span>Filters{activeCount > 0 ? ` · ${activeCount}` : ''}</span>
+              </button>
+            );
+          })()}
           {filterOptions && (
             <FilterPopover
               opened={filterOpen}
