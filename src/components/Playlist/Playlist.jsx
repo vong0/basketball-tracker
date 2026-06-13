@@ -2,6 +2,7 @@ import PlaylistRow from './PlaylistRow';
 import styles from './Playlist.module.css';
 
 export default function Playlist({
+  title,
   cutSegments,
   parsedSegments,
   activeIdx,
@@ -15,7 +16,7 @@ export default function Playlist({
     <aside className={`${styles.playlist} ${isMobile ? styles.playlistMobile : ''}`}>
       <div className={styles.header}>
         <div className={styles.title}>
-          PLAYLIST <span className={styles.count}>({cutSegments.length})</span>
+          {title || 'PLAYLIST'} <span className={styles.count}>({cutSegments.length})</span>
         </div>
         <div className={styles.headerActions}>
           {isMobile && onToggleVideoCollapsed && (

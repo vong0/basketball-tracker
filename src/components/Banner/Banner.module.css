@@ -21,6 +21,29 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border-radius: 4px;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .brand:hover {
+    background: rgba(255, 92, 26, 0.08);
+  }
+  .brand:hover .wordmark {
+    color: var(--orange);
+  }
+}
+
+.brand:active {
+  background: rgba(255, 92, 26, 0.14);
 }
 
 .bannerMobile .brand {
@@ -37,45 +60,3 @@
   font-size: 18px;
 }
 
-.nav {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.tab {
-  position: relative;
-  background: none;
-  border: none;
-  padding: 0 16px;
-  height: 100%;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.15s;
-  font-family: inherit;
-}
-
-.bannerMobile .tab {
-  padding: 0 10px;
-  font-size: 13px;
-}
-
-.tab:hover {
-  color: #fff;
-}
-
-.tab.active {
-  color: #fff;
-}
-
-.tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--orange);
-}

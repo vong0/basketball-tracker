@@ -1,0 +1,81 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;        /* fallback for browsers without dvh */
+  height: 100dvh;       /* dynamic viewport: accounts for mobile URL bar */
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mainDesktop {
+  flex-direction: row;
+}
+
+.mainMobile {
+  flex-direction: column;
+}
+
+.mainMobile .videoWrap {
+  flex: 0 0 auto;
+  height: 45vh;        /* fallback */
+  height: 40dvh;
+  min-height: 0;
+  transition: height 0.2s ease;
+}
+
+/* Collapsed: video shrinks to a thumbnail strip so the playlist owns the
+   screen. Useful for browsing 50+ clips on a phone. */
+.mainMobile.videoCollapsed .videoWrap {
+  height: 80px;
+}
+
+.videoWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  min-width: 0;
+  min-height: 0;
+}
+
+.errorBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+  font-family: var(--font-mono);
+  color: var(--text);
+  text-align: center;
+}
+
+.errorDetail {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.errorBack {
+  margin-top: 12px;
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.errorBack:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}

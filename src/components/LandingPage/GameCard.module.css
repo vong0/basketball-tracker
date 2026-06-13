@@ -1,0 +1,91 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 18px 18px 20px;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--border-strong);
+    border-left-color: var(--orange);
+    background: #111;
+  }
+}
+
+.card:active {
+  transform: translateY(1px);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.badgeWin {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+}
+
+.badgeLoss {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--red);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.badgeTie {
+  background: rgba(156, 163, 175, 0.15);
+  color: var(--gray-dot);
+  border: 1px solid rgba(156, 163, 175, 0.4);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.opponent {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.score {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
