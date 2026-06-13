@@ -15,9 +15,21 @@ function actionLineText(action) {
     ? action.players.join(', ')
     : '';
   const note = action.note || '';
+  const isOpp = action.team === 'O';
+
+  // Opponent actions: prefix with "opp" (instead of "all") when no named
+  // players, or "opp <names>" when named players appear.
+  if (isOpp) {
+    const head = players ? 'opp ' + players : 'opp';
+    if (note) return head + ': ' + note;
+    return head;
+  }
+
+  // Us-team actions: when no players, treat as team-wide ("all").
   if (players && note) return players + ': ' + note;
   if (players) return players;
-  return note;
+  if (note) return 'all: ' + note;
+  return 'all';
 }
 
 /**
@@ -28,7 +40,7 @@ function actionLineText(action) {
  */
 function dotClassFor(action, styles) {
   if (!action) return styles.dotNeutral;
-  if (action.team === 'T') return styles.dotOpponent;
+  if (action.team === 'O') return styles.dotOpponent;
   if (action.quality === 'G') return styles.dotGood;
   if (action.quality === 'B') return styles.dotBad;
   return styles.dotNeutral;

@@ -11,7 +11,7 @@
  * One label may contain multiple ACTIONS separated by `|`. Each action has:
  *
  *   TEAM     — required on the FIRST action.
- *              `U` = us, `T` = them (opponent).
+ *              `U` = us, `O` = opponent.
  *              Subsequent actions inherit TEAM(TYPE) from the previous action
  *              if the prefix is omitted.
  *
@@ -47,7 +47,7 @@
  * Examples:
  *   UG(O) matt: drives baseline and kicks for open three
  *   UB(D) lost rotation, easy layup
- *   TG(O) opponent: well-executed pick and roll for open dunk
+ *   OG(O) opponent: well-executed pick and roll for open dunk
  *   U(MAN) all: full rotation snuffs out drive and kick
  *   UG(O) matt: drives | vong: screens | george: pops for three
  *   UG(O) matt: drives | george,kap: double screen >> textbook flow offense
@@ -75,7 +75,7 @@
  *   {
  *     actions: [
  *       {
- *         team:    'U' | 'T',                     // code, not expanded
+ *         team:    'U' | 'O',                     // code, not expanded
  *         quality: 'G' | 'B' | '',                // code; '' = neutral
  *         type:    'O' | 'D' | 'MAN' | '2-3' | '3-2',
  *         players: string[],                      // [] if none
@@ -107,7 +107,7 @@
 
 export const TEAMS = {
   U: { code: 'U', key: 'us',       label: 'Us'   },
-  T: { code: 'T', key: 'opponent', label: 'Them' },
+  O: { code: 'O', key: 'opponent', label: 'Opponent' },
 };
 
 export const QUALITIES = {
@@ -150,7 +150,7 @@ export function typeLabel(code) {
  * internally for filtering.
  */
 export function qualityColor(action) {
-  if (action.team === 'T') return 'blue';
+  if (action.team === 'O') return 'gray';
   return QUALITIES[action.quality]?.color ?? 'gray';
 }
 
@@ -159,7 +159,7 @@ export function qualityColor(action) {
 // PARSER
 // ============================================================================
 
-const PREFIX_RE = /^(?:([UT])([GB]?)\(([A-Z0-9-]+)\)\s*)?(.*)$/;
+const PREFIX_RE = /^(?:([UO])([GB]?)\(([A-Z0-9-]+)\)\s*)?(.*)$/;
 
 /**
  * Extract `#tag` words out of free-text. Returns { note, tags } where
@@ -269,7 +269,7 @@ export function parseLabel(label) {
 
   // Backward-compat aliases for the first action (expanded keys).
   const firstAlias = first || { team: 'U', quality: '', type: 'O' };
-  const teamAlias = firstAlias.team === 'T' ? 'opponent' : 'us';
+  const teamAlias = firstAlias.team === 'O' ? 'opponent' : 'us';
   const qualityAlias = firstAlias.quality === 'G'
     ? 'good'
     : firstAlias.quality === 'B'
@@ -372,8 +372,8 @@ export function validateParsed(parsed, raw) {
       issues.push(`action ${i + 1}: unknown quality code "${a.quality}"`);
     }
   }
-  if (typeof raw === 'string' && /^O[GB]?\(/.test(raw)) {
-    issues.push('legacy `O` team prefix detected (should be `T`)');
+  if (typeof raw === 'string' && /^T[GB]?\(/.test(raw)) {
+    issues.push('legacy `T` team prefix detected (should be `O`)');
   }
   return issues;
 }
@@ -472,11 +472,11 @@ async function runCli() {
   const samples = [
     'UG(O) matt: drives baseline and kicks for open three',
     'UB(O) matt: bad pass | UG(D) george: deflects, recovers | UG(O) vong: fastbreak layup >> turnover into transition score',
-    'TG(O) opponent: well-executed pick and roll for open dunk',
+    'OG(O) opponent: well-executed pick and roll for open dunk',
     'U(MAN) all: full rotation snuffs out drive and kick',
     'UG(O) matt: high screen and roll, great read #pnr',
     'UG(O) matt: drives | vong: screens | george: pops for three',
-    'T(2-3) opponent runs 2-3 zone, we get stuck on perimeter',
+    'O(2-3) opponent runs 2-3 zone, we get stuck on perimeter',
   ];
   for (const s of samples) {
     console.log('---');

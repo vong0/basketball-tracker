@@ -6,7 +6,7 @@
     {
       start: 95.048436,
       end: 106.970745,
-      name: 'TG(O): stack, high post, wing 3',
+      name: 'OG(O): stack, high post, wing 3',
       selected: true,
     },
     {
@@ -18,7 +18,7 @@
     {
       start: 147.194736,
       end: 151.720843,
-      name: 'TG(O) no13: spin foul bait | UB(D) vong: spin foul bait',
+      name: 'OG(O) no13: spin foul bait | UB(D) vong: spin foul bait',
       selected: true,
     },
     {
@@ -30,13 +30,13 @@
     {
       start: 198.883669,
       end: 203.164461,
-      name: 'TG(O): pin down, wing 3 | UB(D) kap: pin down, wing 3',
+      name: 'OG(O): pin down, wing 3 | UB(D) kap: pin down, wing 3',
       selected: true,
     },
     {
       start: 225.535836,
       end: 232.220111,
-      name: 'TG(O): pin down, wing 3 | UB(D) adam: pin down, wing 3',
+      name: 'OG(O): pin down, wing 3 | UB(D) adam: pin down, wing 3',
       selected: true,
     },
     {
@@ -66,13 +66,13 @@
     {
       start: 337.856988,
       end: 344.396434,
-      name: 'TG(O): pin down wing 3',
+      name: 'OG(O): pin down wing 3',
       selected: true,
     },
     {
       start: 518.494086,
       end: 523.76707,
-      name: 'TG(O) no32: drive mid floater vs 3-2',
+      name: 'OG(O) no32: drive mid floater vs 3-2',
       selected: true,
     },
     {
@@ -108,7 +108,7 @@
     {
       start: 784.607674,
       end: 797.81736,
-      name: 'TG(O): dump mid possible dunkers',
+      name: 'OG(O): dump mid possible dunkers',
       selected: true,
     },
     {
@@ -138,7 +138,7 @@
     {
       start: 993.913281,
       end: 1004.986314,
-      name: 'TG(O): drive open 3',
+      name: 'OG(O): drive open 3',
       selected: true,
     },
     {
