@@ -4,5 +4,9 @@ import react from '@vitejs/plugin-react';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/basketball-tracker/',  // <-- your repo name, with leading + trailing slashes
+  base: '/basketball-tracker/',
+  server: {
+    host: true,  // or use '0.0.0.0'
+    port: 5173
+  }
 });
