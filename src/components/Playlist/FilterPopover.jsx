@@ -1,91 +1,99 @@
-import { Modal } from '@mantine/core';
+import { Modal, Select } from '@mantine/core';
 import styles from './FilterPopover.module.css';
 import { EMPTY_CHOICE } from '../../lib/deriveFilterOptions';
 
 /**
 
- * The filter UI body. Used inside both Popover (desktop) and Modal (mobile).
+ * Filter UI body. Three single-select combo boxes (Players / Rating /
+ * Possession), each with an explicit "Any" option for clearing that
+ * dimension. Sections with no real options (e.g. game has no Bad-rated
+ * actions) are hidden entirely.
  */
 function FilterBody({ choice, setChoice, options, visible, total }) {
-  const setPlayer = (v) => setChoice({ ...choice, player: v });
-  const setRating = (v) => setChoice({ ...choice, rating: v });
-  const setPossession = (v) => setChoice({ ...choice, possession: v });
-
   const reset = () => setChoice(EMPTY_CHOICE);
 
-  // Radio row: clicking the already-selected option does nothing
-  // (per spec — to clear, pick "Any" or hit Reset).
-  const Radio = ({ label, selected, onClick }) => (
-    <button
-      type="button"
-      className={selected ? styles.optSelected : styles.opt}
-      onClick={() => { if (!selected) onClick(); }}
-    >
-      <span className={styles.optDot}>{selected ? '●' : '○'}</span>
-      <span>{label}</span>
-    </button>
-  );
+  // Build option lists. "Any" is always the first entry; we use empty
+  // string as its value because Mantine's Select treats null/undefined
+  // as "no value picked" and will show the placeholder instead of "Any".
+  const playerData = [
+    { value: '', label: 'Any' },
+    ...(options.hasOpponents ? [{ value: 'opponents', label: 'Opponents' }] : []),
+    ...options.players.map(p => ({ value: p, label: p })),
+  ];
+
+  const ratingData = [
+    { value: '', label: 'Any' },
+    ...(options.ratings.includes('G') ? [{ value: 'G', label: 'Good' }] : []),
+    ...(options.ratings.includes('B') ? [{ value: 'B', label: 'Bad' }] : []),
+  ];
+
+  const possessionData = [
+    { value: '', label: 'Any' },
+    ...(options.possessions.includes('offense') ? [{ value: 'offense', label: 'Offense' }] : []),
+    ...(options.possessions.includes('defense') ? [{ value: 'defense', label: 'Defense' }] : []),
+  ];
+
+  // Mantine's Select returns the selected `value` string. We translate
+  // empty string back to `null` for our internal choice shape (which is
+  // what `buildFilter` expects).
+  const onPlayerChange = (v) => setChoice({ ...choice, player: v || null });
+  const onRatingChange = (v) => setChoice({ ...choice, rating: v || null });
+  const onPossessionChange = (v) => setChoice({ ...choice, possession: v || null });
+
+  // Hide a section if it would only contain "Any" (i.e. nothing real to
+  // pick). For Players we also hide if there are no us-team players AND
+  // no opponents.
+  const showPlayers = playerData.length > 1;
+  const showRating = ratingData.length > 1;
+  const showPossession = possessionData.length > 1;
 
   return (
     <div className={styles.body}>
       <div className={styles.countLine}>
         {visible} of {total} selected
       </div>
-      <div className={styles.section}>
-        <div className={styles.sectionTitle}>Players</div>
-        <div className={styles.options}>
-          <Radio label="Any" selected={choice.player === null} onClick={() => setPlayer(null)} />
-          {options.hasOpponents && (
-            <Radio
-              label="Opponents"
-              selected={choice.player === 'opponents'}
-              onClick={() => setPlayer('opponents')}
-            />
-          )}
-          {options.players.map(p => (
-            <Radio
-              key={p}
-              label={p}
-              selected={choice.player === p}
-              onClick={() => setPlayer(p)}
-            />
-          ))}
-        </div>
-      </div>
 
-      <div className={styles.section}>
-        <div className={styles.sectionTitle}>Rating</div>
-        <div className={styles.options}>
-          <Radio label="Any" selected={choice.rating === null} onClick={() => setRating(null)} />
-          {options.ratings.includes('G') && (
-            <Radio label="Good" selected={choice.rating === 'G'} onClick={() => setRating('G')} />
-          )}
-          {options.ratings.includes('B') && (
-            <Radio label="Bad" selected={choice.rating === 'B'} onClick={() => setRating('B')} />
-          )}
+      {showPlayers && (
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>Players</div>
+          <Select
+            data={playerData}
+            value={choice.player ?? ''}
+            onChange={onPlayerChange}
+            allowDeselect={false}
+            classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
+            comboboxProps={{ withinPortal: false }}
+          />
         </div>
-      </div>
+      )}
 
-      <div className={styles.section}>
-        <div className={styles.sectionTitle}>Possession</div>
-        <div className={styles.options}>
-          <Radio label="Any" selected={choice.possession === null} onClick={() => setPossession(null)} />
-          {options.possessions.includes('offense') && (
-            <Radio
-              label="Offense"
-              selected={choice.possession === 'offense'}
-              onClick={() => setPossession('offense')}
-            />
-          )}
-          {options.possessions.includes('defense') && (
-            <Radio
-              label="Defense"
-              selected={choice.possession === 'defense'}
-              onClick={() => setPossession('defense')}
-            />
-          )}
+      {showRating && (
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>Rating</div>
+          <Select
+            data={ratingData}
+            value={choice.rating ?? ''}
+            onChange={onRatingChange}
+            allowDeselect={false}
+            classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
+            comboboxProps={{ withinPortal: false }}
+          />
         </div>
-      </div>
+      )}
+
+      {showPossession && (
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>Possession</div>
+          <Select
+            data={possessionData}
+            value={choice.possession ?? ''}
+            onChange={onPossessionChange}
+            allowDeselect={false}
+            classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
+            comboboxProps={{ withinPortal: false }}
+          />
+        </div>
+      )}
 
       <div className={styles.footer}>
         <button type="button" className={styles.resetBtn} onClick={reset}>
@@ -105,11 +113,6 @@ export default function FilterPopover({
   visible,
   total,
 }) {
-  // Centered modal on both desktop and mobile. Keeps the popup off the
-  // playlist (so rows stay visible) and gives a single focused place
-  // to interact. Pause/resume is handled by the parent — the modal
-  // doesn't auto-close on option clicks, so playback stays paused
-  // for the entire interaction.
   return (
     <Modal
       opened={opened}
@@ -119,7 +122,13 @@ export default function FilterPopover({
       size="sm"
       classNames={{ title: styles.modalTitle }}
     >
-      <FilterBody choice={choice} setChoice={setChoice} options={options} visible={visible} total={total} />
+      <FilterBody
+        choice={choice}
+        setChoice={setChoice}
+        options={options}
+        visible={visible}
+        total={total}
+      />
     </Modal>
   );
 }
