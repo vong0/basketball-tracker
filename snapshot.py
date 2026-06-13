@@ -28,8 +28,7 @@ INCLUDE_FILES = [
 INCLUDE_EXTENSIONS = {
     ".jsx", ".js", ".ts", ".tsx",
     ".css", ".module.css",
-    ".html", ".json",
-    ".md",
+    ".json",
 }
 
 # Folders to skip even if inside an included path

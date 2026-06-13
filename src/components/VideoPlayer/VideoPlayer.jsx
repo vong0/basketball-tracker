@@ -911,7 +911,12 @@ const resumeIfWasPlaying = useCallback(() => {
           className={styles.fsBottomExpandBtn}
           aria-label="Exit fullscreen"
         >
-          ⛶
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="9 4 9 9 4 9" />
+            <polyline points="15 4 15 9 20 9" />
+            <polyline points="9 20 9 15 4 15" />
+            <polyline points="15 20 15 15 20 15" />
+          </svg>
         </button>
       )}
 

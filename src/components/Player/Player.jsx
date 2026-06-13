@@ -165,7 +165,7 @@ export default function Player({ gameId, isMobile }) {
 
   return (
     <div className={styles.app}>
-      {!isFullscreen && <Banner isMobile={isMobile} />}
+      {!isFullscreen && <Banner isMobile={isMobile} game={gameMeta} />}
       <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop} ${isMobile && videoCollapsed ? styles.videoCollapsed : ''}`}>
         <div className={styles.videoWrap}>
           <VideoPlayer

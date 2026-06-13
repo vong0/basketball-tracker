@@ -17,19 +17,16 @@ function actionLineText(action) {
   const note = action.note || '';
   const isOpp = action.team === 'O';
 
-  // Opponent actions: prefix with "opp" (instead of "all") when no named
-  // players, or "opp <names>" when named players appear.
+  // Returns JSX with <b> wrapping the player/team head so names
+  // pop visually when scanning the playlist.
   if (isOpp) {
     const head = players ? 'opp ' + players : 'opp';
-    if (note) return head + ': ' + note;
-    return head;
+    return note ? (<><b>{head}</b>: {note}</>) : (<b>{head}</b>);
   }
-
-  // Us-team actions: when no players, treat as team-wide ("all").
-  if (players && note) return players + ': ' + note;
-  if (players) return players;
-  if (note) return 'all: ' + note;
-  return 'all';
+  if (players && note) return (<><b>{players}</b>: {note}</>);
+  if (players) return (<b>{players}</b>);
+  if (note) return (<><b>all</b>: {note}</>);
+  return (<b>all</b>);
 }
 
 /**

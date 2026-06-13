@@ -566,10 +566,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   cursor: pointer;
   flex-shrink: 0;
   font-family: inherit;
+  padding: 0;
 }
 
 .controlButton:hover {
@@ -658,7 +658,6 @@
   .controlButton {
     width: 32px;
     height: 32px;
-    font-size: 15px;
   }
   .seekbarTrack {
     height: 5px;

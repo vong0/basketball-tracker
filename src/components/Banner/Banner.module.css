@@ -60,3 +60,40 @@
   font-size: 18px;
 }
 
+.divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.gameInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bannerMobile .gameInfo {
+  font-size: 14px;
+  gap: 8px;
+}
+
+.dotSep {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.resultW { color: var(--green); }
+.resultL { color: var(--red); }
+.resultT { color: var(--text-dim); }
+
+

@@ -36,7 +36,6 @@ export default function Playlist({
   const total = cutSegments.length;
   const visible = visibleIndices ? visibleIndices.length : total;
   const visibleSet = visibleIndices || cutSegments.map((_, i) => i);
-  const countText = filterActive ? `(${visible} of ${total})` : `(${total})`;
 
   return (
     <aside className={`${styles.playlist} ${isMobile ? styles.playlistMobile : ''}`}>
@@ -49,12 +48,18 @@ export default function Playlist({
               aria-label={videoCollapsed ? 'Expand video' : 'Collapse video'}
               title={videoCollapsed ? 'Expand video' : 'Collapse video'}
             >
-              {videoCollapsed ? '▼' : '▲'}
+              {videoCollapsed ? (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+              )}
             </button>
           )}
-          <div className={styles.title}>
-            {title || 'PLAYLIST'} <span className={styles.count}>{countText}</span>
-          </div>
+          <div className={styles.title}>{title || 'PLAYLIST'}</div>
         </div>
         <div className={styles.headerActions}>
           {filterOptions && (() => {
@@ -90,6 +95,7 @@ export default function Playlist({
               total={total}
             />
           )}
+          <span className={styles.divider} aria-hidden="true" />
           <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>
         </div>
       </div>
