@@ -353,7 +353,6 @@
   border-radius: 2px;
   transition: height 0.1s ease;
 }
-
 .reelSeekbar:active .reelSeekbarFill {
   height: 6px;
 }
@@ -682,19 +681,19 @@
    ============================================================================ */
 @media (max-width: 900px) {
   .controlBar {
-    height: 36px;
-    padding: 0 8px;
-    gap: 8px;
+    height: 44px;
+    padding: 0 10px;
+    gap: 10px;
   }
   .controlButton {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
   }
   .seekbarTrack {
-    height: 5px;
+    height: 7px;
   }
   .seekbarThumb {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
   }
 }
