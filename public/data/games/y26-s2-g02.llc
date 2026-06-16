@@ -207,15 +207,15 @@
       selected: true,
     },
     {
-      start: 1338.073585,
-      end: 1341.980774,
-      name: 'UG(O) all: FAST passes - swing wing, back to mid, swing opposite wing 3',
-      selected: true,
-    },
-    {
       start: 1332.073585,
       end: 1337.496365,
       name: 'UB(O) alex: go middle high post from start',
+      selected: true,
+    },
+    {
+      start: 1333.381064,
+      end: 1341.980774,
+      name: 'UG(O) all: FAST passes - swing wing, back to mid, swing opposite wing 3',
       selected: true,
     },
     {
@@ -293,7 +293,7 @@
     {
       start: 1774.953898,
       end: 1779.924482,
-      name: 'UG(O): kap,matt: good middle entry pass, to rack, fake then go up | UG(O) george: good screen',
+      name: 'UG(O) kap,matt: good middle entry pass, to rack, fake then go up | UG(O) george: good screen',
       selected: true,
     },
     {
@@ -311,7 +311,7 @@
     {
       start: 1908.421639,
       end: 1911.525539,
-      name: 'UG(O): kap,matt,vong: fast ball movement/low post cut',
+      name: 'UG(O) kap,matt,vong: fast ball movement/low post cut',
       selected: true,
     },
     {
