@@ -4,6 +4,13 @@
     "opponents": "Team Tam",
     "score": "52-50",
     "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
-    "llc": "games/y26-edit.json"
+    "llc": "games/y26-s2-g01.llc"
+  },
+  "02": {
+    "name": "Game 2",
+    "opponents": "Net Profits",
+    "score": "37-65",
+    "youtubeUrl": "https://youtu.be/orgeiVM7074",
+    "llc": "games/y26-s2-g02.llc"
   }
 }

@@ -1,7 +1,6 @@
 {
   version: 2,
   mediaFileName: 'S2G01.mp4',
-  game: {youtubeUrl: "https://www.youtube.com/watch?v=2Y1arwOHfK8"},
   cutSegments: [
     {
       start: 95.048436,
