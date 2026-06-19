@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import Banner from '../Banner/Banner';
 import styles from './StrategiesPage.module.css';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
+import { getYouTubeId } from '../../lib/youtube';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -29,8 +31,13 @@ function groupByDefenseType(strategies) {
 
 // ── Clip modal ────────────────────────────────────────────────────────────────
 
-function ClipModal({ clip, onClose }) {
-  const embedUrl = clip ? buildYouTubeEmbedUrl(clip.youtubeUrl, clip.timestampSeconds) : null;
+function ClipModal({ clip, onClose, isMobile }) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const videoId = clip ? getYouTubeId(clip.youtubeUrl) : null;
+
+  const cutSegments = clip
+    ? [{ start: clip.timestampSeconds, end: clip.timestampSeconds + 30, name: clip.label }]
+    : [];
 
   // Close on Escape
   useEffect(() => {
@@ -45,7 +52,7 @@ function ClipModal({ clip, onClose }) {
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  if (!clip || !embedUrl) return null;
+  if (!clip || !videoId) return null;
 
   return (
     <div className={styles.modalBackdrop} onClick={onClose}>
@@ -62,12 +69,17 @@ function ClipModal({ clip, onClose }) {
           </button>
         </div>
         <div className={styles.modalVideo}>
-          <iframe
-            src={embedUrl}
-            title={clip.label}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+          <VideoPlayer
+            videoId={videoId}
+            cutSegments={cutSegments}
+            parsedSegments={cutSegments.map(() => ({ actions: [], summary: '', title: clip.label, team: 'us', quality: 'neutral', type: 'O' }))}
+            activeIdx={0}
+            setActiveIdx={() => {}}
+            visibleIndices={[0]}
+            isFullscreen={isFullscreen}
+            setIsFullscreen={setIsFullscreen}
+            isMobile={isMobile}
+            hideCounter={true}
           />
         </div>
       </div>
@@ -374,7 +386,7 @@ export default function StrategiesPage({ isMobile }) {
       </div>
 
       {activeClip && (
-        <ClipModal clip={activeClip} onClose={() => setActiveClip(null)} />
+        <ClipModal clip={activeClip} onClose={() => setActiveClip(null)} isMobile={isMobile} />
       )}
     </div>
   );

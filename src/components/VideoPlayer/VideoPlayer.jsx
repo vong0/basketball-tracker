@@ -20,8 +20,10 @@ const VideoPlayer = forwardRef(function VideoPlayer({
   visibleIndices,
   isFullscreen,
   setIsFullscreen,
-  isMobile
-}, ref) {
+  isMobile,
+  hideCounter
+},
+  ref) {
   const ytPlayerRef = useRef(null);
   const containerRef = useRef(null);
   const iframeContainerRef = useRef(null);
@@ -891,7 +893,7 @@ const resumeIfWasPlaying = useCallback(() => {
           />
         )}
 
-        {navList.length > 0 && activeIdx >= 0 && (() => {
+        {!hideCounter && navList.length > 0 && activeIdx >= 0 && (() => {
           // Position within the VISIBLE nav list, not the raw cutSegments
           // array. When filtered to 5 of 23 clips, this should read "3/5"
           // not "3/23".
