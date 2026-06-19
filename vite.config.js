@@ -9,7 +9,7 @@ export default defineConfig({
     host: true,  // or use '0.0.0.0'
     port: 5173,
     headers: {
-      \'Cache-Control\': \'no-store\',
+      'Cache-Control': 'no-store',
     },
   }
 });

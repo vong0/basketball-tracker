@@ -4,22 +4,6 @@ import styles from './StrategiesPage.module.css';
 import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import { getYouTubeId } from '../../lib/youtube';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function buildYouTubeEmbedUrl(baseUrl, timestampSeconds) {
-  const t = Math.floor(timestampSeconds);
-  // Extract video ID from either youtu.be or youtube.com/watch?v=
-  const m = baseUrl.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  if (!m) return null;
-  return (
-    'https://www.youtube.com/embed/' +
-    m[1] +
-    '?start=' +
-    t +
-    '&autoplay=1&controls=1&rel=0&playsinline=1'
-  );
-}
-
 function groupByDefenseType(strategies) {
   const out = {};
   for (const s of strategies) {
@@ -36,7 +20,7 @@ function ClipModal({ clip, onClose, isMobile }) {
   const videoId = clip ? getYouTubeId(clip.youtubeUrl) : null;
 
   const cutSegments = clip
-    ? [{ start: clip.timestampSeconds, end: clip.timestampSeconds + 30, name: clip.label }]
+    ? [{ start: clip.start, end: clip.end, name: clip.label }]
     : [];
 
   // Close on Escape
@@ -94,7 +78,6 @@ function ClipCard({ clip, onPlay }) {
     <button className={styles.clipCard} onClick={() => onPlay(clip)}>
       <span className={styles.clipPlay}>▶</span>
       <span className={styles.clipLabel}>{clip.label}</span>
-      <span className={styles.clipGame}>G{clip.gameId}</span>
     </button>
   );
 }
@@ -103,10 +86,46 @@ function ClipCard({ clip, onPlay }) {
 
 function DescriptionBlock({ lines }) {
   const items = Array.isArray(lines) ? lines : [lines];
+
+  // Group consecutive "-" lines into bullet lists
+  const blocks = [];
+  let bulletBuffer = [];
+
+  const flushBullets = () => {
+    if (bulletBuffer.length > 0) {
+      blocks.push({ type: 'bullets', items: [...bulletBuffer] });
+      bulletBuffer = [];
+    }
+  };
+
+  for (const line of items) {
+    if (!line || line.trim() === '') {
+      flushBullets();
+      continue;
+    }
+    const trimmed = line.trim();
+    if (trimmed.startsWith('-')) {
+      bulletBuffer.push(trimmed.slice(1).trim());
+    } else {
+      flushBullets();
+      blocks.push({ type: 'line', text: line });
+    }
+  }
+  flushBullets();
+
   return (
     <div className={styles.descBlock}>
-      {items.map((line, i) => {
-        if (!line || line.trim() === '') return null;
+      {blocks.map((block, i) => {
+        if (block.type === 'bullets') {
+          return (
+            <ul key={i} className={styles.descBulletList}>
+              {block.items.map((item, j) => (
+                <li key={j} className={styles.descBulletItem}>{item}</li>
+              ))}
+            </ul>
+          );
+        }
+        const line = block.text;
         const colonIdx = line.indexOf(':');
         if (colonIdx > 0 && colonIdx < 28) {
           const label = line.slice(0, colonIdx);

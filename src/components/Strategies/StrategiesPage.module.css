@@ -395,6 +395,23 @@
   font-weight: 600;
 }
 
+.descBulletList {
+  margin: 0;
+  padding: 0 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style-type: disc !important;
+}
+
+.descBulletItem {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  padding-left: 2px;
+  display: list-item;
+}
+
 /* ── Clips section ── */
 .clipsSection {
   margin-top: 16px;
