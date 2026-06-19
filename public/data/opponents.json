@@ -3,11 +3,10 @@
     {
       "id": "net-profits",
       "name": "Net Profits",
-      "photo": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=400&fit=crop",
+      "photo": "data/photos/profits/team.png",
       "notes": [
         "Play 2-3 zone — back row sits high, slow rotations",
         "Get paint touch then look backdoor or short corner",
-        "Attack weak-side skip to collapse zone",
         "If they're hitting 3s, light contest — consider switching to 3-2 or man"
       ],
       "players": [
@@ -72,6 +71,78 @@
           "number": "03",
           "name": "",
           "photo": "data/photos/profits/03.png",
+          "profile": "Non-shooter, sag off",
+          "threat": [],
+          "defend": []
+        }
+      ]
+    },
+    {
+      "id": "team-tam",
+      "name": "Team Tam",
+      "photo": "data/photos/tam/team.png",
+      "notes": [
+        "2 shooters (#1 and #11). 1 very athletic driver (#10)",
+        "Good ball movement and good rotation on defense"
+      ],
+      "players": [
+        {
+          "number": "1",
+          "name": "Shooter",
+          "photo": "data/photos/tam/01.png",
+          "profile": "Best shooter on the team.",
+          "threat": [
+            "Best shooter — will pull up for fast break 3s"
+          ],
+          "defend": [
+            "Get back in transition — no free fast break 3s",
+            "Contest every catch"
+          ]
+        },
+        {
+          "number": "13",
+          "name": "Big dude",
+          "photo": "data/photos/tam/13.png",
+          "profile": "Good in the post. Also a shooter and playmaker.",
+          "threat": [
+            "Strong in the post",
+            "Can shoot and create off the dribble"
+          ],
+          "defend": [
+            "Don't let him catch in the post",
+            "Stay attached on the perimeter — he will shoot"
+          ]
+        },
+        {
+          "number": "10",
+          "name": "Athletic dude",
+          "photo": "data/photos/tam/10.png",
+          "profile": "Most athletic player. Good at drives, layups, floaters.",
+          "threat": [
+            "Dangerous off the dribble — finishes with layups and floaters"
+          ],
+          "defend": []
+        },
+        {
+          "number": "23",
+          "name": "Athletic 2",
+          "photo": "data/photos/tam/23.png",
+          "profile": "Athletic.",
+          "threat": ["Athletic but slightly less than #10"],
+          "defend": []
+        },
+        {
+          "number": "7",
+          "name": "",
+          "photo": "data/photos/tam/07.png",
+          "profile": "Non-shooter, sag off",
+          "threat": [],
+          "defend": []
+        },
+        {
+          "number": "11",
+          "name": "",
+          "photo": "data/photos/tam/11.png",
           "profile": "Non-shooter, sag off",
           "threat": [],
           "defend": []
