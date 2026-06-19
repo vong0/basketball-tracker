@@ -4,6 +4,7 @@ import { parseHash } from './lib/routing';
 import LandingPage from './components/LandingPage/LandingPage';
 import TakeawaysPage from './components/Takeaways/TakeawaysPage';
 import StrategiesPage from './components/Strategies/StrategiesPage';
+import OpponentsPage from './components/Opponents/OpponentsPage';
 import Player from './components/Player/Player';
 
 export default function App() {
@@ -32,6 +33,10 @@ export default function App() {
 
   if (route.view === 'strategies') {
     return <StrategiesPage isMobile={isMobile} />;
+  }
+  
+  if (route.view === 'opponents') {
+    return <OpponentsPage isMobile={isMobile} />;
   }
 
   return <LandingPage isMobile={isMobile} />;

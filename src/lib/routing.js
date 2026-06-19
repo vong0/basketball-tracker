@@ -12,6 +12,7 @@ export function parseHash() {
   if (m) return { view: 'game', gameId: m[1] };
   if (h === '#/takeaways') return { view: 'takeaways' };
   if (h === '#/strategies') return { view: 'strategies' };
+  if (h === '#/opponents') return { view: 'opponents' };
   return { view: 'landing' };
 }
 

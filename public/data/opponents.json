@@ -1,0 +1,58 @@
+{
+  "teams": [
+    {
+      "id": "net-profits",
+      "name": "Net Profits",
+      "photo": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=400&fit=crop",
+      "notes": [
+        "Play 2-3 zone — back row sits high, slow rotations",
+        "Get paint touch then look backdoor or short corner",
+        "Attack weak-side skip to collapse zone",
+        "If they're hitting 3s, light contest — consider switching to 3-2 or man"
+      ],
+      "players": [
+        {
+          "number": "4",
+          "name": "",
+          "photo": null,
+          "profile": "~2m tall, very strong in post. Slow feet laterally.",
+          "threat": [
+            "Dominant in the post once he catches and turns — do not let him get position"
+          ],
+          "defend": [
+            "Deny the entry pass early — push him off his spot before he catches",
+            "Pick him up before he turns and gets inside",
+            "Watch backdoor cuts when denying"
+          ]
+        },
+        {
+          "number": "8",
+          "name": "",
+          "photo": null,
+          "profile": "Point guard shooter. Wants the shot, will take contested mids.",
+          "threat": [
+            "Can hit the 3 off the dribble",
+            "Will take and make mid-range contested shots"
+          ],
+          "defend": [
+            "Stay attached — contest everything",
+            "He takes bad shots under pressure, keep contesting"
+          ]
+        },
+        {
+          "number": "7",
+          "name": "",
+          "photo": null,
+          "profile": "Pure catch-and-shoot. Good defender.",
+          "threat": [
+            "Makes every open look — must contest every single catch"
+          ],
+          "defend": [
+            "Do not leave him for help defense",
+            "Misses when pressured — get a hand up every time"
+          ]
+        }
+      ]
+    }
+  ]
+}
