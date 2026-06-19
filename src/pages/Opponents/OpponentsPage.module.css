@@ -13,7 +13,8 @@
   flex-shrink: 0;
 }
 .heroInner {
-  max-width: 900px;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 .kicker {
   font-family: var(--font-mono);
@@ -48,8 +49,10 @@
   background: var(--bg-elevated);
 }
 .inner {
-  max-width: 900px;
+  max-width: var(--content-width);
+  margin: 0 auto;
   padding: 28px 32px 64px;
+  margin: 0 auto;
 }
 
 /* ── Landing grid ── */
@@ -228,7 +231,9 @@
 
 /* Body */
 .detailBody {
-  max-width: 860px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  margin: 0 auto;
   padding: 24px 24px 64px;
   display: flex;
   flex-direction: column;

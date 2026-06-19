@@ -14,7 +14,8 @@
 }
 
 .heroInner {
-  max-width: 760px;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 
 .kicker {
@@ -78,7 +79,8 @@
 }
 
 .inner {
-  max-width: 760px;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 
 /* ── Game section ── */

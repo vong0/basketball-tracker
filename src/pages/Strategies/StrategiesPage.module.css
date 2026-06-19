@@ -14,7 +14,8 @@
 }
 
 .heroInner {
-  max-width: 900px;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 
 .kicker {
@@ -70,6 +71,8 @@
 }
 
 .filterBtn {
+  min-width: 80px;
+  justify-content: center;
   padding: 5px 14px;
   border-radius: 20px;
   cursor: pointer;
@@ -107,7 +110,8 @@
 }
 
 .inner {
-  max-width: 900px;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 
 .layout {

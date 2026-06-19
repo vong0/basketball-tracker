@@ -42,8 +42,8 @@ export default function LandingPage({ isMobile }) {
   return (
     <div className={styles.page}>
       <Banner isMobile={isMobile} />
-      <div className={styles.scroll}>
-        <div className={styles.headingBlock}>
+      <div className={styles.heroBanner}>
+        <div className={styles.heroInner}>
           <div className={styles.kicker}>SEASON</div>
           <div className={styles.headingRow}>
             <h1 className={styles.heading}>Games</h1>
@@ -52,6 +52,8 @@ export default function LandingPage({ isMobile }) {
             {entries.length} {entries.length === 1 ? 'game' : 'games'}
           </div>
         </div>
+      </div>
+      <div className={styles.scroll}>
         <div className={`${styles.grid} ${isMobile ? styles.gridMobile : ''}`}>
           {entries.map(([id, g]) => (
             <GameCard

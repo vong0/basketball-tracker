@@ -21,7 +21,6 @@ const SECTIONS = [
   {
     id: 'stats',
     href: './data/stats.html',
-    external: true,
     kicker: 'ANALYTICS',
     title: 'Stats',
     description: 'Player statistics for each game.',
