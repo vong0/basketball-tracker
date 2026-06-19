@@ -1,3 +1,4 @@
+// @refresh reset
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Modal } from '@mantine/core';
 import { loadYouTubeAPI } from '../../lib/youtube';
@@ -11,7 +12,7 @@ import styles from './VideoPlayer.module.css';
 // reaches 100% exactly when the loop kicks in.
 const LOOP_LEAD = 0.2;
 
-const VideoPlayer = forwardRef(function VideoPlayer({
+function VideoPlayerInner({
   videoId,
   cutSegments,
   parsedSegments,
@@ -1053,6 +1054,8 @@ const resumeIfWasPlaying = useCallback(() => {
       </Modal>
     </div>
   );
-});
+}
+VideoPlayerInner.displayName = 'VideoPlayer';
 
+const VideoPlayer = forwardRef(VideoPlayerInner);
 export default VideoPlayer;

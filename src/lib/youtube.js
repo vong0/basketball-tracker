@@ -20,3 +20,9 @@ export function getYouTubeId(url) {
   const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
 }
+
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    ytApiPromise = null;
+  });
+}
