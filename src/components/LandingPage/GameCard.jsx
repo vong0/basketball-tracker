@@ -11,7 +11,7 @@ function gameResult(score) {
   return 'T';
 }
 
-export default function GameCard({ id, game, onClick }) {
+export default function GameCard({ id, game, onClick, href }) {
   const result = gameResult(game.score);
   const badgeClass =
     result === 'W' ? cardStyles.badgeWin :
@@ -19,7 +19,7 @@ export default function GameCard({ id, game, onClick }) {
     cardStyles.badgeTie;
 
   return (
-    <button className={cardStyles.card} onClick={onClick}>
+    <a className={cardStyles.card} href={href} onClick={onClick}>
       <div className={cardStyles.topRow}>
         <span className={cardStyles.id}>#{id}</span>
         {result && (
@@ -33,6 +33,6 @@ export default function GameCard({ id, game, onClick }) {
       {game.score && (
         <div className={cardStyles.score}>{game.score}</div>
       )}
-    </button>
+    </a>
   );
 }

@@ -65,10 +65,7 @@ export default function LandingPage({ isMobile }) {
                   <polyline points="7 7 17 7 17 17" />
                 </svg>
               </a>
-              <button
-                className={styles.statsLink}
-                onClick={() => navigate('#/takeaways')}
-              >
+              <a className={styles.statsLink} href="#/takeaways">
                 View takeaways
                 <svg
                   width="12" height="12" viewBox="0 0 24 24"
@@ -78,11 +75,8 @@ export default function LandingPage({ isMobile }) {
                 >
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
-              </button>
-              <button
-                className={styles.statsLink}
-                onClick={() => navigate('#/strategies')}
-              >
+              </a>
+              <a className={styles.statsLink} href="#/strategies">
                 View strategies
                 <svg
                   width="12" height="12" viewBox="0 0 24 24"
@@ -92,7 +86,7 @@ export default function LandingPage({ isMobile }) {
                 >
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
-              </button>
+              </a>
             </div>
           </div>
           <div className={styles.count}>
@@ -105,7 +99,7 @@ export default function LandingPage({ isMobile }) {
               key={id}
               id={id}
               game={g}
-              onClick={() => navigate('#/game/' + id)}
+              href={"#/game/" + id} onClick={() => navigate('#/game/' + id)}
             />
           ))}
         </div>

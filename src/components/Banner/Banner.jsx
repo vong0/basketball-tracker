@@ -4,11 +4,7 @@ import { navigate } from '../../lib/routing';
 export default function Banner({ isMobile, game }) {
   return (
     <div className={`${styles.banner} ${isMobile ? styles.bannerMobile : ''}`}>
-      <button
-        className={styles.brand}
-        onClick={() => navigate('#/')}
-        aria-label="Go to games landing page"
-      >
+      <a className={styles.brand} href="#/" aria-label="Go to games landing page">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="12" r="10" fill="#ff5c1a" />
           <path
@@ -19,7 +15,7 @@ export default function Banner({ isMobile, game }) {
           />
         </svg>
         <span className={styles.wordmark}>SPARTANS</span>
-      </button>
+      </a>
       {game && <GameInfo game={game} isMobile={isMobile} />}
     </div>
   );

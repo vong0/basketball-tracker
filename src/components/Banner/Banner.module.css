@@ -19,6 +19,8 @@
 
 .brand {
   display: flex;
+  text-decoration: none;
+  display: flex;
   align-items: center;
   gap: 12px;
   background: none;
