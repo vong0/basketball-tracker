@@ -1,29 +1,27 @@
 {
   "strategies": [
     {
-      "id": "zone-wing-skip",
+      "id": "2-3-inside-screen-drive-backdoor",
       "defenseType": "2-3 Zone",
-      "name": "Wing Skip & Corner Attack",
-      "summary": "Skip ball to weak-side wing, collapse zone, attack corner.",
+      "name": "Inside Screen Drive with Backdoor Read",
+      "summary": " Drive middle off an inside screen to collapse the 2-3 zone, then dump to a backdoor cutter on the weak side.",
       "description": [
-        "Skip the ball to the weak-side wing.",
+        "Set an inside screen to free the ball handler to drive middle, splitting the two top defenders of the 2-3 zone.",
         "When to use:",
-        "- Zone is sitting deep with no ball pressure",
-        "- Corner shooter has a mismatch",
-        "What it gives you: Open corner 3."
+        "- Zone is sitting back and the top defenders are passive",
+        "- Weak-side bottom defender is ball-watching or cheating toward the paint",
+        "- You have a cutter who can time the backdoor run off the drive",
+        "When not to use:",
+        "- Middle is congested before you can read the dump",
+        "- Cutter is not ready or is being denied on the weak side",
+        "What it gives you: Layup off the drive if the lane stays open. Backdoor layup for the cutter if the weak-side defender collapses."
       ],
       "clips": [
         {
-          "label": "G02 — Kap skip corner 3",
+          "label": "Example",
           "youtubeUrl": "https://youtu.be/orgeiVM7074",
-          "start": 120,
-          "end": 128
-        },
-        {
-          "label": "G01 — Wing skip open 3",
-          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
-          "start": 95,
-          "end": 107
+          "start": 892.183614,
+          "end": 898.721556
         }
       ]
     }

@@ -3,6 +3,7 @@ import Banner from '../Banner/Banner';
 import styles from './StrategiesPage.module.css';
 import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import { getYouTubeId } from '../../lib/youtube';
+import { loadYouTubeAPI } from '../../lib/youtube';
 
 function groupByDefenseType(strategies) {
   const out = {};
@@ -13,70 +14,15 @@ function groupByDefenseType(strategies) {
   return out;
 }
 
-// ── Clip modal ────────────────────────────────────────────────────────────────
-
-function ClipModal({ clip, onClose, isMobile }) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const videoId = clip ? getYouTubeId(clip.youtubeUrl) : null;
-
-  const cutSegments = clip
-    ? [{ start: clip.start, end: clip.end, name: clip.label }]
-    : [];
-
-  // Close on Escape
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  // Lock body scroll while open
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
-
-  if (!clip || !videoId) return null;
-
-  return (
-    <div className={styles.modalBackdrop} onClick={onClose}>
-      <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <span className={styles.modalTitle}>{clip.label}</span>
-          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2.5"
-              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-        <div className={styles.modalVideo}>
-          <VideoPlayer
-            videoId={videoId}
-            cutSegments={cutSegments}
-            parsedSegments={cutSegments.map(() => ({ actions: [], summary: '', title: clip.label, team: 'us', quality: 'neutral', type: 'O' }))}
-            activeIdx={0}
-            setActiveIdx={() => {}}
-            visibleIndices={[0]}
-            isFullscreen={isFullscreen}
-            setIsFullscreen={setIsFullscreen}
-            isMobile={isMobile}
-            hideCounter={true}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Clip card ─────────────────────────────────────────────────────────────────
 
-function ClipCard({ clip, onPlay }) {
+function ClipCard({ clip, isActive, onPlay }) {
   return (
-    <button className={styles.clipCard} onClick={() => onPlay(clip)}>
-      <span className={styles.clipPlay}>▶</span>
+    <button
+      className={`${styles.clipCard} ${isActive ? styles.clipCardActive : ''}`}
+      onClick={() => onPlay(clip)}
+    >
+      <span className={styles.clipPlay}>{isActive ? '■' : '▶'}</span>
       <span className={styles.clipLabel}>{clip.label}</span>
     </button>
   );
@@ -144,25 +90,52 @@ function DescriptionBlock({ lines }) {
 
 // ── Strategy card ─────────────────────────────────────────────────────────────
 
-function StrategyCard({ strategy, onPlay }) {
+function StrategyCard({ strategy, activeClip, setActiveClip, isMobile }) {
   const [open, setOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const s = strategy;
+
+  // Check if this card owns the active clip
+  const activeClipBelongsHere = activeClip && s.clips.some(
+    c => c.youtubeUrl === activeClip.youtubeUrl && c.start === activeClip.start
+  );
+
+  const videoId = activeClipBelongsHere ? getYouTubeId(activeClip.youtubeUrl) : null;
+  const cutSegments = activeClipBelongsHere
+    ? [{ start: activeClip.start, end: activeClip.end, name: activeClip.label }]
+    : [];
+
+  const handlePlay = (clip) => {
+    if (
+      activeClip &&
+      activeClip.youtubeUrl === clip.youtubeUrl &&
+      activeClip.start === clip.start
+    ) {
+      // Same clip — toggle off
+      setActiveClip(null);
+    } else {
+      setActiveClip(clip);
+    }
+  };
+
+  const handleClose = () => {
+    if (activeClipBelongsHere) setActiveClip(null);
+    setOpen(false);
+  };
 
   return (
     <div id={'play-' + s.id} className={styles.card}>
       <button
         className={styles.cardHeader}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (open && activeClipBelongsHere) setActiveClip(null);
+          setOpen((o) => !o);
+        }}
         aria-expanded={open}
       >
         <div className={styles.cardHeaderLeft}>
           <div className={styles.cardTitleRow}>
             <h3 className={styles.cardName}>{s.name}</h3>
-            {s.clips.length > 0 && (
-              <span className={styles.clipBadge}>
-                {s.clips.length} {s.clips.length === 1 ? 'clip' : 'clips'}
-              </span>
-            )}
           </div>
           {s.summary && (
             <p className={styles.cardSummary}>{s.summary}</p>
@@ -187,7 +160,16 @@ function StrategyCard({ strategy, onPlay }) {
               <div className={styles.clipsSectionLabel}>Film Clips</div>
               <div className={styles.clipsList}>
                 {s.clips.map((clip, i) => (
-                  <ClipCard key={i} clip={clip} onPlay={onPlay} />
+                  <ClipCard
+                    key={i}
+                    clip={clip}
+                    isActive={
+                      activeClip &&
+                      activeClip.youtubeUrl === clip.youtubeUrl &&
+                      activeClip.start === clip.start
+                    }
+                    onPlay={handlePlay}
+                  />
                 ))}
               </div>
             </div>
@@ -195,6 +177,32 @@ function StrategyCard({ strategy, onPlay }) {
 
           {s.clips.length === 0 && (
             <p className={styles.noClips}>No film clips added yet.</p>
+          )}
+
+          {activeClipBelongsHere && videoId && (
+            <div className={styles.clipPlayer}>
+              <div className={styles.clipPlayerInner}>
+                <VideoPlayer
+                  videoId={videoId}
+                  cutSegments={cutSegments}
+                  parsedSegments={cutSegments.map(() => ({
+                    actions: [],
+                    summary: '',
+                    title: activeClip.label,
+                    team: 'us',
+                    quality: 'neutral',
+                    type: 'O',
+                  }))}
+                  activeIdx={0}
+                  setActiveIdx={() => {}}
+                  visibleIndices={[0]}
+                  isFullscreen={isFullscreen}
+                  setIsFullscreen={setIsFullscreen}
+                  isMobile={isMobile}
+                  hideCounter={true}
+                />
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -301,6 +309,11 @@ export default function StrategiesPage({ isMobile }) {
   const [activeFilter, setActiveFilter] = useState(FILTER_ALL);
   const [activeClip, setActiveClip] = useState(null);
 
+  // Pre-warm the YouTube API so first click is fast
+  useEffect(() => {
+    loadYouTubeAPI();
+  }, []);
+
   useEffect(() => {
     fetch('./data/strategies.json')
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -313,7 +326,6 @@ export default function StrategiesPage({ isMobile }) {
 
   const strategies = data?.strategies ?? [];
 
-  // Build filter list from unique defenseType values
   const filters = useMemo(() => {
     const seen = new Set();
     const out = [{ id: FILTER_ALL, label: 'All' }];
@@ -392,7 +404,9 @@ export default function StrategiesPage({ isMobile }) {
                         <StrategyCard
                           key={s.id}
                           strategy={s}
-                          onPlay={setActiveClip}
+                          activeClip={activeClip}
+                          setActiveClip={setActiveClip}
+                          isMobile={isMobile}
                         />
                       ))}
                     </div>
@@ -403,10 +417,6 @@ export default function StrategiesPage({ isMobile }) {
           )}
         </div>
       </div>
-
-      {activeClip && (
-        <ClipModal clip={activeClip} onClose={() => setActiveClip(null)} isMobile={isMobile} />
-      )}
     </div>
   );
 }
