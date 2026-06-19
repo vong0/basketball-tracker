@@ -4,13 +4,86 @@
     "opponents": "Team Tam",
     "score": "52-50",
     "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
-    "llc": "games/y26-s2-g01.llc"
+    "llc": "games/y26-s2-g01.llc",
+    "takeaways": {
+      "players": [
+        
+      ]
+    }
   },
   "02": {
     "name": "Game 2",
     "opponents": "Net Profits",
     "score": "37-65",
     "youtubeUrl": "https://youtu.be/orgeiVM7074",
-    "llc": "games/y26-s2-g02.llc"
+    "llc": "games/y26-s2-g02.llc",
+    "takeaways": {
+      "players": [
+        {
+          "name": "Mushi",
+          "strengths": [
+            "Great job pushing pace on transition",
+            "Amazing job splitting defense and dumping to cutting bigs"
+          ],
+          "improvements": [
+            "Forced a few passes inside while too congested",
+            "Sometimes take a look before driving middle"
+          ]
+        },
+        {
+          "name": "Emanuel",
+          "strengths": [
+            "Great job creating paint touches to bigs inside",
+            "Good job swinging ball fast and early"
+          ],
+          "improvements": [
+            "More effort needed boxing out on 45 degree shooters",
+            "More drives needed + take inside floaters if 3pt is not falling"
+          ]
+        },
+        {
+          "name": "Vong",
+          "strengths": [
+            "Good job cutting and rolling, getting inside and finishing"
+          ],
+          "improvements": [
+            "Vary up your inside moves + do not always settle for push shot",
+            "On defense pay more attention to backdoor cutters",
+            "Coordinate post position with Alex more"
+          ]
+        },
+        {
+          "name": "George",
+          "strengths": [
+            "Good screening off-ball",
+            "Keep taking open 3s"
+          ],
+          "improvements": []
+        },
+        {
+          "name": "Matt",
+          "strengths": [
+            "Good job driving corner and dumping",
+            "Good job passing early on fastbreaks"
+          ],
+          "improvements": [
+            "Rotate and communicate more to contest open shooters",
+            "Watch for the 2-3 zone double team on the wing + pass back early",
+            "Set more off-ball and on-ball screens"
+          ]
+        },
+        {
+          "name": "Alex",
+          "strengths": [
+            "Good job screening and rolling for the dump inside",
+            "Good effort on the boards"
+          ],
+          "improvements": [
+            "On offensive boards, either contest or IMMEDIATELY drop back",
+            "Coordinate with Vong vs 2-3 Zone + 1 big at high post centre, 1 at low post"
+          ]
+        }
+      ]
+    }
   }
 }

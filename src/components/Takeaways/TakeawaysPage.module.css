@@ -1,0 +1,298 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Hero banner ── */
+.heroBanner {
+  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 32px 24px;
+  flex-shrink: 0;
+}
+
+.heroInner {
+  max-width: 760px;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--orange);
+  margin-bottom: 8px;
+}
+
+.heroRow {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;  /* stack vertically always */
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  margin: 0;
+  line-height: 1;
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.toggleBtn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+@media (hover: hover) {
+  .toggleBtn:hover {
+    border-color: var(--text-faint);
+    color: var(--text);
+  }
+}
+
+/* ── Scroll area ── */
+.scroll {
+  flex: 1;
+  padding: 32px 32px 64px;
+  background: var(--bg-elevated);
+}
+
+.inner {
+  max-width: 760px;
+}
+
+/* ── Game section ── */
+.gameSection {
+  margin-bottom: 32px;
+}
+
+.gameHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text);
+  margin-bottom: 12px;
+  font-family: inherit;
+}
+
+.gameHeaderLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.gameTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 0.04em;
+}
+
+.gameOpponent {
+  font-size: 13px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+/* ── Player list ── */
+.playerList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Player card ── */
+.card {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.cardOpen {
+  background: #1a1a22;
+  border-color: var(--border-strong);
+}
+
+.cardHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+}
+
+.playerName {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badgeStr {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--green);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+.badgeImp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: rgba(255, 92, 26, 0.12);
+  color: var(--orange);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+.chevron {
+  color: var(--text-faint);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Card body ── */
+.cardBody {
+  padding: 0 18px 18px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 16px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.column {}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.accentGreen {
+  width: 3px;
+  height: 16px;
+  background: var(--green);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.accentOrange {
+  width: 3px;
+  height: 16px;
+  background: var(--orange);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.columnLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.labelGreen { color: var(--green); }
+.labelOrange { color: var(--orange); }
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.listItem {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.bulletGreen {
+  color: var(--green);
+  flex-shrink: 0;
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+.bulletOrange {
+  color: var(--orange);
+  flex-shrink: 0;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* ── States ── */
+.error   { font-family: var(--font-mono); font-size: 12px; color: var(--red); }
+.loading { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+.empty   { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .heroBanner { padding: 24px 16px 20px; }
+  .heading { font-size: 32px; }
+  .scroll { padding: 20px 16px 40px; }
+  .columns { grid-template-columns: 1fr; }
+}

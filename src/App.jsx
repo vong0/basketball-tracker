@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { isMobileDevice } from './lib/isMobile';
 import { parseHash } from './lib/routing';
 import LandingPage from './components/LandingPage/LandingPage';
+import TakeawaysPage from './components/Takeaways/TakeawaysPage';
 import Player from './components/Player/Player';
 
 export default function App() {
@@ -21,9 +22,12 @@ export default function App() {
   }, []);
 
   if (route.view === 'game') {
-    // key={gameId} forces remount on game switch — gives us a clean slate
-    // for future per-game state (filters, etc.).
     return <Player key={route.gameId} gameId={route.gameId} isMobile={isMobile} />;
   }
+
+  if (route.view === 'takeaways') {
+    return <TakeawaysPage isMobile={isMobile} />;
+  }
+
   return <LandingPage isMobile={isMobile} />;
 }

@@ -37,7 +37,6 @@ export default function LandingPage({ isMobile }) {
     );
   }
 
-  // Sort by key so '01','02','10' stay in order.
   const entries = Object.entries(games).sort(([a], [b]) => b.localeCompare(a));
 
   return (
@@ -48,30 +47,43 @@ export default function LandingPage({ isMobile }) {
           <div className={styles.kicker}>SEASON</div>
           <div className={styles.headingRow}>
             <h1 className={styles.heading}>Games</h1>
-            <a
-            className={styles.statsLink}
-            href="./data/stats.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View stats
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <line x1="7" y1="17" x2="17" y2="7" />
-              <polyline points="7 7 17 7 17 17" />
-            </svg>
-          </a>
+            <div className={styles.links}>
+              <a
+                className={styles.statsLink}
+                href="./data/stats.html"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View stats
+                <svg
+                  width="12" height="12" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="7" y1="17" x2="17" y2="7" />
+                  <polyline points="7 7 17 7 17 17" />
+                </svg>
+              </a>
+              <button
+                className={styles.statsLink}
+                onClick={() => navigate('#/takeaways')}
+              >
+                View takeaways
+                <svg
+                  width="12" height="12" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div className={styles.count}>{entries.length} {entries.length === 1 ? 'game' : 'games'}</div>
+          <div className={styles.count}>
+            {entries.length} {entries.length === 1 ? 'game' : 'games'}
+          </div>
         </div>
         <div className={`${styles.grid} ${isMobile ? styles.gridMobile : ''}`}>
           {entries.map(([id, g]) => (
