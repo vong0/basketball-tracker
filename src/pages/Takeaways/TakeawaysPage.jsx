@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Banner from '../Banner/Banner';
+import Banner from '../../components/Banner/Banner';
 import styles from './TakeawaysPage.module.css';
 
 function PlayerCard({ player }) {

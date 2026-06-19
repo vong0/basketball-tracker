@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Loader, Center } from '@mantine/core';
 import JSON5 from 'json5';
-import Banner from '../Banner/Banner';
-import VideoPlayer from '../VideoPlayer/VideoPlayer';
-import Playlist from '../Playlist/Playlist';
-import ShortcutsModal from '../ShortcutsModal/ShortcutsModal';
+import Banner from '../../components/Banner/Banner';
+import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
+import Playlist from '../../components/Playlist/Playlist';
+import ShortcutsModal from '../../components/ShortcutsModal/ShortcutsModal';
 import { parseLabel, segmentMatchesFilter } from '../../lib/parseLabel';
 import { getYouTubeId } from '../../lib/youtube';
 import { navigate } from '../../lib/routing';

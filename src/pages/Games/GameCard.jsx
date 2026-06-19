@@ -1,4 +1,4 @@
-import styles from './LandingPage.module.css';
+import styles from './GamesPage.module.css';
 import cardStyles from './GameCard.module.css';
 
 function gameResult(score) {

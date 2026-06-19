@@ -1,3 +1,0 @@
-/* App is now a thin router shell. All layout lives in LandingPage and
-   Player. Kept as a placeholder so the import path doesn't break if
-   anything still references it. */

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { isMobileDevice } from './lib/isMobile';
 import { parseHash } from './lib/routing';
-import LandingPage from './components/LandingPage/LandingPage';
-import TakeawaysPage from './components/Takeaways/TakeawaysPage';
-import StrategiesPage from './components/Strategies/StrategiesPage';
-import OpponentsPage from './components/Opponents/OpponentsPage';
-import Player from './components/Player/Player';
+import GamesPage from './pages/Games/GamesPage';
+import LandingPage from './pages/Landing/LandingPage';
+import TakeawaysPage from './pages/Takeaways/TakeawaysPage';
+import StrategiesPage from './pages/Strategies/StrategiesPage';
+import OpponentsPage from './pages/Opponents/OpponentsPage';
+import Player from './pages/Player/Player';
 
 export default function App() {
   const [route, setRoute] = useState(parseHash());
@@ -23,6 +24,10 @@ export default function App() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  if (route.view === 'games') {
+    return <GamesPage isMobile={isMobile} />;
+  }
+
   if (route.view === 'game') {
     return <Player key={route.gameId} gameId={route.gameId} isMobile={isMobile} />;
   }
@@ -34,7 +39,7 @@ export default function App() {
   if (route.view === 'strategies') {
     return <StrategiesPage isMobile={isMobile} />;
   }
-  
+
   if (route.view === 'opponents') {
     return <OpponentsPage isMobile={isMobile} />;
   }

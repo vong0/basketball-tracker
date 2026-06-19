@@ -8,6 +8,7 @@
  */
 export function parseHash() {
   const h = typeof window !== 'undefined' ? window.location.hash : '';
+  if (h === '#/games') return { view: 'games' };
   const m = h.match(/^#\/game\/([\w-]+)$/);
   if (m) return { view: 'game', gameId: m[1] };
   if (h === '#/takeaways') return { view: 'takeaways' };

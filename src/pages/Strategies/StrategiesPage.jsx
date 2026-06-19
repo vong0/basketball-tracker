@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import Banner from '../Banner/Banner';
+import Banner from '../../components/Banner/Banner';
 import styles from './StrategiesPage.module.css';
-import VideoPlayer from '../VideoPlayer/VideoPlayer';
+import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
 import { getYouTubeId } from '../../lib/youtube';
 import { loadYouTubeAPI } from '../../lib/youtube';
 

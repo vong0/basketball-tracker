@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Banner from '../Banner/Banner';
+import Banner from '../../components/Banner/Banner';
 import styles from './OpponentsPage.module.css';
 
 // Resolve photo: supports http/https URLs and repo-relative paths like
