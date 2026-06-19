@@ -1,0 +1,591 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Hero ── */
+.heroBanner {
+  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 32px 0;
+  flex-shrink: 0;
+}
+
+.heroInner {
+  max-width: 900px;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--orange);
+  margin-bottom: 8px;
+}
+
+.heroRow {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  margin: 0;
+  line-height: 1;
+}
+
+.heroCount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.heroCountNum {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--orange);
+  line-height: 1;
+}
+
+.heroCountLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Filter bar ── */
+.filterBar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+}
+
+.filterBtn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-faint);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.15s ease;
+}
+
+.filterBtn:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.filterBtnActive {
+  background: var(--orange);
+  color: #111;
+  border-color: var(--orange);
+}
+
+.filterBtnActive:hover {
+  color: #111;
+}
+
+/* ── Scroll / layout ── */
+.scroll {
+  flex: 1;
+  padding: 32px 32px 64px;
+  background: var(--bg-elevated);
+}
+
+.inner {
+  max-width: 900px;
+}
+
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Desktop TOC ── */
+.desktopToc {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 24px;
+  align-self: flex-start;
+}
+
+.desktopTocInner {
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+}
+
+.desktopTocHeading {
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.desktopTocGroup {
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-faint);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.desktopTocItem {
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: block;
+  transition: color 0.15s ease;
+}
+
+.desktopTocItem:hover {
+  color: var(--orange);
+}
+
+/* ── Mobile TOC ── */
+.mobileToc {
+  display: none;
+  margin-bottom: 16px;
+}
+
+.mobileTocToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--orange);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mobileTocChevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-size: 10px;
+}
+
+.mobileTocMenu {
+  margin-top: 4px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+}
+
+.mobileTocGroup {
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-faint);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.mobileTocItem {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 14px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionHeader {
+  margin-bottom: 12px;
+}
+
+.sectionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.sectionCount {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.sectionRule {
+  height: 2px;
+  width: 48px;
+  background: linear-gradient(90deg, var(--orange), transparent);
+}
+
+/* ── Strategy card ── */
+.card {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.cardHeader {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  transition: background 0.15s ease;
+}
+
+.cardHeader:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cardHeaderLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.cardName {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.clipBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(129, 140, 248, 0.12);
+  color: #818cf8;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  border-radius: 4px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+
+.cardSummary {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.chevron {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin-top: 3px;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Card body ── */
+.cardBody {
+  padding: 0 16px 16px;
+}
+
+.cardDivider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 14px;
+}
+
+/* ── Description ── */
+.descBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.descLine {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.descLabel {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Clips section ── */
+.clipsSection {
+  margin-top: 16px;
+}
+
+.clipsSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-faint);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.clipsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Clip card ── */
+.clipCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 7px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.clipCard:hover {
+  background: rgba(255, 92, 26, 0.08);
+  border-color: rgba(255, 92, 26, 0.3);
+  color: var(--text);
+}
+
+.clipPlay {
+  color: #818cf8;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.clipLabel {
+  flex: 1;
+}
+
+.clipGame {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.noClips {
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--border-strong);
+}
+
+/* ── Modal ── */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modalBox {
+  background: #0a0a0d;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.modalClose {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.modalClose:hover {
+  color: var(--text);
+  border-color: var(--orange);
+}
+
+.modalVideo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.modalVideo iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ── States ── */
+.stateMsg {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-faint);
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.emptyText {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .heroBanner {
+    padding: 24px 16px 0;
+  }
+
+  .heading {
+    font-size: 32px;
+  }
+
+  .scroll {
+    padding: 20px 16px 40px;
+  }
+
+  .desktopToc {
+    display: none;
+  }
+
+  .mobileToc {
+    display: block;
+  }
+}

@@ -11,6 +11,7 @@ export function parseHash() {
   const m = h.match(/^#\/game\/([\w-]+)$/);
   if (m) return { view: 'game', gameId: m[1] };
   if (h === '#/takeaways') return { view: 'takeaways' };
+  if (h === '#/strategies') return { view: 'strategies' };
   return { view: 'landing' };
 }
 

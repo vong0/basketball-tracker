@@ -3,6 +3,7 @@ import { isMobileDevice } from './lib/isMobile';
 import { parseHash } from './lib/routing';
 import LandingPage from './components/LandingPage/LandingPage';
 import TakeawaysPage from './components/Takeaways/TakeawaysPage';
+import StrategiesPage from './components/Strategies/StrategiesPage';
 import Player from './components/Player/Player';
 
 export default function App() {
@@ -27,6 +28,10 @@ export default function App() {
 
   if (route.view === 'takeaways') {
     return <TakeawaysPage isMobile={isMobile} />;
+  }
+
+  if (route.view === 'strategies') {
+    return <StrategiesPage isMobile={isMobile} />;
   }
 
   return <LandingPage isMobile={isMobile} />;

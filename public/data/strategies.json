@@ -1,0 +1,128 @@
+{
+  "strategies": [
+    {
+      "id": "zone-wing-skip",
+      "defenseType": "2-3 Zone",
+      "name": "Wing Skip & Corner Attack",
+      "summary": "Skip ball to weak-side wing, collapse zone, attack corner.",
+      "description": [
+        "Skip the ball to the weak-side wing to force both top defenders to rotate. The bottom corner defender cannot cover both the wing and the corner simultaneously — one will be open.",
+        "When to use: Zone is sitting deep with no ball pressure. Corner shooter has a mismatch on the bottom defender. Ball handler is patient enough to hold and wait for the skip.",
+        "When not to use: Corner shooter is cold or being denied hard. Defense is playing a scramble zone with active hands in passing lanes.",
+        "What it gives you: Open corner 3. If the defense overrotates, the high post becomes available for a mid or dump."
+      ],
+      "clips": [
+        {
+          "label": "G02 — Kap skip corner 3",
+          "gameId": "02",
+          "youtubeUrl": "https://youtu.be/orgeiVM7074",
+          "timestampSeconds": 120
+        },
+        {
+          "label": "G01 — Wing skip open 3",
+          "gameId": "01",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "timestampSeconds": 95
+        }
+      ]
+    },
+    {
+      "id": "zone-high-post-split",
+      "defenseType": "2-3 Zone",
+      "name": "High Post Split",
+      "summary": "Feed the high post elbow to split the two top defenders.",
+      "description": [
+        "Pass into the high post elbow. The two top zone defenders must decide who covers — this creates a gap between them. The high post player reads the defense: shoot the mid if they sag, drive the gap if they close hard, or dump to a cutter coming weak side.",
+        "When to use: Your big can catch and face up from the elbow. Top defenders are playing too far apart or too close. Cutters are ready on both sides of the lane.",
+        "When not to use: High post player cannot shoot the mid — defense will sag and clog the lane entirely.",
+        "What it gives you: Elbow mid, drive and dump to a cutting big, or kick-out 3 if the defense collapses on the drive."
+      ],
+      "clips": [
+        {
+          "label": "G01 — Stack, high post, wing 3",
+          "gameId": "01",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "timestampSeconds": 95
+        }
+      ]
+    },
+    {
+      "id": "zone-short-corner-overload",
+      "defenseType": "2-3 Zone",
+      "name": "Short Corner Overload",
+      "summary": "Stack wing and short corner on same side to overload one zone defender.",
+      "description": [
+        "Place a player at the short corner (baseline extended, inside the arc) and a player at the wing on the same side. The bottom zone defender cannot guard both. Quick ball movement between the two forces the defense to choose — one is always open.",
+        "When to use: Bottom zone defender is slow to rotate. Post player can score from short corner.",
+        "When not to use: Defense shifts to match your overload.",
+        "What it gives you: Short corner mid or lob to post."
+      ],
+      "clips": []
+    },
+    {
+      "id": "man-pin-down",
+      "defenseType": "Man-to-Man",
+      "name": "Pin Down Screen",
+      "summary": "Downscreen on baseline to free a shooter cutting to the wing.",
+      "description": [
+        "A big sets a downscreen on the baseline for a guard cutting up to the wing. The screened defender must choose — fight over the screen and give up the catch-and-shoot, or go under and give up the open 3. If they fight over, the cutter can curl to the basket instead.",
+        "When to use: Shooter's defender is playing tight and denying. Screener's defender tends to help on cutters, leaving the screener open on the pop.",
+        "When not to use: Defense is switching all screens — look for mismatches instead.",
+        "What it gives you: Open wing 3 for the shooter. Curl layup if the defender goes under. Pop-out mid for the screener if their defender helps."
+      ],
+      "clips": [
+        {
+          "label": "G01 — George pin down open 3",
+          "gameId": "01",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "timestampSeconds": 701
+        },
+        {
+          "label": "G01 — Pin down wing 3",
+          "gameId": "01",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "timestampSeconds": 337
+        }
+      ]
+    },
+    {
+      "id": "man-transition-early",
+      "defenseType": "Man-to-Man",
+      "name": "Transition Early Pass",
+      "summary": "Push pace and hit the early pass before defense sets.",
+      "description": [
+        "On a made basket or rebound, immediately push the ball up the floor and look for the early pass to a wing sprinting ahead of their defender. The advantage window closes within 2-3 seconds — if the early pass is not there, pull up and set your offense. Do not force it.",
+        "When to use: Defense is slow getting back after a made basket. You have a fast wing who can beat their defender down the floor.",
+        "When not to use: Protecting a lead late in the game. The defense has a dedicated safety who always gets back first.",
+        "What it gives you: Layup or open mid before the defense sets. 2v1 or 3v2 advantage if pushed quickly."
+      ],
+      "clips": [
+        {
+          "label": "G01 — Adam early fastbreak pass",
+          "gameId": "01",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "timestampSeconds": 1804
+        },
+        {
+          "label": "G01 — Kap transition early pass",
+          "gameId": "01",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "timestampSeconds": 2417
+        }
+      ]
+    },
+    {
+      "id": "press-ball-reversal",
+      "defenseType": "Full Court Press",
+      "name": "Ball Reversal vs Press",
+      "summary": "Reverse the ball quickly to attack before the press can reset.",
+      "description": [
+        "Against a full court press, resist the instinct to dribble through it. Use quick passes to reverse the ball. The press is designed to trap on one side — reversing forces the entire press to rotate, creating open lanes in the middle of the floor.",
+        "When to use: Defense is running a trapping press that overloads one side. Players are calm and not panicking under pressure.",
+        "When not to use: Players are making careless passes — take care of the ball first before trying to attack.",
+        "What it gives you: Open lane in the middle of the floor. Easy layup if the press overcommits. Free throws if the defense fouls to stop the break."
+      ],
+      "clips": []
+    }
+  ]
+}
