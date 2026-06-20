@@ -4,6 +4,7 @@ import styles from './StrategiesPage.module.css';
 import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
 import { getYouTubeId } from '../../lib/youtube';
 import { loadYouTubeAPI } from '../../lib/youtube';
+import { getStrategies } from '../../lib/backend.js';
 
 function groupByDefenseType(strategies) {
   const out = {};
@@ -315,16 +316,22 @@ export default function StrategiesPage({ isMobile }) {
   }, []);
 
   useEffect(() => {
-    fetch('./data/strategies.json')
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then(setData)
-      .catch((err) => {
-        console.error('Could not load strategies.json:', err);
-        setError(String(err));
-      });
+    let cancelled = false;
+    (async () => {
+      try {
+        const strategies = await getStrategies();
+        if (!cancelled) setData(strategies);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Could not load strategies:', err);
+          setError(String(err));
+        }
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  const strategies = data?.strategies ?? [];
+  const strategies = Array.isArray(data) ? data : [];
 
   const filters = useMemo(() => {
     const seen = new Set();

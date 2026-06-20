@@ -1,5 +1,4 @@
 import styles from './Banner.module.css';
-import { navigate } from '../../lib/routing';
 
 export default function Banner({ game }) {
   return (
@@ -21,40 +20,29 @@ export default function Banner({ game }) {
   );
 }
 
-function gameResult(score) {
-  if (!score || typeof score !== 'string') return null;
-  const parts = score.split('-').map(s => parseInt(s.trim(), 10));
-  if (parts.length !== 2 || parts.some(n => Number.isNaN(n))) return null;
-  const [us, them] = parts;
-  if (us > them) return 'W';
-  if (us < them) return 'L';
+function deriveResult(teamScore, opponentScore) {
+  if (teamScore > opponentScore) return 'W';
+  if (teamScore < opponentScore) return 'L';
   return 'T';
 }
 
 function GameInfo({ game }) {
-  const result = gameResult(game.score);
+  const result = deriveResult(game.teamScore, game.opponentScore);
   const resultClass = result === 'W'
     ? styles.resultW
     : result === 'L'
     ? styles.resultL
     : styles.resultT;
+  const scoreStr = `${game.teamScore}-${game.opponentScore}`;
   return (
     <>
       <span className={styles.divider} aria-hidden="true" />
       <div className={styles.gameInfo}>
-        {game.name && <span>{game.name}</span>}
-        {game.score && (
-          <>
-            <span className={styles.dotSep}>·</span>
-            <span>{game.score}</span>
-          </>
-        )}
-        {result && (
-          <>
-            <span className={styles.dotSep}>·</span>
-            <span className={resultClass}>{result}</span>
-          </>
-        )}
+        {game.game && <span>{game.game}</span>}
+        <span className={styles.dotSep}>·</span>
+        <span>{scoreStr}</span>
+        <span className={styles.dotSep}>·</span>
+        <span className={resultClass}>{result}</span>
       </div>
     </>
   );

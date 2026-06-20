@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Banner from '../../components/Banner/Banner';
+import { getGames, getGameTakeaways } from '../../lib/backend.js';
 import styles from './TakeawaysPage.module.css';
 
 function PlayerCard({ player }) {
@@ -83,14 +84,14 @@ function PlayerCard({ player }) {
   );
 }
 
-function GameSection({ gameKey, game, forceState }) {
+function GameSection({ game, takeaways, forceState }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (forceState !== null) setOpen(forceState);
   }, [forceState]);
 
-  const players = game.takeaways?.players ?? [];
+  const players = takeaways?.players ?? [];
   if (players.length === 0) return null;
 
   return (
@@ -100,11 +101,9 @@ function GameSection({ gameKey, game, forceState }) {
         onClick={() => setOpen(o => !o)}
       >
         <div className={styles.gameHeaderLeft}>
-          <span className={styles.gameTitle}>
-            {game.name || `Game ${gameKey}`}
-          </span>
-          {game.opponents && (
-            <span className={styles.gameOpponent}>vs {game.opponents}</span>
+          <span className={styles.gameTitle}>{game.game}</span>
+          {game.opponentName && (
+            <span className={styles.gameOpponent}>vs {game.opponentName}</span>
           )}
         </div>
         <svg
@@ -130,22 +129,27 @@ function GameSection({ gameKey, game, forceState }) {
 }
 
 export default function TakeawaysPage({ isMobile }) {
-  const [games, setGames] = useState(null);
+  const [entries, setEntries] = useState(null);
   const [error, setError] = useState(null);
   const [forceState, setForceState] = useState(false);
 
   useEffect(() => {
-    fetch('./data/games.json')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(setGames)
-      .catch(err => setError(String(err)));
+    let cancelled = false;
+    (async () => {
+      try {
+        const games = await getGames();
+        const takeawaysList = await Promise.all(games.map(g => getGameTakeaways(g.id)));
+        if (cancelled) return;
+        const combined = games
+          .map((g, i) => ({ game: g, takeaways: takeawaysList[i] }))
+          .filter(({ takeaways }) => takeaways?.players?.length > 0);
+        setEntries(combined);
+      } catch (err) {
+        if (!cancelled) setError(String(err));
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  const entries = games
-    ? Object.entries(games)
-        .filter(([, g]) => g.takeaways?.players?.length)
-        .sort(([a], [b]) => b.localeCompare(a))
-    : [];
 
   return (
     <div className={styles.page}>
@@ -172,20 +176,20 @@ export default function TakeawaysPage({ isMobile }) {
       <div className={styles.scroll}>
         <div className={styles.inner}>
           {error && (
-            <p className={styles.error}>Could not load games. ({error})</p>
+            <p className={styles.error}>Could not load takeaways. ({error})</p>
           )}
-          {!games && !error && (
+          {!entries && !error && (
             <p className={styles.loading}>Loading...</p>
           )}
-          {entries.map(([key, game]) => (
+          {entries && entries.map(({ game, takeaways }) => (
             <GameSection
-              key={key}
-              gameKey={key}
+              key={game.id}
               game={game}
+              takeaways={takeaways}
               forceState={forceState}
             />
           ))}
-          {games && entries.length === 0 && (
+          {entries && entries.length === 0 && (
             <p className={styles.empty}>No takeaways recorded yet.</p>
           )}
         </div>

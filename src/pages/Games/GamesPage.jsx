@@ -3,6 +3,7 @@ import { Loader, Center } from '@mantine/core';
 import Banner from '../../components/Banner/Banner';
 import GameCard from './GameCard';
 import { navigate } from '../../lib/routing';
+import { getGames } from '../../lib/backend.js';
 import styles from './GamesPage.module.css';
 
 export default function LandingPage() {
@@ -10,13 +11,19 @@ export default function LandingPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('./data/games.json')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(setGames)
-      .catch(err => {
-        console.error('Could not load games.json:', err);
-        setError(String(err));
-      });
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getGames();
+        if (!cancelled) setGames(data);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Could not load games:', err);
+          setError(String(err));
+        }
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   if (error) {
@@ -37,8 +44,6 @@ export default function LandingPage() {
     );
   }
 
-  const entries = Object.entries(games).sort(([a], [b]) => b.localeCompare(a));
-
   return (
     <div className={styles.page}>
       <Banner />
@@ -49,18 +54,18 @@ export default function LandingPage() {
             <h1 className={styles.heading}>Games</h1>
           </div>
           <div className={styles.count}>
-            {entries.length} {entries.length === 1 ? 'game' : 'games'}
+            {games.length} {games.length === 1 ? 'game' : 'games'}
           </div>
         </div>
       </div>
       <div className={styles.scroll}>
         <div className={styles.grid}>
-          {entries.map(([id, g]) => (
+          {games.map(game => (
             <GameCard
-              key={id}
-              id={id}
-              game={g}
-              href={"#/game/" + id} onClick={() => navigate('#/game/' + id)}
+              key={game.id}
+              game={game}
+              href={"#/game/" + game.id}
+              onClick={() => navigate('#/game/' + game.id)}
             />
           ))}
         </div>

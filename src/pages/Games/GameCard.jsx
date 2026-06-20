@@ -1,38 +1,28 @@
 import styles from './GamesPage.module.css';
 import cardStyles from './GameCard.module.css';
+import { gameLabel } from '../../lib/backend.js';
 
-function gameResult(score) {
-  if (!score || typeof score !== 'string') return null;
-  const parts = score.split('-').map(s => parseInt(s.trim(), 10));
-  if (parts.length !== 2 || parts.some(n => Number.isNaN(n))) return null;
-  const [us, them] = parts;
-  if (us > them) return 'W';
-  if (us < them) return 'L';
-  return 'T';
-}
-
-export default function GameCard({ id, game, onClick, href }) {
-  const result = gameResult(game.score);
+export default function GameCard({ game, onClick, href }) {
   const badgeClass =
-    result === 'W' ? cardStyles.badgeWin :
-    result === 'L' ? cardStyles.badgeLoss :
+    game.result === 'W' ? cardStyles.badgeWin :
+    game.result === 'L' ? cardStyles.badgeLoss :
     cardStyles.badgeTie;
+
+  const scoreStr = `${game.teamScore}-${game.opponentScore}`;
 
   return (
     <a className={cardStyles.card} href={href} onClick={onClick}>
       <div className={cardStyles.topRow}>
-        <span className={cardStyles.id}>#{id}</span>
-        {result && (
-          <span className={`${cardStyles.badge} ${badgeClass}`}>{result}</span>
+        <span className={cardStyles.id}>#{game.game}</span>
+        {game.result && (
+          <span className={`${cardStyles.badge} ${badgeClass}`}>{game.result}</span>
         )}
       </div>
-      <div className={cardStyles.name}>{game.name || 'Untitled game'}</div>
-      {game.opponents && (
-        <div className={cardStyles.opponent}>vs {game.opponents}</div>
+      <div className={cardStyles.name}>{gameLabel(game)}</div>
+      {game.opponentName && (
+        <div className={cardStyles.opponent}>vs {game.opponentName}</div>
       )}
-      {game.score && (
-        <div className={cardStyles.score}>{game.score}</div>
-      )}
+      <div className={cardStyles.score}>{scoreStr}</div>
     </a>
   );
 }

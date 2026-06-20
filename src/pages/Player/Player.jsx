@@ -1,19 +1,18 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Loader, Center } from '@mantine/core';
-import JSON5 from 'json5';
 import Banner from '../../components/Banner/Banner';
 import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
 import Playlist from '../../components/Playlist/Playlist';
 import ShortcutsModal from '../../components/ShortcutsModal/ShortcutsModal';
 import { parseLabel, segmentMatchesFilter } from '../../lib/parseLabel';
-import { getYouTubeId } from '../../lib/youtube';
 import { navigate } from '../../lib/routing';
 import { deriveFilterOptions, buildFilter, EMPTY_CHOICE } from '../../lib/deriveFilterOptions';
+import { getGame, getGameClips } from '../../lib/backend.js';
 import styles from './Player.module.css';
 
 export default function Player({ gameId, isMobile }) {
-  const [gameMeta, setGameMeta] = useState(null);
-  const [gameData, setGameData] = useState(null);
+  const [game, setGame] = useState(null);
+  const [cutSegments, setCutSegments] = useState(null);
   const [loadError, setLoadError] = useState(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -51,62 +50,35 @@ export default function Player({ gameId, isMobile }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [showHelp, openHelp, closeHelp]);
 
-  // Load games.json -> find entry -> load LLC -> extract cutSegments.
   useEffect(() => {
     let cancelled = false;
-    setGameMeta(null);
-    setGameData(null);
+    setGame(null);
+    setCutSegments(null);
     setLoadError(null);
 
-    fetch('./data/games.json')
-      .then(r => r.ok ? r.json() : Promise.reject('games.json ' + r.status))
-      .then(games => {
-        if (cancelled) return null;
-        const entry = games[gameId];
-        if (!entry) {
-          throw new Error('Unknown game id: ' + gameId);
-        }
-        setGameMeta(entry);
-        return fetch('./data/' + entry.llc);
-      })
-      .then(r => {
-        if (cancelled || !r) return null;
-        if (!r.ok) return Promise.reject('LLC ' + r.status);
-        return r.text();
-      })
-      .then(text => {
-        if (cancelled || !text) return;
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = JSON5.parse(text);
-        }
-        if (data && Array.isArray(data.cutSegments)) {
-          data.cutSegments = data.cutSegments
-            .filter(s => typeof s.start === 'number' && typeof s.end === 'number')
-            .map(s => ({
-              ...s,
-              start: Math.floor(s.start),
-              end: Math.ceil(s.end),
-            }));
-          data.cutSegments.sort((a, b) => a.start - b.start);
-        }
-        setGameData(data);
-      })
-      .catch(err => {
+    (async () => {
+      try {
+        const [gameData, clipsData] = await Promise.all([
+          getGame(gameId),
+          getGameClips(gameId),
+        ]);
+        if (cancelled) return;
+        setGame(gameData);
+        setCutSegments(clipsData.clips);
+      } catch (err) {
         if (cancelled) return;
         console.error('Could not load game:', err);
         setLoadError(String(err.message || err));
-      });
+      }
+    })();
 
     return () => { cancelled = true; };
   }, [gameId]);
 
-  const cutSegments = gameData?.cutSegments || [];
+  const segments = cutSegments ?? [];
   const parsedSegments = useMemo(
-    () => cutSegments.map(s => parseLabel(s.name || '')),
-    [cutSegments]
+    () => segments.map(s => parseLabel(s.name || '')),
+    [segments]
   );
   const filterOptions = useMemo(
     () => deriveFilterOptions(parsedSegments),
@@ -115,31 +87,21 @@ export default function Player({ gameId, isMobile }) {
 
   const filter = useMemo(() => buildFilter(filterChoice), [filterChoice]);
 
-  // visibleIndices: indices into the ORIGINAL cutSegments array that
-  // pass the active filter. activeIdx still indexes the original array;
-  // navigation helpers walk this list.
   const visibleIndices = useMemo(() => {
-    if (!filter) return cutSegments.map((_, i) => i);
+    if (!filter) return segments.map((_, i) => i);
     const out = [];
-    for (let i = 0; i < cutSegments.length; i++) {
+    for (let i = 0; i < segments.length; i++) {
       if (segmentMatchesFilter(parsedSegments[i], filter)) out.push(i);
     }
     return out;
-  }, [cutSegments, parsedSegments, filter]);
+  }, [segments, parsedSegments, filter]);
 
-  // When the filter changes, jump to the first visible clip (or -1 if
-  // none). Skip on initial mount when nothing is filtered yet.
   const prevFilterRef = useRef(filter);
   useEffect(() => {
     if (prevFilterRef.current === filter) return;
     prevFilterRef.current = filter;
     setActiveIdx(visibleIndices.length > 0 ? visibleIndices[0] : -1);
   }, [filter, visibleIndices]);
-
-  const videoId = useMemo(
-    () => gameMeta ? getYouTubeId(gameMeta.youtubeUrl) : null,
-    [gameMeta]
-  );
 
   if (loadError) {
     return (
@@ -156,7 +118,7 @@ export default function Player({ gameId, isMobile }) {
     );
   }
 
-  if (!gameData || !gameMeta) {
+  if (!cutSegments || !game) {
     return (
       <Center h="100vh">
         <Loader color="orange" />
@@ -166,14 +128,14 @@ export default function Player({ gameId, isMobile }) {
 
   return (
     <div className={styles.app}>
-      {!isFullscreen && <Banner game={gameMeta} />}
+      {!isFullscreen && <Banner game={game} />}
       <div className={`${styles.main} ${videoCollapsed ? styles.videoCollapsed : ''}`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
             ref={videoPlayerRef}
             key={isMobile ? 'mobile' : 'desktop'}
-            videoId={videoId}
-            cutSegments={cutSegments}
+            videoId={game.videoId}
+            cutSegments={segments}
             parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}
@@ -185,8 +147,8 @@ export default function Player({ gameId, isMobile }) {
         </div>
         {!isFullscreen && (
           <Playlist
-            title={gameMeta.name}
-            cutSegments={cutSegments}
+            title={game.game}
+            cutSegments={segments}
             parsedSegments={parsedSegments}
             activeIdx={activeIdx}
             setActiveIdx={setActiveIdx}

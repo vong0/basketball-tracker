@@ -1,0 +1,9 @@
+[
+  { "id": "vong",    "name": "Vong",    "number": "", "position": "Big",   "photo": "", "active": true },
+  { "id": "mushi",   "name": "Mushi",   "number": "", "position": "Guard", "photo": "", "active": true },
+  { "id": "matt",    "name": "Matt",    "number": "", "position": "Guard", "photo": "", "active": true },
+  { "id": "emanuel", "name": "Emanuel", "number": "", "position": "Guard", "photo": "", "active": true },
+  { "id": "alex",    "name": "Alex",    "number": "", "position": "Big",   "photo": "", "active": true },
+  { "id": "george",  "name": "George",  "number": "", "position": "Guard", "photo": "", "active": true },
+  { "id": "adam",    "name": "Adam",    "number": "", "position": "Wing",  "photo": "", "active": true }
+]

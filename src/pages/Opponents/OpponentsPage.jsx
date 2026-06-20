@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { navigate } from '../../lib/routing';
 import Banner from '../../components/Banner/Banner';
+import { getOpponents } from '../../lib/backend.js';
 import styles from './OpponentsPage.module.css';
 
 // Resolve photo: supports http/https URLs and repo-relative paths like
@@ -213,16 +214,22 @@ export default function OpponentsPage({ isMobile, selectedId: selectedIdProp = n
   }, [selectedIdProp]);
 
   useEffect(() => {
-    fetch('./data/opponents.json')
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then(setData)
-      .catch((err) => {
-        console.error('Could not load opponents.json:', err);
-        setError(String(err));
-      });
+    let cancelled = false;
+    (async () => {
+      try {
+        const opponents = await getOpponents();
+        if (!cancelled) setData(opponents);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Could not load opponents:', err);
+          setError(String(err));
+        }
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  const teams = data?.teams ?? [];
+  const teams = Array.isArray(data) ? data : [];
   const selectedTeam = selectedId ? teams.find((t) => t.id === selectedId) : null;
 
   if (selectedTeam) {

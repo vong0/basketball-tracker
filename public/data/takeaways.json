@@ -1,0 +1,72 @@
+[
+  {
+    "gameId": "2026-S2-G2",
+    "team": [],
+    "players": [
+      {
+        "playerId": "mushi",
+        "strengths": [
+          "Great job pushing pace on transition",
+          "Amazing job splitting defense and dumping to cutting bigs"
+        ],
+        "improvements": [
+          "Forced a few passes inside while too congested",
+          "Sometimes take a look before driving middle"
+        ]
+      },
+      {
+        "playerId": "emanuel",
+        "strengths": [
+          "Great job creating paint touches to bigs inside",
+          "Good job swinging ball fast and early"
+        ],
+        "improvements": [
+          "More effort needed boxing out on 45 degree shooters",
+          "More drives needed + take inside floaters if 3pt is not falling"
+        ]
+      },
+      {
+        "playerId": "vong",
+        "strengths": [
+          "Good job cutting and rolling, getting inside and finishing"
+        ],
+        "improvements": [
+          "Vary up your inside moves + do not always settle for push shot",
+          "On defense pay more attention to backdoor cutters",
+          "Coordinate post position with Alex more"
+        ]
+      },
+      {
+        "playerId": "george",
+        "strengths": [
+          "Good screening off-ball",
+          "Keep taking open 3s"
+        ],
+        "improvements": []
+      },
+      {
+        "playerId": "matt",
+        "strengths": [
+          "Good job driving corner and dumping",
+          "Good job passing early on fastbreaks"
+        ],
+        "improvements": [
+          "Rotate and communicate more to contest open shooters",
+          "Watch for the 2-3 zone double team on the wing + pass back early",
+          "Set more off-ball and on-ball screens"
+        ]
+      },
+      {
+        "playerId": "alex",
+        "strengths": [
+          "Good job screening and rolling for the dump inside",
+          "Good effort on the boards"
+        ],
+        "improvements": [
+          "On offensive boards, either contest or IMMEDIATELY drop back",
+          "Coordinate with Vong vs 2-3 Zone + 1 big at high post centre, 1 at low post"
+        ]
+      }
+    ]
+  }
+]
