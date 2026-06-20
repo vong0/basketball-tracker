@@ -11,6 +11,7 @@ Usage:
 
 from pathlib import Path
 
+
 # Folders/files to include (relative to script location)
 INCLUDE_PATHS = [
     "src",
@@ -23,6 +24,12 @@ INCLUDE_FILES = [
     "vite.config.js",
     "index.html",
 ]
+INCLUDE_FILES += [
+    "tools/stats-core/standalone/basketball-tracker-v0.4.17.3-locked-game-final-fix.html", "public/data/stats.html",
+    "../html/games-g1.html", "../html/games.html", "../html/players.html", "../html/players-adam.html", "../html/tables/ab.html",
+    "tools/stats-core/src/stats/basketballConstants.js", "tools/stats-core/src/stats/basketballStats.js",
+]
+
 
 # File extensions to cat
 INCLUDE_EXTENSIONS = {
