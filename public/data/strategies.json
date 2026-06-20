@@ -24,6 +24,23 @@
           "end": 898.721556
         }
       ]
+    },
+    {
+      "id": "2-3-inside-screen-drive-backdoor-2",
+      "defenseType": "2-3 Zone",
+      "name": "Dummy",
+      "summary": " Dummy",
+      "description": [
+        "Dummy"
+      ],
+      "clips": [
+        {
+          "label": "Example",
+          "youtubeUrl": "https://www.youtube.com/watch?v=2Y1arwOHfK8",
+          "start": 892.183614,
+          "end": 898.721556
+        }
+      ]
     }
   ]
 }
