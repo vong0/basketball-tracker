@@ -30,6 +30,8 @@ function VideoPlayerInner({
   const iframeContainerRef = useRef(null);
   const iframeScaleWrapRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const hasPlayedOnceRef = useRef(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [playerReady, setPlayerReady] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -139,6 +141,10 @@ const wasPlayingBeforeModalRef = useRef(false);
           onStateChange: (e) => {
             if (e.data === 1) {
               setIsPlaying(true);
+              if (!hasPlayedOnceRef.current) {
+                hasPlayedOnceRef.current = true;
+                setInitialLoading(false);
+              }
             } else if (e.data === 2 || e.data === 0) {
               setIsPlaying(false);
             }
@@ -809,6 +815,9 @@ const resumeIfWasPlaying = useCallback(() => {
               <div ref={iframeContainerRef} className={styles.iframeContainerMobile}>
                 <div ref={iframeScaleWrapRef} className={styles.iframeScaleWrap} />
               </div>
+              {isMobile && initialLoading && (
+                <div className={styles.iframeLoadBlocker} />
+              )}
             </div>
             <div className={styles.neighborSlot + ' ' + styles.neighborNext} aria-hidden="true">
               <div className={styles.neighborInner}>

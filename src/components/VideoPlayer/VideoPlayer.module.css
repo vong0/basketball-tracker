@@ -45,6 +45,14 @@
    Black background prevents a white flash leaking through during YT
    seeks (loop fires) and dim/undim - the transform creates a separate
    compositor layer whose contents are briefly invalidated on mobile. */
+.iframeLoadBlocker {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 5;
+  pointer-events: none;
+}
+
 .iframeScaleWrap {
   position: absolute;
   width: 1920px;
