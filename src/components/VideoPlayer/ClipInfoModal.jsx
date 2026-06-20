@@ -1,33 +1,14 @@
 import { Modal } from '@mantine/core';
-import { parseLabel } from '../../lib/parseLabel';
+import { parseLabel, dotKey, actionDisplayParts } from '../../lib/parseLabel';
 import { formatTime } from '../../lib/time';
 import styles from './VideoPlayer.module.css';
 
-function dotClassFor(a) {
-  if (a.team === 'O') return styles.dotOpponent;
-  if (a.quality === 'G') return styles.dotGood;
-  if (a.quality === 'B') return styles.dotBad;
-  return styles.dotNeutral;
-}
-
-function isSchemeOnlyNoQuality(a) {
-  const isScheme = a.type === 'MAN' || a.type === '2-3' || a.type === '3-2';
-  return isScheme && !a.quality;
-}
-
-function actionLineText(a) {
-  const players = a.players && a.players.length ? a.players.join(', ') : '';
-  const note = a.note || '';
-  const isOpp = a.team === 'O';
-  if (isOpp) {
-    const head = players ? 'opp ' + players : 'opp';
-    return note ? head + ': ' + note : head;
-  }
-  if (players && note) return players + ': ' + note;
-  if (players) return players;
-  if (note) return 'all: ' + note;
-  return 'all';
-}
+const DOT_CLASSES = {
+  good:     styles.dotGood,
+  bad:      styles.dotBad,
+  opponent: styles.dotOpponent,
+  neutral:  styles.dotNeutral,
+};
 
 export default function ClipInfoModal({ opened, onClose, activeSegment, activeParsed, navList, activeIdx }) {
   const navPos = navList.indexOf(activeIdx);
@@ -58,12 +39,16 @@ export default function ClipInfoModal({ opened, onClose, activeSegment, activePa
         </div>
         <div className={styles.infoBody}>
           {actions.map((a, i) => {
-            const text = actionLineText(a);
-            const noDot = isSchemeOnlyNoQuality(a);
+            const { subject, note } = actionDisplayParts(a);
+            const noDot = false;
             return (
               <div key={i} className={styles.infoActionLine}>
-                {!noDot && <span className={`${styles.infoLineDot} ${dotClassFor(a)}`} />}
-                <span className={styles.infoActionText}>{text || activeSegment.name}</span>
+                {!noDot && <span className={`${styles.infoLineDot} ${DOT_CLASSES[dotKey(a)]}`} />}
+                <span className={styles.infoActionText}>
+                  {note
+                    ? <><b>{subject}</b>{': '}{note}</>
+                    : <b>{subject || activeSegment.name}</b>}
+                </span>
               </div>
             );
           })}

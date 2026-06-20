@@ -11,6 +11,7 @@ import { useSwipeGesture } from './hooks/useSwipeGesture';
 import { useModalPlayback } from './hooks/useModalPlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { LOOP_LEAD } from './constants';
+import { dotKey } from '../../lib/parseLabel';
 import styles from './VideoPlayer.module.css';
 
 function VideoPlayerInner({
@@ -167,10 +168,11 @@ function VideoPlayerInner({
     : 0;
   const useFsMobileChrome = isMobile && isFullscreen;
   const activeParsed = parsedSegments && activeIdx >= 0 ? parsedSegments[activeIdx] : null;
-  const counterDotClass = activeParsed?.team === 'opponent' ? styles.dotOpponent
-    : activeParsed?.quality === 'good' ? styles.dotGood
-    : activeParsed?.quality === 'bad' ? styles.dotBad
-    : styles.dotNeutral;
+  const DOT_CLASSES = {
+    good: styles.dotGood, bad: styles.dotBad,
+    opponent: styles.dotOpponent, neutral: styles.dotNeutral,
+  };
+  const counterDotClass = DOT_CLASSES[dotKey(activeParsed?.actions?.[0])] ?? styles.dotNeutral;
   const navPos = navList.indexOf(activeIdx);
   const handleSeekbarPointerDown = makePointerDownHandler(seekbarRef);
   const handleReelPointerDown = makePointerDownHandler(reelRef);

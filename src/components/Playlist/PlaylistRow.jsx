@@ -1,24 +1,20 @@
 import { useRef } from 'react';
 import { formatTime } from '../../lib/time';
 import { usePlaylistScroll } from './hooks/usePlaylistScroll';
-import { dotClassFor, isSchemeOnlyNoQuality } from './utils';
+import { dotKey, actionDisplayParts } from '../../lib/parseLabel';
 import styles from './Playlist.module.css';
 
-function actionLineText(action) {
-  const players = action.players && action.players.length
-    ? action.players.join(', ')
-    : '';
-  const note = action.note || '';
-  const isOpp = action.team === 'O';
+const DOT_CLASSES = {
+  good:     styles.dotGood,
+  bad:      styles.dotBad,
+  opponent: styles.dotOpponent,
+  neutral:  styles.dotNeutral,
+};
 
-  if (isOpp) {
-    const head = players ? 'opp ' + players : 'opp';
-    return note ? (<><b>{head}</b>: {note}</>) : (<b>{head}</b>);
-  }
-  if (players && note) return (<><b>{players}</b>: {note}</>);
-  if (players) return (<b>{players}</b>);
-  if (note) return (<><b>all</b>: {note}</>);
-  return (<b>all</b>);
+function ActionText({ action, fallback }) {
+  const { subject, note } = actionDisplayParts(action);
+  if (note) return <><b>{subject}</b>{': '}{note}</>;
+  return <b>{subject || fallback}</b>;
 }
 
 export default function PlaylistRow({ segment, parsed, isActive, onClick }) {
@@ -42,14 +38,13 @@ export default function PlaylistRow({ segment, parsed, isActive, onClick }) {
           </div>
         )}
         {actions.map((a, i) => {
-          const text = actionLineText(a);
-          const noDot = isSchemeOnlyNoQuality(a);
+          const noDot = false;
           return (
             <div key={i} className={styles.actionLine}>
               {!noDot && (
-                <span className={styles.dot + ' ' + dotClassFor(a, styles)} />
+                <span className={`${styles.dot} ${DOT_CLASSES[dotKey(a)]}`} />
               )}
-              <span className={styles.actionText}>{text || segment.name}</span>
+              <ActionText action={a} fallback={segment.name} />
             </div>
           );
         })}

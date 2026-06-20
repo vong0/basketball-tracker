@@ -1,4 +1,5 @@
 /**
+
  * parseLabel.js — single source of truth for the segment label format.
  *
  * ============================================================================
@@ -18,14 +19,11 @@
  *   QUALITY  — optional. `G` = good, `B` = bad, omitted = neutral.
  *              From the actor's perspective: a good play *for the team
  *              doing it*. Display layer can re-interpret (e.g. opponent
- *              actions render as a blue dot regardless of G/B).
+ *              actions render as a white dot regardless of G/B).
  *
  *   TYPE     — required on the first action. Frozen set:
  *                O   = offense
  *                D   = defense
- *                MAN = man-to-man defensive scheme
- *                2-3 = 2-3 zone defensive scheme
- *                3-2 = 3-2 zone defensive scheme
  *
  *   players  — optional, comma-separated short names. Examples:
  *                matt
@@ -48,7 +46,6 @@
  *   UG(O) matt: drives baseline and kicks for open three
  *   UB(D) lost rotation, easy layup
  *   OG(O) opponent: well-executed pick and roll for open dunk
- *   U(MAN) all: full rotation snuffs out drive and kick
  *   UG(O) matt: drives | vong: screens | george: pops for three
  *   UG(O) matt: drives | george,kap: double screen >> textbook flow offense
  *   UG(O) matt: high screen and roll, great read #pnr
@@ -61,10 +58,7 @@
  * of `end` in the segment object:
  *
  *   Segment (clip):  { start: 95.04, end: 106.97, name: 'UG(O) matt: drives' }
- *   Marker (point):  { start: 52.90,              name: 'U(MAN)' }
- *
- * Markers represent a moment-in-time tag (e.g. defensive scheme change)
- * and are typically rendered as vertical ticks on a timeline.
+ *   Marker (point):  { start: 52.90,              name: 'U(D)' }
  *
  * ============================================================================
  * PARSED OUTPUT SHAPE
@@ -77,7 +71,7 @@
  *       {
  *         team:    'U' | 'O',                     // code, not expanded
  *         quality: 'G' | 'B' | '',                // code; '' = neutral
- *         type:    'O' | 'D' | 'MAN' | '2-3' | '3-2',
+ *         type:    'O' | 'D',
  *         players: string[],                      // [] if none
  *         note:    string,                        // '' if none
  *         tags:    string[],                      // extracted #tag words
@@ -94,19 +88,15 @@
  *     type:    string,
  *   }
  *
- * Codes (not expanded keys) are the canonical form. Display layer should
- * use the TEAMS/QUALITIES/TYPES lookups below to render labels.
- *
  * ============================================================================
  */
-
 
 // ============================================================================
 // LOOKUPS — single source of truth for code <-> display mappings.
 // ============================================================================
 
 export const TEAMS = {
-  U: { code: 'U', key: 'us',       label: 'Us'   },
+  U: { code: 'U', key: 'us',       label: 'Us'       },
   O: { code: 'O', key: 'opponent', label: 'Opponent' },
 };
 
@@ -117,16 +107,12 @@ export const QUALITIES = {
 };
 
 export const TYPES = {
-  O:     { code: 'O',     key: 'offense', label: 'Offense',     short: 'OFF' },
-  D:     { code: 'D',     key: 'defense', label: 'Defense',     short: 'DEF' },
-  MAN:   { code: 'MAN',   key: 'man',     label: 'Man defense', short: 'MAN' },
-  '2-3': { code: '2-3',   key: 'zone23',  label: '2-3 zone',    short: '2-3' },
-  '3-2': { code: '3-2',   key: 'zone32',  label: '3-2 zone',    short: '3-2' },
+  O: { code: 'O', key: 'offense', label: 'Offense', short: 'OFF' },
+  D: { code: 'D', key: 'defense', label: 'Defense', short: 'DEF' },
 };
 
 const VALID_TEAM_CODES = new Set(Object.keys(TEAMS));
 const VALID_TYPE_CODES = new Set(Object.keys(TYPES));
-
 
 // ============================================================================
 // DISPLAY HELPERS — code -> human-readable string.
@@ -145,15 +131,15 @@ export function typeLabel(code) {
 }
 
 /**
+
  * Quality color for an action, accounting for opponent rendering rule.
- * Opponent actions always render blue regardless of G/B; G/B is preserved
+ * Opponent actions always render gray regardless of G/B; G/B is preserved
  * internally for filtering.
  */
 export function qualityColor(action) {
   if (action.team === 'O') return 'gray';
   return QUALITIES[action.quality]?.color ?? 'gray';
 }
-
 
 // ============================================================================
 // PARSER
@@ -162,6 +148,7 @@ export function qualityColor(action) {
 const PREFIX_RE = /^(?:([UO])([GB]?)\(([A-Z0-9-]+)\)\s*)?(.*)$/;
 
 /**
+
  * Extract `#tag` words out of free-text. Returns { note, tags } where
  * `note` has the tags removed and `tags` is the array of tag words.
  */
@@ -179,6 +166,7 @@ function extractTags(rawNote) {
 }
 
 /**
+
  * Parse one segment label into structured data. Always returns a valid
  * shape, even for empty/null input.
  */
@@ -212,7 +200,6 @@ export function parseLabel(label) {
   for (const seg of segments) {
     const m = seg.match(PREFIX_RE);
     if (!m) continue;
-
     const [, teamCode, qualCode, typeCode, rest] = m;
 
     let code;
@@ -237,7 +224,6 @@ export function parseLabel(label) {
     }
 
     const { note, tags } = extractTags(rawNote);
-
     actions.push({
       team: code.team,
       quality: code.qual,
@@ -286,6 +272,48 @@ export function parseLabel(label) {
   };
 }
 
+// ============================================================================
+// ACTION DISPLAY HELPERS — shared by PlaylistRow and ClipInfoModal
+// ============================================================================
+
+/**
+
+ * Returns a stable semantic key for the quality dot colour.
+ * Consumers map this to their own CSS module class.
+ *
+ *   'good'     → green dot
+ *   'bad'      → red dot
+ *   'opponent' → white dot
+ *   'neutral'  → grey dot
+ */
+export function dotKey(action) {
+  if (!action) return 'neutral';
+  if (action.team === 'O') return 'opponent';
+  if (action.quality === 'G') return 'good';
+  if (action.quality === 'B') return 'bad';
+  return 'neutral';
+}
+
+/**
+
+ * Returns { subject, note } for a single action so callers can apply
+ * bold/JSX to the subject portion.
+ *
+ *   subject — player(s) or 'opp'/'all' prefix
+ *   note    — free-text after ': ', or '' if none
+ */
+export function actionDisplayParts(action) {
+  const players = action.players?.length ? action.players.join(', ') : '';
+  const note = action.note || '';
+  const isOpp = action.team === 'O';
+
+  if (isOpp) {
+    const subject = players ? 'opp ' + players : 'opp';
+    return { subject, note };
+  }
+  if (players) return { subject: players, note };
+  return { subject: 'all', note };
+}
 
 // ============================================================================
 // FILTERS
@@ -298,28 +326,22 @@ function asArray(v) {
 
 export function actionMatchesFilter(action, filter) {
   if (!filter) return true;
-
   const teams = asArray(filter.team);
   if (teams && !teams.includes(action.team)) return false;
-
   const qualities = asArray(filter.quality);
   if (qualities && !qualities.includes(action.quality)) return false;
-
   const types = asArray(filter.type);
   if (types && !types.includes(action.type)) return false;
-
   const players = asArray(filter.players);
   if (players && players.length > 0) {
     const has = action.players.some(p => players.includes(p));
     if (!has) return false;
   }
-
   return true;
 }
 
 export function segmentMatchesFilter(parsed, filter) {
   if (!filter) return true;
-
   const hasStructured =
     filter.team !== undefined ||
     filter.quality !== undefined ||
@@ -349,7 +371,6 @@ export function segmentMatchesFilter(parsed, filter) {
   return true;
 }
 
-
 // ============================================================================
 // VALIDATION
 // ============================================================================
@@ -377,7 +398,6 @@ export function validateParsed(parsed, raw) {
   }
   return issues;
 }
-
 
 // ============================================================================
 // CLI
@@ -473,11 +493,10 @@ async function runCli() {
     'UG(O) matt: drives baseline and kicks for open three',
     'UB(O) matt: bad pass | UG(D) george: deflects, recovers | UG(O) vong: fastbreak layup >> turnover into transition score',
     'OG(O) opponent: well-executed pick and roll for open dunk',
-    'U(MAN) all: full rotation snuffs out drive and kick',
     'UG(O) matt: high screen and roll, great read #pnr',
     'UG(O) matt: drives | vong: screens | george: pops for three',
-    'O(2-3) opponent runs 2-3 zone, we get stuck on perimeter',
   ];
+
   for (const s of samples) {
     console.log('---');
     console.log('INPUT:', s);
