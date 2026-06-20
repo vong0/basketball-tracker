@@ -1,0 +1,315 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Hero ────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 32px 24px;
+}
+
+.heroInner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.heroBody {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.photoWrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.initials {
+  width: 100%;
+  height: 100%;
+  background: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.heroInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroName {
+  font-family: var(--font-display);
+  font-size: 48px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.heroMeta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metaSep { color: var(--text-faint); }
+
+/* ── Scope bar ───────────────────────── */
+
+.scopeBar {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 32px;
+  background: var(--bg);
+}
+
+.scopeInner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.scopePicker {
+  appearance: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 7px 28px 7px 12px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.15s;
+}
+
+.scopePicker:focus { outline: none; border-color: var(--orange); }
+
+/* ── Tab bar ─────────────────────────── */
+
+.tabBar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 30;
+}
+
+.tabInner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  padding: 0 32px;
+  gap: 4px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  height: 44px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--text); }
+
+.tabActive {
+  color: var(--text);
+  border-bottom-color: var(--orange);
+}
+
+/* ── Content ─────────────────────────── */
+
+.content {
+  flex: 1;
+  background: var(--bg-elevated);
+  padding: 0 32px 64px;
+}
+
+.contentInner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.section {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child { border-bottom: none; }
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.sectionDate {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+}
+
+.placeholder {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dim);
+  padding: 32px 0;
+  font-style: italic;
+}
+
+/* ── Takeaways ───────────────────────── */
+
+.teamNote {
+  margin-bottom: 16px;
+}
+
+.takeawayColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.takeawayLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+
+.takeawayList {
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.takeawayGreen li { color: var(--green); }
+.takeawayRed   li { color: var(--red); }
+
+/* ── Clips ───────────────────────────── */
+
+.clipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.clipCard {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+@media (hover: hover) {
+  .clipCard:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+}
+
+.clipLabel {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.clipCount {
+  font-family: var(--font-display);
+  font-size: 40px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.clipMeta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+
+.clipWatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 20px;
+  align-self: flex-start;
+  transition: background 0.15s;
+}
+
+.clipWatch:hover { background: #e54e12; }
+
+/* ── Responsive ──────────────────────── */
+
+@media (max-width: 640px) {
+  .hero { padding: 20px 16px 16px; }
+  .heroName { font-size: 36px; }
+  .photoWrap { width: 60px; height: 60px; }
+  .initials { font-size: 24px; }
+
+  .scopeBar { padding: 10px 16px; }
+
+  .tabInner { padding: 0 16px; gap: 0; }
+  .tab { padding: 0 10px; font-size: 13px; }
+
+  .content { padding: 0 16px 48px; }
+
+  .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
+  .clipsGrid { grid-template-columns: 1fr 1fr; }
+}

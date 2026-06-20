@@ -1,48 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Loader, Center } from '@mantine/core';
+import { useState } from 'react';
 import Banner from '../../components/Banner/Banner';
 import GameCard from './GameCard';
-import { navigate } from '../../lib/routing';
-import { getGames } from '../../lib/backend.js';
+import { mockGames } from '../../lib/mockData.js';
 import styles from './GamesPage.module.css';
 
-export default function LandingPage() {
-  const [games, setGames] = useState(null);
-  const [error, setError] = useState(null);
+const ALL_SEASONS = [...new Set(mockGames.map(g => g.season))].sort().reverse();
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const data = await getGames();
-        if (!cancelled) setGames(data);
-      } catch (err) {
-        if (!cancelled) {
-          console.error('Could not load games:', err);
-          setError(String(err));
-        }
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+export default function GamesPage() {
+  const [seasonFilter, setSeasonFilter] = useState('');
+  const [resultFilter, setResultFilter] = useState('');
 
-  if (error) {
-    return (
-      <div className={styles.page}>
-        <Banner />
-        <div className={styles.errorBox}>Could not load games. ({error})</div>
-      </div>
-    );
-  }
+  const games = mockGames.filter(g => {
+    if (seasonFilter && g.season !== seasonFilter) return false;
+    if (resultFilter && g.result !== resultFilter) return false;
+    return true;
+  });
 
-  if (!games) {
-    return (
-      <div className={styles.page}>
-        <Banner />
-        <Center style={{ flex: 1 }}><Loader color="orange" /></Center>
-      </div>
-    );
-  }
+  const hasFilter = seasonFilter || resultFilter;
 
   return (
     <div className={styles.page}>
@@ -59,14 +33,40 @@ export default function LandingPage() {
         </div>
       </div>
       <div className={styles.scroll}>
+        <div className={styles.headingBlock}>
+          <div className={styles.filterRow}>
+            <select
+              className={styles.filterSelect}
+              value={seasonFilter}
+              onChange={e => setSeasonFilter(e.target.value)}
+            >
+              <option value="">All Seasons</option>
+              {ALL_SEASONS.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            <select
+              className={styles.filterSelect}
+              value={resultFilter}
+              onChange={e => setResultFilter(e.target.value)}
+            >
+              <option value="">All Results</option>
+              <option value="W">Wins</option>
+              <option value="L">Losses</option>
+            </select>
+            {hasFilter && (
+              <button
+                className={styles.filterClear}
+                onClick={() => { setSeasonFilter(''); setResultFilter(''); }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
         <div className={styles.grid}>
           {games.map(game => (
-            <GameCard
-              key={game.id}
-              game={game}
-              href={"#/game/" + game.id}
-              onClick={() => navigate('#/game/' + game.id)}
-            />
+            <GameCard key={game.id} game={game} />
           ))}
         </div>
       </div>
