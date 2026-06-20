@@ -1,9 +1,9 @@
 import styles from './Banner.module.css';
 import { navigate } from '../../lib/routing';
 
-export default function Banner({ isMobile, game }) {
+export default function Banner({ game }) {
   return (
-    <div className={`${styles.banner} ${isMobile ? styles.bannerMobile : ''}`}>
+    <div className={styles.banner}>
       <a className={styles.brand} href="#/" aria-label="Go to games landing page">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="12" r="10" fill="#ff5c1a" />
@@ -16,7 +16,7 @@ export default function Banner({ isMobile, game }) {
         </svg>
         <span className={styles.wordmark}>SPARTANS</span>
       </a>
-      {game && <GameInfo game={game} isMobile={isMobile} />}
+      {game && <GameInfo game={game} />}
     </div>
   );
 }
@@ -31,7 +31,7 @@ function gameResult(score) {
   return 'T';
 }
 
-function GameInfo({ game, isMobile }) {
+function GameInfo({ game }) {
   const result = gameResult(game.score);
   const resultClass = result === 'W'
     ? styles.resultW

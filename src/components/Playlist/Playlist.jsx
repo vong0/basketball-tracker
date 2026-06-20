@@ -1,7 +1,6 @@
-import { useState, useRef } from 'react';
 import PlaylistRow from './PlaylistRow';
 import FilterPopover from './FilterPopover';
-import { isFilterActive } from '../../lib/deriveFilterOptions';
+import { useFilterState } from './hooks/useFilterState';
 import styles from './Playlist.module.css';
 
 export default function Playlist({
@@ -21,21 +20,12 @@ export default function Playlist({
   videoCollapsed,
   onToggleVideoCollapsed,
 }) {
-  const [filterOpen, setFilterOpen] = useState(false);
+  const { filterOpen, filterBtnRef, openFilter, closeFilter, filterActive, total, visible, visibleSet } =
+    useFilterState({ cutSegments, visibleIndices, filterChoice, onFilterOpen, onFilterClose });
 
-  const openFilter = () => {
-    if (onFilterOpen) onFilterOpen();
-    setFilterOpen(true);
-  };
-  const closeFilter = () => {
-    setFilterOpen(false);
-    if (onFilterClose) onFilterClose();
-  };
-  const filterBtnRef = useRef(null);
-  const filterActive = isFilterActive(filterChoice);
-  const total = cutSegments.length;
-  const visible = visibleIndices ? visibleIndices.length : total;
-  const visibleSet = visibleIndices || cutSegments.map((_, i) => i);
+  const activeCount = filterOptions
+    ? (filterChoice.player ? 1 : 0) + (filterChoice.rating ? 1 : 0) + (filterChoice.possession ? 1 : 0)
+    : 0;
 
   return (
     <aside className={`${styles.playlist} ${isMobile ? styles.playlistMobile : ''}`}>
@@ -62,28 +52,19 @@ export default function Playlist({
           <div className={styles.title}>{title || 'PLAYLIST'}</div>
         </div>
         <div className={styles.headerActions}>
-          {filterOptions && (() => {
-            // Count how many dimensions are actively filtered, so the
-            // button can read 'Filters' / 'Filters · 2' etc. Helps users
-            // see at a glance whether/how much is filtered.
-            const activeCount =
-              (filterChoice.player ? 1 : 0) +
-              (filterChoice.rating ? 1 : 0) +
-              (filterChoice.possession ? 1 : 0);
-            return (
-              <button
-                ref={filterBtnRef}
-                className={filterActive ? `${styles.filterBtn} ${styles.filterBtnActive}` : styles.filterBtn}
-                onClick={() => filterOpen ? closeFilter() : openFilter()}
-                aria-label="Filter clips"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-                </svg>
-                <span>Filters{activeCount > 0 ? ` · ${activeCount}` : ''}</span>
-              </button>
-            );
-          })()}
+          {filterOptions && (
+            <button
+              ref={filterBtnRef}
+              className={filterActive ? `${styles.filterBtn} ${styles.filterBtnActive}` : styles.filterBtn}
+              onClick={() => filterOpen ? closeFilter() : openFilter()}
+              aria-label="Filter clips"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              <span>Filters{activeCount > 0 ? ` · ${activeCount}` : ''}</span>
+            </button>
+          )}
           {filterOptions && (
             <FilterPopover
               opened={filterOpen}

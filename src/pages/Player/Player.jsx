@@ -144,7 +144,7 @@ export default function Player({ gameId, isMobile }) {
   if (loadError) {
     return (
       <div className={styles.app}>
-        <Banner isMobile={isMobile} />
+        <Banner />
         <div className={styles.errorBox}>
           <div>Could not load this game.</div>
           <div className={styles.errorDetail}>{loadError}</div>
@@ -166,8 +166,8 @@ export default function Player({ gameId, isMobile }) {
 
   return (
     <div className={styles.app}>
-      {!isFullscreen && <Banner isMobile={isMobile} game={gameMeta} />}
-      <div className={`${styles.main} ${isMobile ? styles.mainMobile : styles.mainDesktop} ${isMobile && videoCollapsed ? styles.videoCollapsed : ''}`}>
+      {!isFullscreen && <Banner game={gameMeta} />}
+      <div className={`${styles.main} ${videoCollapsed ? styles.videoCollapsed : ''}`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
             ref={videoPlayerRef}

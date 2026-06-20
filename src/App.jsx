@@ -25,7 +25,7 @@ export default function App() {
   }, []);
 
   if (route.view === 'games') {
-    return <GamesPage isMobile={isMobile} />;
+    return <GamesPage />;
   }
 
   if (route.view === 'game') {

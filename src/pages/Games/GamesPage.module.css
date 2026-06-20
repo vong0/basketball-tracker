@@ -107,9 +107,11 @@
   margin: 0 auto;
 }
 
-.gridMobile {
-  grid-template-columns: 1fr;
-  gap: 12px;
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .errorBox {

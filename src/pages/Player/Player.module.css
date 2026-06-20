@@ -9,30 +9,27 @@
 .main {
   flex: 1;
   display: flex;
+  flex-direction: row;
   overflow: hidden;
   min-height: 0;
 }
 
-.mainDesktop {
-  flex-direction: row;
-}
-
-.mainMobile {
-  flex-direction: column;
-}
-
-.mainMobile .videoWrap {
-  flex: 0 0 auto;
-  height: 45vh;        /* fallback */
-  height: 40dvh;
-  min-height: 0;
-  transition: height 0.2s ease;
-}
-
-/* Collapsed: video shrinks to a thumbnail strip so the playlist owns the
-   screen. Useful for browsing 50+ clips on a phone. */
-.mainMobile.videoCollapsed .videoWrap {
-  height: 80px;
+@media (max-width: 900px) {
+  .main {
+    flex-direction: column;
+  }
+  .main .videoWrap {
+    flex: 0 0 auto;
+    height: 45vh;      /* fallback */
+    height: 40dvh;
+    min-height: 0;
+    transition: height 0.2s ease;
+  }
+  /* Collapsed: video shrinks to a thumbnail strip so the playlist owns the
+     screen. Useful for browsing 50+ clips on a phone. */
+  .main.videoCollapsed .videoWrap {
+    height: 80px;
+  }
 }
 
 .videoWrap {

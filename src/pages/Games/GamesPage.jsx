@@ -5,7 +5,7 @@ import GameCard from './GameCard';
 import { navigate } from '../../lib/routing';
 import styles from './GamesPage.module.css';
 
-export default function LandingPage({ isMobile }) {
+export default function LandingPage() {
   const [games, setGames] = useState(null);
   const [error, setError] = useState(null);
 
@@ -22,7 +22,7 @@ export default function LandingPage({ isMobile }) {
   if (error) {
     return (
       <div className={styles.page}>
-        <Banner isMobile={isMobile} />
+        <Banner />
         <div className={styles.errorBox}>Could not load games. ({error})</div>
       </div>
     );
@@ -31,7 +31,7 @@ export default function LandingPage({ isMobile }) {
   if (!games) {
     return (
       <div className={styles.page}>
-        <Banner isMobile={isMobile} />
+        <Banner />
         <Center style={{ flex: 1 }}><Loader color="orange" /></Center>
       </div>
     );
@@ -41,7 +41,7 @@ export default function LandingPage({ isMobile }) {
 
   return (
     <div className={styles.page}>
-      <Banner isMobile={isMobile} />
+      <Banner />
       <div className={styles.heroBanner}>
         <div className={styles.heroInner}>
           <div className={styles.kicker}>SEASON</div>
@@ -54,7 +54,7 @@ export default function LandingPage({ isMobile }) {
         </div>
       </div>
       <div className={styles.scroll}>
-        <div className={`${styles.grid} ${isMobile ? styles.gridMobile : ''}`}>
+        <div className={styles.grid}>
           {entries.map(([id, g]) => (
             <GameCard
               key={id}
