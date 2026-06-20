@@ -1,0 +1,42 @@
+{
+  "emanuel": {
+    "id": "emanuel",
+    "name": "Emanuel",
+    "jersey": "0",
+    "position": "Guard",
+    "height": "",
+    "role": "Creator / guard",
+    "photo": "",
+    "notes": "Primary ball handler. Edit this later."
+  },
+  "adam": {
+    "id": "adam",
+    "name": "Adam",
+    "jersey": "",
+    "position": "Wing",
+    "height": "",
+    "role": "Scorer / shooter",
+    "photo": "",
+    "notes": "Top scorer sample player."
+  },
+  "alex": {
+    "id": "alex",
+    "name": "Alex",
+    "jersey": "",
+    "position": "Forward",
+    "height": "",
+    "role": "Screening / rebounding / defense",
+    "photo": "",
+    "notes": "High activity player."
+  },
+  "mushi": {
+    "id": "mushi",
+    "name": "Mushi",
+    "jersey": "",
+    "position": "Guard",
+    "height": "",
+    "role": "Slasher / creator",
+    "photo": "",
+    "notes": "Boilerplate profile."
+  }
+}

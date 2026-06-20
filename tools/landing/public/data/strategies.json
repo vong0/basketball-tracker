@@ -1,0 +1,23 @@
+{
+  "five-out": {
+    "id": "five-out",
+    "title": "5-out spacing",
+    "category": "Offense",
+    "summary": "Keep corners filled, lift on drives, punish help with drive-kick threes.",
+    "notes": "Boilerplate strategy note."
+  },
+  "screen-actions": {
+    "id": "screen-actions",
+    "title": "Screen actions",
+    "category": "Offense",
+    "summary": "Track screen assists, screen opportunities, and advantage-created possessions.",
+    "notes": "Connect this later to screen stats from the tracker."
+  },
+  "transition-defense": {
+    "id": "transition-defense",
+    "title": "Transition defense",
+    "category": "Defense",
+    "summary": "First three steps back after shots and turnovers. Stop ball early.",
+    "notes": "Boilerplate defensive note."
+  }
+}

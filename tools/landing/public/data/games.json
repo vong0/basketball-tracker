@@ -1,0 +1,30 @@
+{
+  "2026-S2-G1": {
+    "id": "2026-S2-G1",
+    "name": "2026-S2 G1",
+    "opponentId": "team-tam",
+    "opponentName": "Team Tam",
+    "date": "",
+    "scoreFor": 52,
+    "scoreAgainst": 50,
+    "result": "W",
+    "youtubeUrl": "https://www.youtube.com/watch?v=",
+    "llc": "games/y26-s2-g01.llc",
+    "reportUrl": "reports/2026-s2-g1.html",
+    "notes": "Sample game page notes."
+  },
+  "2026-S2-G2": {
+    "id": "2026-S2-G2",
+    "name": "2026-S2 G2",
+    "opponentId": "net-profits",
+    "opponentName": "Net Profits",
+    "date": "",
+    "scoreFor": 37,
+    "scoreAgainst": 65,
+    "result": "L",
+    "youtubeUrl": "https://youtu.be/orgeiVM7074",
+    "llc": "games/y26-s2-g02.llc",
+    "reportUrl": "reports/2026-s2-g2.html",
+    "notes": "Game 2 sample. Link the locked-game report here later."
+  }
+}

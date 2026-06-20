@@ -1,0 +1,10 @@
+{
+  "name": "spartans-site-boilerplate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "smoke": "node tests/smoke-test.mjs"
+  }
+}

@@ -13,8 +13,8 @@ const DOT_CLASSES = {
 
 function ActionText({ action, fallback }) {
   const { subject, note } = actionDisplayParts(action);
-  if (note) return <><b>{subject}</b>{': '}{note}</>;
-  return <b>{subject || fallback}</b>;
+  if (note) return <span><b>{subject}</b>{': '}{note}</span>;
+  return <span><b>{subject || fallback}</b></span>;
 }
 
 export default function PlaylistRow({ segment, parsed, isActive, onClick }) {

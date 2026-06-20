@@ -1,0 +1,18 @@
+{
+  "team-tam": {
+    "id": "team-tam",
+    "name": "Team Tam",
+    "record": "",
+    "notes": "Boilerplate opponent notes. Add scouting later.",
+    "keyPlayers": "",
+    "strategyNotes": ""
+  },
+  "net-profits": {
+    "id": "net-profits",
+    "name": "Net Profits",
+    "record": "",
+    "notes": "Physical team. Edit/add scout notes here.",
+    "keyPlayers": "",
+    "strategyNotes": ""
+  }
+}
