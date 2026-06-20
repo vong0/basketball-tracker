@@ -14,6 +14,8 @@ export function parseHash() {
   if (h === '#/takeaways') return { view: 'takeaways' };
   if (h === '#/strategies') return { view: 'strategies' };
   if (h === '#/opponents') return { view: 'opponents' };
+  const oppM = h.match(/^#\/opponents\/([\w-]+)$/);
+  if (oppM) return { view: 'opponent', teamId: oppM[1] };
   return { view: 'landing' };
 }
 

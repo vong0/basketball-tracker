@@ -43,6 +43,9 @@ export default function App() {
   if (route.view === 'opponents') {
     return <OpponentsPage isMobile={isMobile} />;
   }
+  if (route.view === 'opponent') {
+    return <OpponentsPage isMobile={isMobile} selectedId={route.teamId} />;
+  }
 
   return <LandingPage isMobile={isMobile} />;
 }

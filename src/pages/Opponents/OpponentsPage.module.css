@@ -71,6 +71,8 @@
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
   text-align: left;
   color: inherit;
   font-family: inherit;

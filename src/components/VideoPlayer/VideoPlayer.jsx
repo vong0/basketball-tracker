@@ -54,6 +54,9 @@ const wasPlayingBeforeModalRef = useRef(false);
     pointerDown: false,
     startX: 0,
     startY: 0,
+    startTime: 0,
+    lastMoveX: 0,
+    lastMoveTime: 0,
     dx: 0,
     swiping: false,
     side: null,
@@ -62,7 +65,10 @@ const wasPlayingBeforeModalRef = useRef(false);
   const activeSegment = activeIdx >= 0 ? cutSegments[activeIdx] : null;
 
   // Swipe gesture tuning (mobile only)
-  const SWIPE_COMMIT_PX = 80;        // horizontal travel to commit a segment change
+  const SWIPE_COMMIT_PX = 120;
+  const SWIPE_VELOCITY_PX_MS = 0.2;
+  const SWIPE_MIN_FLICK_PX   = 25;
+  const SWIPE_STALE_MS       = 150;        // velocity = 0 if finger stopped >150ms before lift        // horizontal travel to commit a segment change
   const SWIPE_MOVE_THRESHOLD_PX = 10; // movement that promotes pointerdown -> swipe
   const SWIPE_EDGE_RESIST = 0.15;    // drag follows finger at 15% past first/last
   const SWIPE_EDGE_CAP_PX = 60;      // hard cap on edge drag distance
@@ -435,6 +441,9 @@ try {
       pointerDown: true,
       startX: clientX,
       startY: clientY,
+      startTime: performance.now(),
+      lastMoveX: clientX,
+      lastMoveTime: performance.now(),
       dx: 0,
       swiping: false,
       side,
@@ -548,6 +557,8 @@ try {
       dx = Math.max(dx * SWIPE_EDGE_RESIST, -SWIPE_EDGE_CAP_PX);
     }
     s.dx = dx;
+    s.lastMoveX = clientX;
+    s.lastMoveTime = performance.now();
     setSwipeOffset(dx, false);
   };
 
@@ -557,12 +568,21 @@ try {
     const wasSwiping = s.swiping;
     const dx = s.dx;
     // Reset swipe state
-    swipeStateRef.current = { pointerDown: false, startX: 0, startY: 0, dx: 0, swiping: false, side: null };
+    swipeStateRef.current = { pointerDown: false, startX: 0, startY: 0, startTime: 0, lastMoveX: 0, lastMoveTime: 0, dx: 0, swiping: false, side: null };
 
     // 1) Swipe path
     if (wasSwiping) {
       // Long-press timer was already cancelled when swipe started
-      if (Math.abs(dx) > SWIPE_COMMIT_PX) {
+      // Rolling-window velocity: only count motion in the last SWIPE_STALE_MS.
+      // If the finger stopped before lifting, lastMoveTime is stale -> velocity = 0.
+      // This separates fast flicks (commit) from slow-drag-then-stop (bounce back).
+      const upTime = performance.now();
+      const moveDt = upTime - s.lastMoveTime;
+      const velocity = moveDt < SWIPE_STALE_MS && moveDt >= 0
+        ? Math.abs(s.lastMoveX - s.startX) / (s.lastMoveTime - s.startTime || 1)
+        : 0;
+      const velocityCommit = velocity > SWIPE_VELOCITY_PX_MS && Math.abs(dx) > SWIPE_MIN_FLICK_PX;
+      if (Math.abs(dx) > SWIPE_COMMIT_PX || velocityCommit) {
         // dx > 0 -> finger moved right -> previous segment (dir = -1)
         // dx < 0 -> finger moved left -> next segment (dir = +1)
         commitSwipe(dx > 0 ? -1 : 1);
@@ -583,7 +603,7 @@ try {
     if (s.swiping) {
       setSwipeOffset(0, true);
     }
-    swipeStateRef.current = { pointerDown: false, startX: 0, startY: 0, dx: 0, swiping: false, side: null };
+    swipeStateRef.current = { pointerDown: false, startX: 0, startY: 0, startTime: 0, lastMoveX: 0, lastMoveTime: 0, dx: 0, swiping: false, side: null };
     endLongPress();
   };
 

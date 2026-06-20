@@ -90,6 +90,7 @@ export default function Player({ gameId, isMobile }) {
               start: Math.floor(s.start),
               end: Math.ceil(s.end),
             }));
+          data.cutSegments.sort((a, b) => a.start - b.start);
         }
         setGameData(data);
       })

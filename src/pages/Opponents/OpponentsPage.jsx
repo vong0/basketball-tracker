@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { navigate } from '../../lib/routing';
 import Banner from '../../components/Banner/Banner';
 import styles from './OpponentsPage.module.css';
 
@@ -88,14 +89,14 @@ function PlayerCard({ player }) {
 
 // ── Team detail ───────────────────────────────────────────────────────────────
 
-function TeamDetail({ team, onBack }) {
+function TeamDetail({ team }) {
   const src = resolvePhoto(team.photo);
 
   return (
     <div className={styles.detailPage}>
       {/* Sticky nav */}
       <div className={styles.detailNav}>
-        <button className={styles.backBtn} onClick={onBack}>
+        <button className={styles.backBtn} onClick={() => navigate('#/opponents')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2.5"
             strokeLinecap="round" strokeLinejoin="round">
@@ -158,11 +159,11 @@ function TeamDetail({ team, onBack }) {
 
 // ── Team card (landing grid) ──────────────────────────────────────────────────
 
-function TeamCard({ team, onClick }) {
+function TeamCard({ team, href }) {
   const src = resolvePhoto(team.photo);
 
   return (
-    <button className={styles.teamCard} onClick={onClick}>
+    <a className={styles.teamCard} href={href}>
       <div className={styles.teamCardPhoto}>
         {src && (
           <>
@@ -181,19 +182,19 @@ function TeamCard({ team, onClick }) {
           }
         </div>
       </div>
-    </button>
+    </a>
   );
 }
 
 // ── Landing page ──────────────────────────────────────────────────────────────
 
-function LandingGrid({ teams, onSelect }) {
+function LandingGrid({ teams }) {
   const sorted = [...teams].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className={styles.landingGrid}>
       {sorted.map((team) => (
-        <TeamCard key={team.id} team={team} onClick={() => onSelect(team.id)} />
+        <TeamCard key={team.id} team={team} href={'#/opponents/' + team.id} />
       ))}
     </div>
   );
@@ -201,10 +202,15 @@ function LandingGrid({ teams, onSelect }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function OpponentsPage({ isMobile }) {
+export default function OpponentsPage({ isMobile, selectedId: selectedIdProp = null }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState(selectedIdProp);
+
+  // Sync when prop changes (browser back/forward)
+  useEffect(() => {
+    setSelectedId(selectedIdProp);
+  }, [selectedIdProp]);
 
   useEffect(() => {
     fetch('./data/opponents.json')
@@ -224,7 +230,7 @@ export default function OpponentsPage({ isMobile }) {
       <div className={styles.page}>
         <Banner isMobile={isMobile} />
         <div className={styles.scroll}>
-          <TeamDetail team={selectedTeam} onBack={() => setSelectedId(null)} />
+          <TeamDetail team={selectedTeam} />
         </div>
       </div>
     );
@@ -252,7 +258,7 @@ export default function OpponentsPage({ isMobile }) {
             <p className={styles.stateMsg}>No opponents added yet.</p>
           )}
           {data && teams.length > 0 && (
-            <LandingGrid teams={teams} onSelect={setSelectedId} />
+            <LandingGrid teams={teams} />
           )}
         </div>
       </div>
