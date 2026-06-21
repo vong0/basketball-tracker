@@ -760,11 +760,242 @@ export function getGameReports(data, seasonId = 'ALL') {
   return getGames(data, seasonId).map(gameId => getGameReport(data, { seasonId: seasonId === 'ALL' ? gameSeason(data, gameId) : seasonId, gameId, half: 'ALL', player: 'ALL' }));
 }
 
+// ── New backend-data-shape API ────────────────────────────────────────────────
+// These functions accept { shots, events, freeThrows, lineupStints } directly
+// from backend.getStats(). No normalizeData needed.
+
+function _filterByPlayer(data, playerId) {
+  return {
+    shots: data.shots.filter(s => s.player === playerId),
+    events: data.events.filter(e => e.player === playerId),
+    freeThrows: data.freeThrows.filter(ft => ft.player === playerId),
+    lineupStints: (data.lineupStints || []).filter(st =>
+      [st.player_1, st.player_2, st.player_3, st.player_4, st.player_5].includes(playerId)
+    ),
+  }
+}
+
+function _uniquePlayers(data) {
+  return [...new Set([
+    ...data.shots.map(s => s.player),
+    ...data.events.map(e => e.player),
+    ...data.freeThrows.map(ft => ft.player),
+  ].filter(Boolean))]
+}
+
+function _gameLabel(game) {
+  const m = String(game.game || '').match(/^G(\d+)$/)
+  return m ? `Game ${m[1]}` : game.game
+}
+
+// One BoxScoreRow per player. If playerId given, returns single-element array.
+// Always uses full data for AST (counts assisted_by across all shots).
+export function calculateBoxScore(data, playerId = null) {
+  const players = playerId ? [playerId] : _uniquePlayers(data)
+  return players.map(pid => {
+    const pShots = data.shots.filter(s => s.player === pid)
+    const pEvents = data.events.filter(e => e.player === pid)
+    const pFt = data.freeThrows.filter(ft => ft.player === pid)
+    const fg = fgStats(pShots)
+    const ft = ftStats(pFt)
+    const AST = data.shots.filter(s => made(s) && s.assisted_by === pid).length
+    const REB = countEvents(pEvents, 'rebound')
+    const STL = countEvents(pEvents, 'steal')
+    const BLK = countEvents(pEvents, 'block')
+    const TO = countEvents(pEvents, 'turnover')
+    const stints = (data.lineupStints || []).filter(st =>
+      [st.player_1, st.player_2, st.player_3, st.player_4, st.player_5].includes(pid)
+    )
+    const pm = stints.reduce((s, st) => s + num(st.points_for) - num(st.points_against), 0)
+    return {
+      player: pid,
+      PTS: fg.shot_points + ft.ft_points,
+      REB, AST, STL, BLK, TO, pm,
+      FGM: fg.FGM, FGA: fg.FGA, FG_pct: fg.FG_pct,
+      threePM: fg.threePM, threePA: fg.threePA, threeP_pct: fg.threeP_pct,
+      FTM: ft.FTM, FTA: ft.FTA, FT_pct: ft.FT_pct,
+    }
+  })
+}
+
+// Team totals with eFG% and TS%.
+export function calculateTeamBoxScore(data) {
+  const fg = fgStats(data.shots)
+  const ft = ftStats(data.freeThrows)
+  const PTS = fg.shot_points + ft.ft_points
+  const AST = data.shots.filter(s => made(s) && s.assisted_by).length
+  const events = data.events
+  const REB = countEvents(events, 'rebound')
+  const STL = countEvents(events, 'steal')
+  const BLK = countEvents(events, 'block')
+  const TO = countEvents(events, 'turnover')
+  return {
+    PTS, REB, AST, STL, BLK, TO,
+    FGM: fg.FGM, FGA: fg.FGA, FG_pct: fg.FG_pct,
+    threePM: fg.threePM, threePA: fg.threePA, threeP_pct: fg.threeP_pct,
+    FTM: ft.FTM, FTA: ft.FTA, FT_pct: ft.FT_pct,
+    eFG_pct: safe(fg.FGM + 0.5 * fg.threePM, fg.FGA),
+    TS_pct: safe(PTS, 2 * (fg.FGA + 0.44 * ft.FTA)),
+  }
+}
+
+// Zone breakdown using zoneFromXY (ignores stored shot_zone).
+export function calculateZoneBreakdown(shots, playerId = null) {
+  const filtered = playerId ? shots.filter(s => s.player === playerId) : shots
+  const totals = new Map()
+  for (const s of filtered) {
+    const { zone } = zoneFromXY(s.shot_x, s.shot_y)
+    if (!totals.has(zone)) totals.set(zone, { FGM: 0, FGA: 0, PTS: 0 })
+    const z = totals.get(zone)
+    z.FGA++
+    if (made(s)) { z.FGM++; z.PTS += num(s.points) }
+  }
+  const total = filtered.length
+  return [...totals.entries()]
+    .map(([zone, z]) => ({
+      zone,
+      FGM: z.FGM, FGA: z.FGA,
+      FG_pct: safe(z.FGM, z.FGA),
+      PTS: z.PTS,
+      freq_pct: safe(z.FGA, total),
+    }))
+    .sort((a, b) => b.FGA - a.FGA)
+}
+
+// FG% per contest level.
+export function calculateShotQuality(shots, playerId = null) {
+  const filtered = playerId ? shots.filter(s => s.player === playerId) : shots
+  if (!filtered.length) return []
+  const totals = new Map()
+  for (const s of filtered) {
+    const label = s.contest || 'unknown'
+    if (!totals.has(label)) totals.set(label, { FGM: 0, FGA: 0 })
+    const c = totals.get(label)
+    c.FGA++
+    if (made(s)) c.FGM++
+  }
+  const total = filtered.length
+  return [...totals.entries()]
+    .map(([label, c]) => ({
+      label,
+      FGM: c.FGM, FGA: c.FGA,
+      FG_pct: safe(c.FGM, c.FGA),
+      freq_pct: safe(c.FGA, total),
+    }))
+    .sort((a, b) => b.FGA - a.FGA)
+}
+
+// eFG% and TS% per player (or single team row if playerId='team').
+export function calculateShootingEfficiency(shots, freeThrows, playerId = null) {
+  const players = playerId ? [playerId] : _uniquePlayers({ shots, events: [], freeThrows, lineupStints: [] })
+  return players.map(pid => {
+    const pShots = shots.filter(s => s.player === pid)
+    const pFt = freeThrows.filter(ft => ft.player === pid)
+    const fg = fgStats(pShots)
+    const ft = ftStats(pFt)
+    const PTS = fg.shot_points + ft.ft_points
+    return {
+      player: pid,
+      eFG_pct: safe(fg.FGM + 0.5 * fg.threePM, fg.FGA),
+      TS_pct: safe(PTS, 2 * (fg.FGA + 0.44 * ft.FTA)),
+      PTS,
+      FGM: fg.FGM, FGA: fg.FGA,
+      threePM: fg.threePM, threePA: fg.threePA,
+      FTM: ft.FTM, FTA: ft.FTA,
+    }
+  })
+}
+
+// Creation stats per player. shots used to count actual assists (assisted_by).
+export function calculateCreation(events, shots, playerId = null) {
+  const allPlayers = playerId
+    ? [playerId]
+    : [...new Set(events.map(e => e.player).filter(Boolean))]
+  return allPlayers.map(pid => {
+    const pEvents = events.filter(e => e.player === pid)
+    const AST = shots.filter(s => made(s) && s.assisted_by === pid).length
+    const TO = countEvents(pEvents, 'turnover')
+    const Potential_AST = countEvents(pEvents, 'creation', 'potential_assist')
+    const Adv_Created = countEvents(pEvents, 'creation', 'advantage_created')
+    return { player: pid, AST, TO, Potential_AST, Adv_Created }
+  })
+}
+
+// Defensive stats per player.
+export function calculateDefense(events, playerId = null) {
+  const allPlayers = playerId
+    ? [playerId]
+    : [...new Set(events.map(e => e.player).filter(Boolean))]
+  return allPlayers.map(pid => {
+    const pEvents = events.filter(e => e.player === pid)
+    const STL = countEvents(pEvents, 'steal')
+    const BLK = countEvents(pEvents, 'block')
+    const DEFLECTION = countEvents(pEvents, 'deflection')
+    const Charges_Drawn = countEvents(pEvents, 'charge_drawn')
+    return { player: pid, STL, BLK, DEFLECTION, Charges_Drawn, Def_Activity: STL + BLK + DEFLECTION + Charges_Drawn }
+  })
+}
+
+// Top-5 lineups by net_points. players = [{ id, name }] for name resolution.
+export function calculateLineups(lineupStints, players = []) {
+  const map = new Map()
+  for (const st of lineupStints) {
+    const key = [st.player_1, st.player_2, st.player_3, st.player_4, st.player_5]
+      .filter(Boolean).sort().join('+')
+    if (!map.has(key)) map.set(key, { lineup_key: key, stints: 0, net_points: 0, FGM: 0, FGA: 0 })
+    const row = map.get(key)
+    row.stints++
+    row.net_points += num(st.points_for) - num(st.points_against)
+  }
+  return [...map.values()]
+    .map(row => ({
+      ...row,
+      lineup_names: row.lineup_key.split('+').map(pid => {
+        const p = players.find(pl => pl.id === pid)
+        return p ? p.name : pid
+      }).join(' / '),
+    }))
+    .sort((a, b) => b.net_points - a.net_points)
+    .slice(0, 5)
+}
+
+// Career averages for stat cards.
+export function calculateCareerAverages(data, playerId) {
+  const gameIds = new Set([
+    ...data.shots.filter(s => s.player === playerId).map(s => s.game_id),
+    ...data.events.filter(e => e.player === playerId).map(e => e.game_id),
+    ...data.freeThrows.filter(ft => ft.player === playerId).map(ft => ft.game_id),
+  ])
+  const gameCount = gameIds.size
+  if (!gameCount) return { PPG: 0, RPG: 0, APG: 0, SPG: 0, BPG: 0, FG_pct: null, threeP_pct: null }
+  const rows = calculateBoxScore(data, playerId)
+  const t = rows[0] || {}
+  return {
+    PPG: round(num(t.PTS) / gameCount, 1),
+    RPG: round(num(t.REB) / gameCount, 1),
+    APG: round(num(t.AST) / gameCount, 1),
+    SPG: round(num(t.STL) / gameCount, 1),
+    BPG: round(num(t.BLK) / gameCount, 1),
+    FG_pct: t.FG_pct ?? null,
+    threeP_pct: t.threeP_pct ?? null,
+  }
+}
+
+// Top performer per stat from an array of BoxScoreRows.
+export function calculateLeaders(boxScoreRows) {
+  const top = key => boxScoreRows.reduce((best, row) =>
+    (!best || num(row[key]) > num(best[key])) ? row : best, null)
+  return { PTS: top('PTS'), REB: top('REB'), AST: top('AST'), STL: top('STL'), BLK: top('BLK') }
+}
+
 export default {
   ZONES, CONTESTS, SHOT_TYPES,
   normalizeData, normalizeFilters, seasonFromGameId, getPlayers, getSeasons, getGames, gameRecord,
   filterRows, fgStats, ftStats, getTeamStats, getPlayerStats, getAllPlayerStats, onCourtStats,
   getLineupStats, getZoneBreakdown, getContestBreakdown, getEventBreakdown, getShotChartData,
   getNeedsAttention, getGameReport, getSeasonReport, getPlayerReport, getGameReports,
-  zoneFromXY, shotKey, compactStats, playerTableRow, leaderboardRows, pctValue, pctText
+  zoneFromXY, shotKey, compactStats, playerTableRow, leaderboardRows, pctValue, pctText,
+  calculateBoxScore, calculateTeamBoxScore, calculateZoneBreakdown, calculateShotQuality,
+  calculateShootingEfficiency, calculateCreation, calculateDefense, calculateLineups,
+  calculateCareerAverages, calculateLeaders,
 };

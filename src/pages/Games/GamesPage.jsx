@@ -1,22 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Banner from '../../components/Banner/Banner';
 import GameCard from './GameCard';
-import { mockGames } from '../../lib/mockData.js';
+import { getSeasons, getGames } from '../../lib/backend.js';
 import styles from './GamesPage.module.css';
 
-const ALL_SEASONS = [...new Set(mockGames.map(g => g.season))].sort().reverse();
-
 export default function GamesPage() {
-  const [seasonFilter, setSeasonFilter] = useState('');
-  const [resultFilter, setResultFilter] = useState('');
+  const [seasons, setSeasons] = useState(null)
+  const [games, setGames] = useState(null)
+  const [seasonFilter, setSeasonFilter] = useState('')
+  const [resultFilter, setResultFilter] = useState('')
 
-  const games = mockGames.filter(g => {
-    if (seasonFilter && g.season !== seasonFilter) return false;
-    if (resultFilter && g.result !== resultFilter) return false;
-    return true;
-  });
+  useEffect(() => {
+    getSeasons().then(setSeasons)
+  }, [])
 
-  const hasFilter = seasonFilter || resultFilter;
+  useEffect(() => {
+    setGames(null)
+    getGames({ season: seasonFilter || undefined, result: resultFilter || undefined })
+      .then(setGames)
+  }, [seasonFilter, resultFilter])
+
+  const hasFilter = seasonFilter || resultFilter
 
   return (
     <div className={styles.page}>
@@ -28,7 +32,7 @@ export default function GamesPage() {
             <h1 className={styles.heading}>Games</h1>
           </div>
           <div className={styles.count}>
-            {games.length} {games.length === 1 ? 'game' : 'games'}
+            {games ? `${games.length} ${games.length === 1 ? 'game' : 'games'}` : '—'}
           </div>
         </div>
       </div>
@@ -41,7 +45,7 @@ export default function GamesPage() {
               onChange={e => setSeasonFilter(e.target.value)}
             >
               <option value="">All Seasons</option>
-              {ALL_SEASONS.map(s => (
+              {(seasons ?? []).map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
@@ -64,11 +68,15 @@ export default function GamesPage() {
             )}
           </div>
         </div>
-        <div className={styles.grid}>
-          {games.map(game => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </div>
+        {!games ? (
+          <p className={styles.loading}>Loading…</p>
+        ) : (
+          <div className={styles.grid}>
+            {games.map(game => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -116,6 +116,15 @@
   margin: 0 auto;
 }
 
+.loading {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dim);
+  font-style: italic;
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
 .errorBox {
   padding: 32px;
   font-family: var(--font-mono);

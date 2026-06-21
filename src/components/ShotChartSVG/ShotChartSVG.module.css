@@ -1,0 +1,130 @@
+.wrap {
+  width: 100%;
+}
+
+/* ── Filters ─────────────────────────── */
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  min-width: 48px;
+}
+
+.filterBtn {
+  padding: 3px 10px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.filterBtnActive {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #fff;
+}
+
+/* ── Court ───────────────────────────── */
+
+.courtWrap {
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 10px;
+}
+
+.court {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+/* ── Summary bar ─────────────────────── */
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.summaryMake  { color: #6fbb84; }
+.summaryMiss  { color: #d97366; }
+.summaryTotal { color: var(--text-dim); }
+.summaryPct   { color: var(--text); }
+.summarySep   { color: var(--text-faint); }
+
+/* ── Shot list ───────────────────────── */
+
+.shotList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.shotRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.shotNum {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  min-width: 28px;
+}
+
+.shotPill {
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pillMake { background: rgba(111,187,132,0.2); color: #6fbb84; }
+.pillMiss { background: rgba(217,115,102,0.2); color: #d97366; }
+
+.shotPts   { color: var(--text-dim); min-width: 28px; }
+.shotZone  { color: var(--text-dim); flex: 1; }
+.shotType  { color: var(--text-faint); font-size: 11px; }
+.shotPlayer {
+  color: var(--text-faint);
+  font-size: 11px;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .courtWrap { max-width: 100%; }
+  .shotType, .shotPlayer { display: none; }
+}

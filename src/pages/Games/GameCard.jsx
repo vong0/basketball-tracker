@@ -1,5 +1,5 @@
 import cardStyles from './GameCard.module.css';
-import { gameLabel } from '../../lib/mockData.js';
+import { gameLabel } from '../../lib/backend.js';
 
 export default function GameCard({ game }) {
   const badgeClass =

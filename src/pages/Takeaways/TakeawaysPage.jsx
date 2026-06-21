@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Banner from '../../components/Banner/Banner';
-import { getGames, getGameTakeaways } from '../../lib/backend.js';
+import { getTakeaways } from '../../lib/backend.js';
 import styles from './TakeawaysPage.module.css';
 
 function PlayerCard({ player }) {
@@ -135,19 +135,15 @@ export default function TakeawaysPage({ isMobile }) {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const games = await getGames();
-        const takeawaysList = await Promise.all(games.map(g => getGameTakeaways(g.id)));
+    getTakeaways({})
+      .then(entries => {
         if (cancelled) return;
-        const combined = games
-          .map((g, i) => ({ game: g, takeaways: takeawaysList[i] }))
-          .filter(({ takeaways }) => takeaways?.players?.length > 0);
+        const combined = entries
+          .filter(e => e.players?.length > 0)
+          .map(e => ({ game: e.game, takeaways: e }));
         setEntries(combined);
-      } catch (err) {
-        if (!cancelled) setError(String(err));
-      }
-    })();
+      })
+      .catch(err => { if (!cancelled) setError(String(err)); });
     return () => { cancelled = true; };
   }, []);
 

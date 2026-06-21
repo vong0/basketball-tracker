@@ -229,6 +229,133 @@
 .takeawayGreen li { color: var(--green); }
 .takeawayRed   li { color: var(--red); }
 
+/* ── Stats ───────────────────────────── */
+
+.statCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.statCard {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 18px;
+  text-align: center;
+  min-width: 72px;
+}
+
+.statCardVal {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.statCardLbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+}
+
+.statSubRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.statChip {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 4px 10px;
+}
+
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.table th {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  text-align: right;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tdName {
+  text-align: left !important;
+  color: var(--text) !important;
+  font-weight: 500;
+}
+
+/* Boxscore grid */
+
+.boxscoreGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.boxscoreCell {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+
+/* StatTable mobile cards (hidden on desktop) */
+.statCardMobileGrid { display: none; }
+
+/* Advanced sub-tabs */
+
+.advSubTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0 16px;
+}
+
+.advTab {
+  padding: 6px 14px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.advTabActive { background: var(--orange); border-color: var(--orange); color: #fff; }
+
 /* ── Clips ───────────────────────────── */
 
 .clipsGrid {
@@ -297,6 +424,31 @@
 
 /* ── Responsive ──────────────────────── */
 
+.statCardMobile {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.statCardMobileName {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.statCardMobileRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.statCardMobileLbl { color: var(--text-faint); }
+.statCardMobileVal { color: var(--text); font-weight: 500; }
+
 @media (max-width: 640px) {
   .hero { padding: 20px 16px 16px; }
   .heroName { font-size: 36px; }
@@ -312,4 +464,12 @@
 
   .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
   .clipsGrid { grid-template-columns: 1fr 1fr; }
+
+  .tableWrap { display: none; }
+  .statCardMobileGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .boxscoreGrid { grid-template-columns: repeat(4, 1fr); }
 }

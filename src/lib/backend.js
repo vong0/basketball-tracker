@@ -5,9 +5,12 @@
 // TODO (Editor): implement write functions — addShot, addEvent, addFt, addLineupStint,
 //   addGame, updateGame, addTakeaway, updateTakeaway — using the same local/supabase
 //   dispatch pattern. Read functions are complete; write functions slot in below them.
-
 import JSON5 from 'json5'
 import { getYouTubeId } from './youtube.js'
+import {
+  fgStats, ftStats, countEvents, made, num, safe, round,
+  zoneFromXY, pctText,
+} from './statsCore.js'
 
 // ── Cache ─────────────────────────────────────────────────────────────────────
 
@@ -41,18 +44,6 @@ export function clearCache() { _cache.clear() }
 
 // ── Internal filter helpers ───────────────────────────────────────────────────
 
-// Generic key=value match. Skips keys where filter value is undefined, null, or 'ALL'
-function applyFilters(rows, filters = {}) {
-  return rows.filter(row => {
-    for (const [key, val] of Object.entries(filters)) {
-      if (val == null || val === 'ALL') continue
-      if (row[key] !== val) return false
-    }
-    return true
-  })
-}
-
-// Stats rows use game_id (snake_case). Handles: gameId, season (prefix match), half, player
 function applyStatsFilters(rows, filters = {}) {
   return rows.filter(row => {
     if (filters.gameId != null && filters.gameId !== 'ALL') {
@@ -73,7 +64,6 @@ function applyStatsFilters(rows, filters = {}) {
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
-// Derive W/L/T from scores — never stored, always computed
 function deriveResult(teamScore, opponentScore) {
   if (teamScore > opponentScore) return 'W'
   if (teamScore < opponentScore) return 'L'
@@ -82,10 +72,8 @@ function deriveResult(teamScore, opponentScore) {
 
 // ── Public utilities ──────────────────────────────────────────────────────────
 
-// Convenience — saves callers importing youtube.js separately
 export { getYouTubeId }
 
-// "G1" → "Game 1", "Finals" → "Finals"
 export function gameLabel(game) {
   const m = game.game.match(/^G(\d+)$/)
   return m ? `Game ${m[1]}` : game.game
@@ -216,51 +204,130 @@ async function _getStrategies(filters = {}) {
 
 // ── Takeaways ─────────────────────────────────────────────────────────────────
 
-async function _getGameTakeaways(gameId) {
+// Unified takeaways function. Replaces getGameTakeaways + getPlayerTakeaways.
+// filters: { gameId?, season?, playerId? }
+// Returns TakeawayEntry[] sorted newest first:
+// { gameId, game, team: string[], players: [{ playerId, name, strengths, improvements }] }
+async function _getTakeaways(filters = {}) {
+  const [takeawaysData, players, games] = await Promise.all([
+    fetchJson('./data/takeaways.json'),
+    _getPlayers({ active: false }),
+    _getGames(),
+  ])
+
+  let entries = [...takeawaysData]
+
+  if (filters.gameId) {
+    entries = entries.filter(t => t.gameId === filters.gameId)
+  }
+  if (filters.season) {
+    const seasonGameIds = new Set(games.filter(g => g.season === filters.season).map(g => g.id))
+    entries = entries.filter(t => seasonGameIds.has(t.gameId))
+  }
+  if (filters.playerId) {
+    entries = entries.filter(t => (t.players ?? []).some(p => p.playerId === filters.playerId))
+  }
+
+  return entries
+    .map(entry => {
+      const game = games.find(g => g.id === entry.gameId) ?? null
+      let entryPlayers = (entry.players ?? []).map(p => {
+        const player = players.find(pl => pl.id === p.playerId)
+        return { ...p, name: player ? player.name : p.playerId }
+      })
+      if (filters.playerId) {
+        entryPlayers = entryPlayers.filter(p => p.playerId === filters.playerId)
+      }
+      return {
+        gameId: entry.gameId,
+        game,
+        team: entry.team ?? [],
+        players: entryPlayers,
+      }
+    })
+    .sort((a, b) => {
+      if (!a.game || !b.game) return 0
+      return b.game.date.localeCompare(a.game.date)
+    })
+}
+
+// Returns [{ playerId, name }] for the scope picker in a game detail page.
+// Players who appear in takeaways for this game.
+async function _getGameScopes(gameId) {
   const [takeawaysData, players] = await Promise.all([
     fetchJson('./data/takeaways.json'),
     _getPlayers({ active: false }),
   ])
 
   const entry = takeawaysData.find(t => t.gameId === gameId)
-  if (!entry) return null
+  if (!entry) return []
 
-  return {
-    gameId: entry.gameId,
-    team: entry.team ?? [],
-    players: (entry.players ?? []).map(p => {
-      const player = players.find(pl => pl.id === p.playerId)
-      return {
-        ...p,
-        name: player ? player.name : p.playerId,
-      }
-    }),
-  }
+  return (entry.players ?? []).map(p => {
+    const player = players.find(pl => pl.id === p.playerId)
+    return { playerId: p.playerId, name: player ? player.name : p.playerId }
+  })
 }
 
-async function _getPlayerTakeaways(playerId) {
-  const [takeawaysData, games] = await Promise.all([
+// Returns hierarchical scope data for the player detail page scope picker.
+async function _getPlayerScopes(playerId) {
+  const [takeawaysData, statsData, games] = await Promise.all([
     fetchJson('./data/takeaways.json'),
+    fetchJson('./data/stats.json'),
     _getGames(),
   ])
 
-  const result = []
-  for (const entry of takeawaysData) {
-    const playerEntry = (entry.players ?? []).find(p => p.playerId === playerId)
-    if (!playerEntry) continue
-    const game = games.find(g => g.id === entry.gameId)
-    result.push({
-      gameId: entry.gameId,
-      game,
-      teamNotes: entry.team ?? [],
-      player: playerEntry,
-    })
+  const gameIds = new Set()
+
+  for (const t of takeawaysData) {
+    if ((t.players ?? []).some(p => p.playerId === playerId)) {
+      gameIds.add(t.gameId)
+    }
   }
 
-  return result.sort((a, b) => {
-    if (!a.game || !b.game) return 0
-    return b.game.date.localeCompare(a.game.date)
-  })
+  const allRows = [
+    ...(statsData.shots ?? []),
+    ...(statsData.events ?? []),
+    ...(statsData.freeThrows ?? []),
+  ]
+  for (const row of allRows) {
+    if (row.player === playerId) gameIds.add(row.game_id)
+  }
+
+  const playerGames = games.filter(g => gameIds.has(g.id))
+
+  const seasonMap = new Map()
+  for (const g of playerGames) {
+    if (!seasonMap.has(g.season)) seasonMap.set(g.season, [])
+    seasonMap.get(g.season).push(g)
+  }
+
+  const seasons = [...seasonMap.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([season, sGames]) => {
+      const sorted = [...sGames].sort((a, b) => b.date.localeCompare(a.date))
+      return {
+        season,
+        gameCount: sorted.length,
+        wins: sorted.filter(g => g.result === 'W').length,
+        losses: sorted.filter(g => g.result === 'L').length,
+        games: sorted.map(g => ({
+          id: g.id,
+          gameLabel: gameLabel(g),
+          date: g.date,
+          result: g.result,
+          score: `${g.teamScore}–${g.opponentScore}`,
+          opponentName: g.opponentName,
+        })),
+      }
+    })
+
+  const career = {
+    gameCount: playerGames.length,
+    wins: playerGames.filter(g => g.result === 'W').length,
+    losses: playerGames.filter(g => g.result === 'L').length,
+  }
+
+  return { career, seasons }
 }
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
@@ -275,6 +342,135 @@ async function _getStats(filters = {}) {
   }
 }
 
+// Per-game box score rows for a player in a season, enriched with game metadata.
+async function _getPlayerGameLog(playerId, season) {
+  const [statsData, games] = await Promise.all([
+    _getStats({ season }),
+    _getGames(),
+  ])
+
+  const gameIds = [...new Set([
+    ...statsData.shots.map(s => s.game_id),
+    ...statsData.events.map(e => e.game_id),
+    ...statsData.freeThrows.map(ft => ft.game_id),
+  ])]
+
+  return gameIds
+    .map(gameId => {
+      const gameData = {
+        shots: statsData.shots.filter(s => s.game_id === gameId),
+        events: statsData.events.filter(e => e.game_id === gameId),
+        freeThrows: statsData.freeThrows.filter(ft => ft.game_id === gameId),
+        lineupStints: statsData.lineupStints.filter(st => st.game_id === gameId),
+      }
+
+      const pShots = gameData.shots.filter(s => s.player === playerId)
+      const pEvents = gameData.events.filter(e => e.player === playerId)
+      const pFt = gameData.freeThrows.filter(ft => ft.player === playerId)
+
+      if (!pShots.length && !pEvents.length && !pFt.length) return null
+
+      const fg = fgStats(pShots)
+      const ft = ftStats(pFt)
+      const AST = gameData.shots.filter(s => made(s) && s.assisted_by === playerId).length
+      const REB = countEvents(pEvents, 'rebound')
+      const STL = countEvents(pEvents, 'steal')
+      const BLK = countEvents(pEvents, 'block')
+      const TO = countEvents(pEvents, 'turnover')
+
+      const game = games.find(g => g.id === gameId)
+      return {
+        gameId,
+        gameLabel: game ? gameLabel(game) : gameId,
+        date: game?.date ?? '',
+        result: game?.result ?? '',
+        opponentName: game?.opponentName ?? '',
+        PTS: fg.shot_points + ft.ft_points,
+        REB,
+        AST,
+        STL,
+        BLK,
+        TO,
+        FGM: fg.FGM,
+        FGA: fg.FGA,
+        FG_pct: fg.FG_pct,
+        threePM: fg.threePM,
+        threePA: fg.threePA,
+        threeP_pct: fg.threeP_pct,
+        FTM: ft.FTM,
+        FTA: ft.FTA,
+        FT_pct: ft.FT_pct,
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.date.localeCompare(a.date))
+}
+
+// Per-season averages for a player, for the career view table.
+async function _getPlayerSeasonSummary(playerId) {
+  const [statsData, games] = await Promise.all([
+    _getStats({}),
+    _getGames(),
+  ])
+
+  const seasonMap = new Map()
+  for (const game of games) {
+    if (!seasonMap.has(game.season)) seasonMap.set(game.season, [])
+    seasonMap.get(game.season).push(game)
+  }
+
+  return [...seasonMap.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([season, sGames]) => {
+      const sGameIds = new Set(sGames.map(g => g.id))
+
+      const seasonShots = statsData.shots.filter(s => sGameIds.has(s.game_id))
+      const seasonEvents = statsData.events.filter(e => sGameIds.has(e.game_id))
+      const seasonFt = statsData.freeThrows.filter(ft => sGameIds.has(ft.game_id))
+
+      const pShots = seasonShots.filter(s => s.player === playerId)
+      const pEvents = seasonEvents.filter(e => e.player === playerId)
+      const pFt = seasonFt.filter(ft => ft.player === playerId)
+
+      const playerGameIds = new Set([
+        ...pShots.map(s => s.game_id),
+        ...pEvents.map(e => e.game_id),
+        ...pFt.map(ft => ft.game_id),
+      ])
+      const gameCount = playerGameIds.size
+      if (!gameCount) return null
+
+      const fg = fgStats(pShots)
+      const ft = ftStats(pFt)
+      const AST = seasonShots.filter(s => made(s) && s.assisted_by === playerId).length
+      const REB = countEvents(pEvents, 'rebound')
+      const STL = countEvents(pEvents, 'steal')
+      const BLK = countEvents(pEvents, 'block')
+      const TO = countEvents(pEvents, 'turnover')
+      const PTS = fg.shot_points + ft.ft_points
+
+      const wins = sGames.filter(g => playerGameIds.has(g.id) && g.result === 'W').length
+      const losses = sGames.filter(g => playerGameIds.has(g.id) && g.result === 'L').length
+
+      return {
+        season,
+        gameCount,
+        wins,
+        losses,
+        PTS_avg: round(PTS / gameCount, 1),
+        REB_avg: round(REB / gameCount, 1),
+        AST_avg: round(AST / gameCount, 1),
+        STL_avg: round(STL / gameCount, 1),
+        BLK_avg: round(BLK / gameCount, 1),
+        TO_avg: round(TO / gameCount, 1),
+        FG_pct: fg.FG_pct,
+        threeP_pct: fg.threeP_pct,
+        FT_pct: ft.FT_pct,
+      }
+    })
+    .filter(Boolean)
+}
+
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 
 const local = {
@@ -287,12 +483,14 @@ const local = {
   getOpponents: _getOpponents,
   getOpponent: _getOpponent,
   getStrategies: _getStrategies,
-  getGameTakeaways: _getGameTakeaways,
-  getPlayerTakeaways: _getPlayerTakeaways,
+  getTakeaways: _getTakeaways,
+  getGameScopes: _getGameScopes,
+  getPlayerScopes: _getPlayerScopes,
   getStats: _getStats,
+  getPlayerGameLog: _getPlayerGameLog,
+  getPlayerSeasonSummary: _getPlayerSeasonSummary,
 }
 
-// TODO (Supabase): implement supabase_* versions and swap in here
 const impl = local
 
 export const {
@@ -305,7 +503,10 @@ export const {
   getOpponents,
   getOpponent,
   getStrategies,
-  getGameTakeaways,
-  getPlayerTakeaways,
+  getTakeaways,
+  getGameScopes,
+  getPlayerScopes,
   getStats,
+  getPlayerGameLog,
+  getPlayerSeasonSummary,
 } = impl

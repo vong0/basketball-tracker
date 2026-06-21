@@ -1,43 +1,95 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Banner from '../../components/Banner/Banner';
-import { mockGames, mockTakeaways, mockPlayers, mockClipCounts, mockStats, mockZones, gameLabel } from '../../lib/mockData.js';
+import ShotChartSVG from '../../components/ShotChartSVG/ShotChartSVG.jsx';
+import {
+  getGame, getTakeaways, getGameScopes, getGameClips, getStats, gameLabel,
+} from '../../lib/backend.js';
+import {
+  calculateBoxScore, calculateTeamBoxScore,
+  calculateZoneBreakdown, calculateShotQuality, calculateShootingEfficiency,
+  calculateCreation, calculateDefense, calculateLineups,
+  pctText, num,
+} from '../../lib/statsCore.js';
 import styles from './GameDetailPage.module.css';
 
 const PLAYLISTS = [
-  { label: 'All Clips',    key: 'all',        filter: '' },
-  { label: 'Good Offense', key: 'goodOffense', filter: 'good-offense' },
-  { label: 'Bad Offense',  key: 'badOffense',  filter: 'bad-offense' },
-  { label: 'Good Defense', key: 'goodDefense', filter: 'good-defense' },
-  { label: 'Bad Defense',  key: 'badDefense',  filter: 'bad-defense' },
+  { label: 'All Clips',    key: 'all',        quality: '',     type: '' },
+  { label: 'Good Offense', key: 'goodOffense', quality: 'good', type: 'offense' },
+  { label: 'Bad Offense',  key: 'badOffense',  quality: 'bad',  type: 'offense' },
+  { label: 'Good Defense', key: 'goodDefense', quality: 'good', type: 'defense' },
+  { label: 'Bad Defense',  key: 'badDefense',  quality: 'bad',  type: 'defense' },
 ]
 
 const TABS = ['Takeaways', 'Stats', 'Advanced', 'Clips']
+const ADV_TABS = ['Shooting', 'Creation', 'Defense', 'Lineups']
 
 export default function GameDetailPage({ gameId }) {
-  const game = mockGames.find(g => g.id === gameId)
-  const takeaways = mockTakeaways.find(t => t.gameId === gameId)
-  const clipCounts = mockClipCounts[gameId] ?? {}
-  const stats = mockStats[gameId]
-  const zones = mockZones[gameId] ?? []
-
+  const [game, setGame] = useState(null)
+  const [takeawayEntry, setTakeawayEntry] = useState(null)
+  const [scopeOptions, setScopeOptions] = useState([])
+  const [statsData, setStatsData] = useState(null)
+  const [clipCounts, setClipCounts] = useState({})
+  const [allPlayers, setAllPlayers] = useState([])
   const [scope, setScope] = useState('')
   const [tab, setTab] = useState('Takeaways')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  if (!game) {
+  // Load game, takeaways, scope options in parallel on mount
+  useEffect(() => {
+    setLoading(true)
+    Promise.all([
+      getGame(gameId),
+      getTakeaways({ gameId }),
+      getGameScopes(gameId),
+    ])
+      .then(([g, takeaways, scopes]) => {
+        setGame(g)
+        setTakeawayEntry(takeaways[0] ?? null)
+        setScopeOptions(scopes)
+        setAllPlayers(scopes)
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [gameId])
+
+  // Load stats when scope changes
+  useEffect(() => {
+    if (!game) return
+    getStats({ gameId }).then(setStatsData)
+  }, [game, gameId])
+
+  // Load clip counts when game is ready
+  useEffect(() => {
+    if (!game) return
+    Promise.all(
+      PLAYLISTS.map(pl =>
+        getGameClips(gameId, { quality: pl.quality || undefined, type: pl.type || undefined })
+          .then(r => [pl.key, r.clips.length])
+      )
+    ).then(pairs => setClipCounts(Object.fromEntries(pairs)))
+  }, [game, gameId])
+
+  if (loading) {
     return (
       <div className={styles.page}>
         <Banner />
-        <p className={styles.placeholder}>Game not found.</p>
+        <p className={styles.placeholder}>Loading…</p>
+      </div>
+    )
+  }
+
+  if (error || !game) {
+    return (
+      <div className={styles.page}>
+        <Banner />
+        <p className={styles.placeholder}>{error ?? 'Game not found.'}</p>
       </div>
     )
   }
 
   const resultClass = game.result === 'W' ? styles.badgeW : game.result === 'L' ? styles.badgeL : styles.badgeT
-  const scopePlayers = takeaways?.players ?? []
-  const scopedPlayer = scopePlayers.find(p => p.playerId === scope)
-  const scopedPlayerInfo = mockPlayers.find(p => p.id === scope)
-
-  const clipsBase = `#/game/${game.id}`
+  const clipsHref = scope ? `#/game/${game.id}?player=${scope}` : `#/game/${game.id}`
 
   return (
     <div className={styles.page}>
@@ -60,13 +112,6 @@ export default function GameDetailPage({ gameId }) {
             <span className={styles.scoreDash}>–</span>
             <span className={styles.scoreOpp}>{game.opponentScore}</span>
           </div>
-          <div className={styles.halvesRow}>
-            <span className={styles.halfLabel}>H1</span>
-            <span className={styles.halfScore}>{game.halves.h1.team}–{game.halves.h1.opponent}</span>
-            <span className={styles.halfSep}>·</span>
-            <span className={styles.halfLabel}>H2</span>
-            <span className={styles.halfScore}>{game.halves.h2.team}–{game.halves.h2.opponent}</span>
-          </div>
           <div className={styles.metaRow}>
             <span>vs {game.opponentName}</span>
             <span className={styles.metaSep}>·</span>
@@ -84,19 +129,14 @@ export default function GameDetailPage({ gameId }) {
             onChange={e => setScope(e.target.value)}
           >
             <option value="">All Players</option>
-            {scopePlayers.map(p => {
-              const info = mockPlayers.find(pl => pl.id === p.playerId)
-              return (
-                <option key={p.playerId} value={p.playerId}>
-                  {info?.name ?? p.playerId}
-                </option>
-              )
-            })}
+            {scopeOptions.map(p => (
+              <option key={p.playerId} value={p.playerId}>{p.name}</option>
+            ))}
           </select>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tab bar */}
       <div className={styles.tabBar}>
         <div className={styles.tabInner}>
           {TABS.map(t => (
@@ -115,16 +155,16 @@ export default function GameDetailPage({ gameId }) {
       <div className={styles.content}>
         <div className={styles.contentInner}>
           {tab === 'Takeaways' && (
-            <TakeawaysTab takeaways={takeaways} scope={scope} scopedPlayer={scopedPlayer} scopedPlayerInfo={scopedPlayerInfo} allPlayers={mockPlayers} />
+            <TakeawaysTab entry={takeawayEntry} scope={scope} scopeOptions={scopeOptions} />
           )}
           {tab === 'Stats' && (
-            <StatsTab stats={stats} allPlayers={mockPlayers} />
+            <StatsTab statsData={statsData} scope={scope} allPlayers={allPlayers} />
           )}
           {tab === 'Advanced' && (
-            <AdvancedTab zones={zones} />
+            <AdvancedTab statsData={statsData} scope={scope} allPlayers={allPlayers} />
           )}
           {tab === 'Clips' && (
-            <ClipsTab clipCounts={clipCounts} clipsBase={clipsBase} scope={scope} />
+            <ClipsTab clipCounts={clipCounts} clipsHref={clipsHref} />
           )}
         </div>
       </div>
@@ -132,13 +172,15 @@ export default function GameDetailPage({ gameId }) {
   )
 }
 
-function TakeawaysTab({ takeaways, scope, scopedPlayer, scopedPlayerInfo, allPlayers }) {
-  if (!takeaways) return <p className={styles.placeholder}>No takeaways for this game yet.</p>
+function TakeawaysTab({ entry, scope, scopeOptions }) {
+  if (!entry) return <p className={styles.placeholder}>No takeaways for this game yet.</p>
 
-  if (scope && scopedPlayer) {
+  if (scope) {
+    const scopedPlayer = entry.players.find(p => p.playerId === scope)
+    if (!scopedPlayer) return <p className={styles.placeholder}>No takeaways for this player.</p>
     return (
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>{scopedPlayerInfo?.name ?? scope}</div>
+        <div className={styles.sectionTitle}>{scopedPlayer.name}</div>
         <PlayerTakeawayBlock player={scopedPlayer} />
       </div>
     )
@@ -146,23 +188,20 @@ function TakeawaysTab({ takeaways, scope, scopedPlayer, scopedPlayerInfo, allPla
 
   return (
     <>
-      {takeaways.team?.length > 0 && (
+      {entry.team?.length > 0 && (
         <div className={styles.section}>
           <div className={styles.sectionTitle}>Team</div>
           <ul className={styles.takeawayList}>
-            {takeaways.team.map((note, i) => <li key={i}>{note}</li>)}
+            {entry.team.map((note, i) => <li key={i}>{note}</li>)}
           </ul>
         </div>
       )}
-      {takeaways.players.map(p => {
-        const info = allPlayers.find(pl => pl.id === p.playerId)
-        return (
-          <div key={p.playerId} className={styles.section}>
-            <div className={styles.sectionTitle}>{info?.name ?? p.playerId}</div>
-            <PlayerTakeawayBlock player={p} />
-          </div>
-        )
-      })}
+      {entry.players.map(p => (
+        <div key={p.playerId} className={styles.section}>
+          <div className={styles.sectionTitle}>{p.name}</div>
+          <PlayerTakeawayBlock player={p} />
+        </div>
+      ))}
     </>
   )
 }
@@ -190,141 +229,360 @@ function PlayerTakeawayBlock({ player }) {
   )
 }
 
-function StatsTab({ stats, allPlayers }) {
-  if (!stats) return <p className={styles.placeholder}>No stats available.</p>
+function StatsTab({ statsData, scope, allPlayers }) {
+  if (!statsData) return <p className={styles.placeholder}>Loading stats…</p>
 
-  const playerIds = Object.keys(stats.players)
-  const cols = ['pts', 'reb', 'ast', 'stl', 'blk', 'to', 'pm', 'fg', 'threes', 'ft']
-  const headers = ['Player', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', '+/-', 'FG', '3P', 'FT']
+  if (scope) {
+    // Single player: boxscore grid + shooting splits
+    const rows = calculateBoxScore(statsData, scope)
+    const r = rows[0]
+    if (!r) return <p className={styles.placeholder}>No stats for this player.</p>
+    const playerName = allPlayers.find(p => p.playerId === scope)?.name ?? scope
+    return (
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>{playerName}</div>
+        <BoxscoreGrid row={r} />
+        <ShootingSplits row={r} />
+      </div>
+    )
+  }
+
+  // All players: team totals + per-player table
+  const team = calculateTeamBoxScore(statsData)
+  const playerRows = calculateBoxScore(statsData)
 
   return (
     <>
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Team</div>
         <div className={styles.statCards}>
-          {['pts','reb','ast','stl','blk','to'].map(k => (
-            <div key={k} className={styles.statCard}>
-              <div className={styles.statCardVal}>{stats.team[k]}</div>
-              <div className={styles.statCardLbl}>{k.toUpperCase()}</div>
+          {[['PTS', team.PTS], ['REB', team.REB], ['AST', team.AST], ['STL', team.STL], ['BLK', team.BLK], ['TO', team.TO]].map(([lbl, val]) => (
+            <div key={lbl} className={styles.statCard}>
+              <div className={styles.statCardVal}>{val}</div>
+              <div className={styles.statCardLbl}>{lbl}</div>
             </div>
           ))}
         </div>
         <div className={styles.statSubRow}>
-          <span className={styles.statChip}>{stats.team.fg} FG</span>
-          <span className={styles.statChip}>{stats.team.threes} 3P</span>
-          <span className={styles.statChip}>{stats.team.ft} FT</span>
+          <span className={styles.statChip}>{team.FGM}/{team.FGA} FG ({pctText(team.FG_pct)})</span>
+          <span className={styles.statChip}>{team.threePM}/{team.threePA} 3P ({pctText(team.threeP_pct)})</span>
+          <span className={styles.statChip}>{team.FTM}/{team.FTA} FT ({pctText(team.FT_pct)})</span>
         </div>
       </div>
-
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Players</div>
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                {headers.map(h => <th key={h}>{h}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {playerIds.map(pid => {
-                const p = stats.players[pid]
-                const info = allPlayers.find(pl => pl.id === pid)
-                return (
-                  <tr key={pid}>
-                    <td className={styles.tdName}>{info?.name ?? pid}</td>
-                    {cols.map(c => <td key={c}>{p[c] ?? '—'}</td>)}
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-        {/* Mobile stat cards */}
-        <div className={styles.playerStatCardGrid}>
-          {playerIds.map(pid => {
-            const p = stats.players[pid]
-            const info = allPlayers.find(pl => pl.id === pid)
-            return (
-              <div key={pid} className={styles.playerStatCard}>
-                <div className={styles.playerStatName}>{info?.name ?? pid}</div>
-                <div className={styles.playerStatRow}>
-                  <span><b>{p.pts}</b> PTS</span>
-                  <span><b>{p.reb}</b> REB</span>
-                  <span><b>{p.ast}</b> AST</span>
-                </div>
-                <div className={styles.playerStatRow}>
-                  <span><b>{p.fg}</b> FG</span>
-                  <span><b>{p.threes}</b> 3P</span>
-                  <span><b>{p.pm}</b> +/-</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <PlayerStatsTable rows={playerRows} allPlayers={allPlayers} />
       </div>
     </>
   )
 }
 
-function AdvancedTab({ zones }) {
-  if (!zones.length) return <p className={styles.placeholder}>No advanced data available.</p>
-
+function BoxscoreGrid({ row }) {
+  const cells = [
+    ['PTS', row.PTS], ['REB', row.REB], ['AST', row.AST], ['STL', row.STL],
+    ['BLK', row.BLK], ['TO', row.TO], ['+/-', row.pm >= 0 ? `+${row.pm}` : row.pm], ['MIN', '—'],
+  ]
   return (
-    <div className={styles.section}>
-      <div className={styles.sectionTitle}>Shot Zones</div>
-      <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Zone</th><th>FG</th><th>PCT</th><th>PTS</th><th>FREQ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {zones.map(z => (
-              <tr key={z.zone}>
-                <td className={styles.tdName}>{z.zone}</td>
-                <td>{z.fg}</td>
-                <td>{z.pct}</td>
-                <td>{z.pts}</td>
-                <td>{z.freq}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* Mobile zone cards */}
-      <div className={styles.zoneCardGrid}>
-        {zones.map(z => (
-          <div key={z.zone} className={styles.zoneCard}>
-            <div className={styles.zoneName}>{z.zone}</div>
-            <div className={styles.zoneFg}>{z.fg}</div>
-            <div className={styles.zonePct}>{z.pct}</div>
-            <div className={styles.zoneMeta}>{z.pts} pts · {z.freq}</div>
-          </div>
-        ))}
-      </div>
+    <div className={styles.boxscoreGrid}>
+      {cells.map(([lbl, val]) => (
+        <div key={lbl} className={styles.boxscoreCell}>
+          <div className={styles.statCardVal}>{val}</div>
+          <div className={styles.statCardLbl}>{lbl}</div>
+        </div>
+      ))}
     </div>
   )
 }
 
-function ClipsTab({ clipCounts, clipsBase, scope }) {
-  const suffix = scope ? `?player=${scope}` : ''
+function ShootingSplits({ row }) {
+  return (
+    <div className={styles.statSubRow} style={{ marginTop: 12 }}>
+      <span className={styles.statChip}>{row.FGM}/{row.FGA} FG ({pctText(row.FG_pct)})</span>
+      <span className={styles.statChip}>{row.threePM}/{row.threePA} 3P ({pctText(row.threeP_pct)})</span>
+      <span className={styles.statChip}>{row.FTM}/{row.FTA} FT ({pctText(row.FT_pct)})</span>
+    </div>
+  )
+}
+
+function PlayerStatsTable({ rows, allPlayers }) {
+  const headers = ['Player', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', '+/-', 'FG', '3P', 'FT']
+  return (
+    <>
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          <thead>
+            <tr>{headers.map(h => <th key={h}>{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map(r => {
+              const info = allPlayers.find(p => p.playerId === r.player)
+              const name = info?.name ?? r.player
+              const pm = r.pm >= 0 ? `+${r.pm}` : String(r.pm)
+              return (
+                <tr key={r.player}>
+                  <td className={styles.tdName}>{name}</td>
+                  <td>{r.PTS}</td>
+                  <td>{r.REB}</td>
+                  <td>{r.AST}</td>
+                  <td>{r.STL}</td>
+                  <td>{r.BLK}</td>
+                  <td>{r.TO}</td>
+                  <td>{pm}</td>
+                  <td>{r.FGM}/{r.FGA}</td>
+                  <td>{r.threePM}/{r.threePA}</td>
+                  <td>{r.FTM}/{r.FTA}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className={styles.playerStatCardGrid}>
+        {rows.map(r => {
+          const info = allPlayers.find(p => p.playerId === r.player)
+          const name = info?.name ?? r.player
+          const pm = r.pm >= 0 ? `+${r.pm}` : String(r.pm)
+          return (
+            <div key={r.player} className={styles.playerStatCard}>
+              <div className={styles.playerStatName}>{name}</div>
+              <div className={styles.playerStatRow}>
+                <span><b>{r.PTS}</b> PTS</span>
+                <span><b>{r.REB}</b> REB</span>
+                <span><b>{r.AST}</b> AST</span>
+              </div>
+              <div className={styles.playerStatRow}>
+                <span><b>{r.FGM}/{r.FGA}</b> FG</span>
+                <span><b>{r.threePM}/{r.threePA}</b> 3P</span>
+                <span><b>{pm}</b> +/-</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </>
+  )
+}
+
+function AdvancedTab({ statsData, scope, allPlayers }) {
+  const [advTab, setAdvTab] = useState('Shooting')
+
+  if (!statsData) return <p className={styles.placeholder}>Loading…</p>
+
+  const scopedShots = scope ? statsData.shots.filter(s => s.player === scope) : statsData.shots
+
+  return (
+    <>
+      <div className={styles.advSubTabs}>
+        {ADV_TABS.map(t => (
+          <button
+            key={t}
+            className={t === advTab ? `${styles.advTab} ${styles.advTabActive}` : styles.advTab}
+            onClick={() => setAdvTab(t)}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+      {advTab === 'Shooting' && <ShootingSubTab statsData={statsData} scope={scope} scopedShots={scopedShots} allPlayers={allPlayers} />}
+      {advTab === 'Creation' && <CreationSubTab statsData={statsData} scope={scope} allPlayers={allPlayers} />}
+      {advTab === 'Defense'  && <DefenseSubTab  statsData={statsData} scope={scope} allPlayers={allPlayers} />}
+      {advTab === 'Lineups'  && <LineupsSubTab  statsData={statsData} allPlayers={allPlayers} />}
+    </>
+  )
+}
+
+function ShootingSubTab({ statsData, scope, scopedShots, allPlayers }) {
+  const zones = calculateZoneBreakdown(statsData.shots, scope || null)
+  const efficiency = calculateShootingEfficiency(statsData.shots, statsData.freeThrows, scope || null)
+
+  return (
+    <>
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>Shot Chart</div>
+        <ShotChartSVG shots={scopedShots} showList={true} />
+      </div>
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>Zone Breakdown</div>
+        <StatTable
+          rows={zones}
+          cols={[
+            { key: 'zone',     label: 'Zone',  align: 'left' },
+            { key: 'fgStr',    label: 'FG' },
+            { key: 'fgPct',    label: 'FG%' },
+            { key: 'PTS',      label: 'PTS' },
+            { key: 'freqPct',  label: 'FREQ' },
+          ]}
+          getRow={z => ({
+            zone: z.zone,
+            fgStr: `${z.FGM}/${z.FGA}`,
+            fgPct: pctText(z.FG_pct),
+            PTS: z.PTS,
+            freqPct: pctText(z.freq_pct),
+          })}
+          nameKey="zone"
+        />
+      </div>
+      {!scope && (
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>Shooting Efficiency</div>
+          <StatTable
+            rows={efficiency}
+            cols={[
+              { key: 'player', label: 'Player', align: 'left' },
+              { key: 'eFG',    label: 'eFG%' },
+              { key: 'TS',     label: 'TS%' },
+            ]}
+            getRow={r => ({
+              player: allPlayers.find(p => p.playerId === r.player)?.name ?? r.player,
+              eFG: pctText(r.eFG_pct),
+              TS: pctText(r.TS_pct),
+            })}
+            nameKey="player"
+          />
+        </div>
+      )}
+    </>
+  )
+}
+
+function CreationSubTab({ statsData, scope, allPlayers }) {
+  const rows = calculateCreation(statsData.events, statsData.shots, scope || null)
+  return (
+    <div className={styles.section}>
+      <div className={styles.sectionTitle}>Creation</div>
+      <StatTable
+        rows={rows}
+        cols={[
+          { key: 'player',       label: 'Player',         align: 'left' },
+          { key: 'AST',          label: 'AST' },
+          { key: 'TO',           label: 'TO' },
+          { key: 'Potential_AST', label: 'Pot. AST' },
+          { key: 'Adv_Created',  label: 'Adv. Created' },
+        ]}
+        getRow={r => ({
+          player: allPlayers.find(p => p.playerId === r.player)?.name ?? r.player,
+          AST: r.AST,
+          TO: r.TO,
+          Potential_AST: r.Potential_AST,
+          Adv_Created: r.Adv_Created,
+        })}
+        nameKey="player"
+      />
+    </div>
+  )
+}
+
+function DefenseSubTab({ statsData, scope, allPlayers }) {
+  const rows = calculateDefense(statsData.events, scope || null)
+  return (
+    <div className={styles.section}>
+      <div className={styles.sectionTitle}>Defense</div>
+      <StatTable
+        rows={rows}
+        cols={[
+          { key: 'player',      label: 'Player',  align: 'left' },
+          { key: 'STL',         label: 'STL' },
+          { key: 'BLK',         label: 'BLK' },
+          { key: 'DEFLECTION',  label: 'DEFL' },
+          { key: 'Charges',     label: 'Charges' },
+          { key: 'Total',       label: 'Total' },
+        ]}
+        getRow={r => ({
+          player: allPlayers.find(p => p.playerId === r.player)?.name ?? r.player,
+          STL: r.STL,
+          BLK: r.BLK,
+          DEFLECTION: r.DEFLECTION,
+          Charges: r.Charges_Drawn,
+          Total: r.Def_Activity,
+        })}
+        nameKey="player"
+      />
+    </div>
+  )
+}
+
+function LineupsSubTab({ statsData, allPlayers }) {
+  const rows = calculateLineups(statsData.lineupStints, allPlayers.map(p => ({ id: p.playerId, name: p.name })))
+  return (
+    <div className={styles.section}>
+      <div className={styles.sectionTitle}>Lineups (Top 5 by Net +/-)</div>
+      <StatTable
+        rows={rows}
+        cols={[
+          { key: 'lineup_names', label: 'Lineup',   align: 'left' },
+          { key: 'net_points',   label: 'Net +/-' },
+          { key: 'stints',       label: 'Stints' },
+        ]}
+        getRow={r => ({
+          lineup_names: r.lineup_names,
+          net_points: r.net_points >= 0 ? `+${r.net_points}` : String(r.net_points),
+          stints: r.stints,
+        })}
+        nameKey="lineup_names"
+      />
+    </div>
+  )
+}
+
+// Responsive table/card grid: table on desktop, cards on mobile (CSS-only).
+function StatTable({ rows, cols, getRow, nameKey }) {
+  if (!rows.length) return <p className={styles.placeholder}>No data.</p>
+  return (
+    <>
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          <thead>
+            <tr>{cols.map(c => <th key={c.key} style={c.align === 'left' ? { textAlign: 'left' } : {}}>{c.label}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              const cells = getRow(row)
+              return (
+                <tr key={i}>
+                  {cols.map(c => (
+                    <td key={c.key} className={c.align === 'left' ? styles.tdName : undefined}>
+                      {cells[c.key]}
+                    </td>
+                  ))}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className={styles.statCardMobileGrid}>
+        {rows.map((row, i) => {
+          const cells = getRow(row)
+          return (
+            <div key={i} className={styles.statCardMobile}>
+              <div className={styles.statCardMobileName}>{cells[nameKey]}</div>
+              {cols.filter(c => c.key !== nameKey).map(c => (
+                <div key={c.key} className={styles.statCardMobileRow}>
+                  <span className={styles.statCardMobileLbl}>{c.label}</span>
+                  <span className={styles.statCardMobileVal}>{cells[c.key]}</span>
+                </div>
+              ))}
+            </div>
+          )
+        })}
+      </div>
+    </>
+  )
+}
+
+function ClipsTab({ clipCounts, clipsHref }) {
   return (
     <div className={styles.section}>
       <div className={styles.sectionTitle}>Playlists</div>
       <div className={styles.clipsGrid}>
-        {PLAYLISTS.map(pl => {
-          const count = clipCounts[pl.key] ?? 0
-          const href = `${clipsBase}${suffix}`
-          return (
-            <div key={pl.key} className={styles.clipCard}>
-              <div className={styles.clipLabel}>{pl.label}</div>
-              <div className={styles.clipCount}>{count}</div>
-              <div className={styles.clipMeta}>clips</div>
-              <a href={href} className={styles.clipWatch}>▶ Watch</a>
-            </div>
-          )
-        })}
+        {PLAYLISTS.map(pl => (
+          <div key={pl.key} className={styles.clipCard}>
+            <div className={styles.clipLabel}>{pl.label}</div>
+            <div className={styles.clipCount}>{clipCounts[pl.key] ?? 0}</div>
+            <div className={styles.clipMeta}>clips</div>
+            <a href={clipsHref} className={styles.clipWatch}>▶ Watch</a>
+          </div>
+        ))}
       </div>
     </div>
   )

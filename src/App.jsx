@@ -43,6 +43,10 @@ export default function App() {
     return <PlayersPage />;
   }
 
+  if (route.view === 'teamView') {
+    return <PlayerDetailPage playerId="team" />;
+  }
+
   if (route.view === 'playerDetail') {
     return <PlayerDetailPage playerId={route.playerId} />;
   }

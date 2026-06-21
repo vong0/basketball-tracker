@@ -18,6 +18,7 @@ export function parseHash() {
   const m = h.match(/^#\/game\/([\w-]+)$/);
   if (m) return { view: 'game', gameId: m[1] };
   if (h === '#/players') return { view: 'players' };
+  if (h === '#/players/team') return { view: 'teamView' };
   const pm = h.match(/^#\/players\/([\w-]+)$/);
   if (pm) return { view: 'playerDetail', playerId: pm[1] };
   if (h === '#/takeaways') return { view: 'takeaways' };

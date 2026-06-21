@@ -1,8 +1,15 @@
+import { useState, useEffect } from 'react';
 import Banner from '../../components/Banner/Banner';
-import { mockPlayers } from '../../lib/mockData.js';
+import { getPlayers } from '../../lib/backend.js';
 import styles from './PlayersPage.module.css';
 
 export default function PlayersPage() {
+  const [players, setPlayers] = useState(null)
+
+  useEffect(() => {
+    getPlayers().then(setPlayers)
+  }, [])
+
   return (
     <div className={styles.page}>
       <Banner />
@@ -10,16 +17,24 @@ export default function PlayersPage() {
         <div className={styles.heroInner}>
           <div className={styles.kicker}>ROSTER</div>
           <h1 className={styles.heading}>Players</h1>
-          <div className={styles.count}>{mockPlayers.length} players</div>
+          <div className={styles.count}>{players ? `${players.length} players` : '—'}</div>
         </div>
       </div>
       <div className={styles.scroll}>
         <div className={styles.gridWrap}>
-          <div className={styles.grid}>
-            {mockPlayers.map(player => (
-              <PlayerCard key={player.id} player={player} />
-            ))}
-          </div>
+          <a href="#/players/team" className={styles.teamLink}>
+            <span>View Team</span>
+            <span>→</span>
+          </a>
+          {!players ? (
+            <p className={styles.loading}>Loading…</p>
+          ) : (
+            <div className={styles.grid}>
+              {players.map(player => (
+                <PlayerCard key={player.id} player={player} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -39,8 +54,7 @@ function PlayerCard({ player }) {
       </div>
       <div className={styles.name}>{player.name}</div>
       <div className={styles.meta}>
-        <span>#{player.number}</span>
-        <span className={styles.metaSep}>·</span>
+        {player.number && <><span>#{player.number}</span><span className={styles.metaSep}>·</span></>}
         <span>{player.position}</span>
       </div>
     </a>

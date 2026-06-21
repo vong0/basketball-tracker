@@ -131,6 +131,35 @@
   color: var(--text-faint);
 }
 
+.teamLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s, border-left-width 0.15s;
+}
+
+.teamLink:hover {
+  border-left: 3px solid var(--orange);
+  color: var(--text);
+}
+
+.loading {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
 @media (max-width: 900px) {
   .grid { grid-template-columns: repeat(3, 1fr); }
 }
