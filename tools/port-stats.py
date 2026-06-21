@@ -26,7 +26,7 @@ from pathlib import Path
 
 SHOT_FIELDS = {
     "shot_id", "game_id", "half", "player", "result", "points",
-    "shot_x", "shot_y", "shot_zone", "shot_type", "contest",
+    "shot_x", "shot_y", "shot_type", "contest",
     "assisted_by", "screen_assist_by", "transition", "paint_touch",
     "drive_kick", "notes",
 }
@@ -101,28 +101,22 @@ def process_free_throws(fts: list) -> list:
 
 def process_stints(stints: list) -> tuple[list, int]:
     out = []
-    dropped = 0
     for row in stints:
         row = dict(row)
-        if row.get("half") == "result":
-            dropped += 1
-            continue
         row["game_id"] = normalise_game_id(row.get("game_id", ""))
         row = lowercase_players(row)
         out.append(filter_fields(row, STINT_FIELDS))
-    return out, dropped
+    return out
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--src",
-        default="tools/landing/public/data/spartans-tracked-data.json",
+        "src",
         help="Path to spartans-tracked-data.json",
     )
     parser.add_argument(
-        "--out",
-        default="public/data/stats.json",
+        "out",
         help="Output path for stats.json",
     )
     args = parser.parse_args()
@@ -146,7 +140,7 @@ def main():
     shots_out = process_shots(shots)
     events_out = process_events(events)
     fts_out = process_free_throws(free_throws)
-    stints_out, stints_dropped = process_stints(lineup_stints)
+    stints_out = process_stints(lineup_stints)
 
     stats = {
         "shots": shots_out,
@@ -164,7 +158,7 @@ def main():
     print(f"  shots:        {len(shots_out)}")
     print(f"  events:       {len(events_out)}")
     print(f"  freeThrows:   {len(fts_out)}")
-    print(f"  lineupStints: {len(stints_out)}  (dropped {stints_dropped} half=result)")
+    print(f"  lineupStints: {len(stints_out)}")
 
 
 if __name__ == "__main__":
