@@ -1,0 +1,118 @@
+/* Shared styles imported by all tab components */
+
+/* ── Section ────────────────────────── */
+
+.section {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child { border-bottom: none; }
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.sectionDate {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+}
+
+.placeholder {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dim);
+  padding: 32px 0;
+  font-style: italic;
+}
+
+/* ── Stat cards ─────────────────────── */
+
+.statCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.statCard {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 18px;
+  text-align: center;
+  min-width: 72px;
+}
+
+.statCardVal {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.statCardLbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+}
+
+.statSubRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.statChip {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 4px 10px;
+}
+
+/* ── Takeaways ──────────────────────── */
+
+.takeawayColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.takeawayLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+
+.takeawayList {
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.takeawayGreen li { color: var(--green); }
+.takeawayRed   li { color: var(--red); }
+
+@media (max-width: 640px) {
+  .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
+}

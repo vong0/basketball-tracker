@@ -10,6 +10,7 @@ import OpponentsPage from './pages/Opponents/OpponentsPage';
 import Player from './pages/Player/Player';
 import PlayersPage from './pages/Players/PlayersPage.jsx';
 import PlayerDetailPage from './pages/Players/PlayerDetailPage.jsx';
+import TeamDetailPage from './pages/Players/TeamDetailPage.jsx';
 
 export default function App() {
   const [route, setRoute] = useState(parseHash());
@@ -44,7 +45,7 @@ export default function App() {
   }
 
   if (route.view === 'teamView') {
-    return <PlayerDetailPage playerId="team" />;
+    return <TeamDetailPage />;
   }
 
   if (route.view === 'playerDetail') {

@@ -1,0 +1,25 @@
+.subTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0 16px;
+}
+
+.subTab {
+  padding: 6px 14px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.subTabActive {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #fff;
+}

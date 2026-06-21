@@ -11,6 +11,7 @@
   background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
   border-bottom: 1px solid var(--border);
   padding: 28px 32px 24px;
+  flex-shrink: 0;
 }
 
 .heroInner {
@@ -24,23 +25,10 @@
   gap: 20px;
 }
 
-.photoWrap {
+.avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.initials {
-  width: 100%;
-  height: 100%;
   background: var(--orange);
   display: flex;
   align-items: center;
@@ -49,6 +37,7 @@
   font-size: 32px;
   color: #fff;
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
 .heroInfo { display: flex; flex-direction: column; gap: 4px; }
@@ -65,12 +54,7 @@
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
-
-.metaSep { color: var(--text-faint); }
 
 /* ── Content ─────────────────────────── */
 
@@ -98,7 +82,6 @@
 @media (max-width: 640px) {
   .hero { padding: 20px 16px 16px; }
   .heroName { font-size: 36px; }
-  .photoWrap { width: 60px; height: 60px; }
-  .initials { font-size: 24px; }
+  .avatar { width: 60px; height: 60px; font-size: 24px; }
   .content { padding: 0 16px 48px; }
 }
