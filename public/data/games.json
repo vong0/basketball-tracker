@@ -85,5 +85,12 @@
         }
       ]
     }
+  },
+  "03": {
+    "name": "Game 3",
+    "opponents": "Garuda Titan",
+    "score": "42-46",
+    "youtubeUrl": "https://youtu.be/PUPmgAXDk4M",
+    "llc": "games/y26-s2-g03.llc"
   }
 }
