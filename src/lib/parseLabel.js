@@ -393,20 +393,13 @@ export function validateParsed(parsed, raw) {
       issues.push(`action ${i + 1}: unknown quality code "${a.quality}"`);
     }
   }
-  if (typeof raw === 'string' && /^T[GB]?\(/.test(raw)) {
-    issues.push('legacy `T` team prefix detected (should be `O`)');
-  }
   return issues;
 }
 
 // ============================================================================
 // CLI
-// ============================================================================
 //
-//   node parseLabel.js                      # parse built-in samples
-//   node parseLabel.js path/to/game.json    # parse all segments in a file
-//   node parseLabel.js -s "UG(O) matt: drive"   # parse a single string
-//   echo "UG(O) ..." | node parseLabel.js   # piped input
+//   node parseLabel.js "<label>"
 // ============================================================================
 
 async function runCli() {
@@ -415,93 +408,12 @@ async function runCli() {
 
   const args = process.argv.slice(2);
 
-  // -s "string" : parse a single label string
-  if (args[0] === '-s') {
-    const input = args.slice(1).join(' ');
-    if (!input) {
-      console.error('Usage: node parseLabel.js -s "<label>"');
-      process.exit(2);
-    }
-    console.log('INPUT:', input);
-    const parsed = parseLabel(input);
-    console.log(JSON.stringify(parsed, null, 2));
-    const issues = validateParsed(parsed, input);
-    if (issues.length) {
-      console.log('ISSUES:');
-      for (const it of issues) console.log('  -', it);
-    }
-    return;
+  if (args.length !== 1) {
+    console.error('Usage: node parseLabel.js "<label>"');
+    process.exit(2);
   }
 
-  // Positional file argument: parse all segments
-  if (args.length > 0 && !args[0].startsWith('-')) {
-    const file = args[0];
-    const fs = await import('fs');
-    let text;
-    try {
-      text = fs.readFileSync(file, 'utf8');
-    } catch (e) {
-      console.error(`Cannot read ${file}: ${e.message}`);
-      process.exit(2);
-    }
-    let game;
-    try {
-      game = JSON.parse(text);
-    } catch {
-      try {
-        const json5 = await import('json5');
-        game = (json5.default || json5).parse(text);
-      } catch (e) {
-        console.error(`Cannot parse ${file}: ${e.message}`);
-        process.exit(2);
-      }
-    }
-    const segments = game.cutSegments || [];
-    let totalIssues = 0;
-    console.log(`Parsing ${segments.length} segments from ${file}\n`);
-    for (let i = 0; i < segments.length; i++) {
-      const s = segments[i];
-      const parsed = parseLabel(s.name || '');
-      const issues = validateParsed(parsed, s.name);
-      if (issues.length) {
-        totalIssues += issues.length;
-        console.log(`[${i}] @ ${s.start}: ${s.name}`);
-        for (const it of issues) console.log(`    - ${it}`);
-      }
-    }
-    console.log(`\nTotal issues: ${totalIssues}`);
-    process.exit(totalIssues > 0 ? 1 : 0);
-  }
-
-  // Piped input (one label per line)
-  if (!process.stdin.isTTY) {
-    let buf = '';
-    for await (const chunk of process.stdin) buf += chunk;
-    const lines = buf.split('\n').map(l => l.trim()).filter(Boolean);
-    if (lines.length) {
-      for (const line of lines) {
-        console.log('---');
-        console.log('INPUT:', line);
-        console.log(JSON.stringify(parseLabel(line), null, 2));
-      }
-      return;
-    }
-  }
-
-  // Default: built-in samples
-  const samples = [
-    'UG(O) matt: drives baseline and kicks for open three',
-    'UB(O) matt: bad pass | UG(D) george: deflects, recovers | UG(O) vong: fastbreak layup >> turnover into transition score',
-    'OG(O) opponent: well-executed pick and roll for open dunk',
-    'UG(O) matt: high screen and roll, great read #pnr',
-    'UG(O) matt: drives | vong: screens | george: pops for three',
-  ];
-
-  for (const s of samples) {
-    console.log('---');
-    console.log('INPUT:', s);
-    console.log(JSON.stringify(parseLabel(s), null, 2));
-  }
+  console.log(JSON.stringify(parseLabel(args[0]), null, 2));
 }
 
 if (typeof process !== 'undefined' && process.argv) {
