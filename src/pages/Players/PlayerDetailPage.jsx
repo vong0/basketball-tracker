@@ -2,17 +2,16 @@ import { useState, useEffect } from 'react'
 import Banner from '../../components/Banner/Banner'
 import ScopeBar, { pickerClass } from '../../components/ScopeBar/ScopeBar.jsx'
 import TabBar from '../../components/TabBar/TabBar.jsx'
-import PlayerTakeawaysTab from '../../tabs/PlayerTakeawaysTab.jsx'
-import PlayerStatsTab from '../../tabs/PlayerStatsTab.jsx'
-import AdvancedTab from '../../tabs/AdvancedTab.jsx'
-import ClipsTab from '../../tabs/ClipsTab.jsx'
+import Takeaways from './views/Takeaways.jsx'
+import BoxScore from './views/BoxScore.jsx'
+import Clips from './views/Clips.jsx'
+import Advanced from './views/Advanced.jsx'
 import {
-  getPlayer, getPlayerScopes, getTakeaways, getGameClips, getStats,
-  getPlayerGameLog, getPlayerSeasonSummary,
+  getPlayer, getPlayerScopes, getTakeaways, getGameClips, getStats, getGames,
 } from '../../lib/backend.js'
 import styles from './PlayerDetailPage.module.css'
 
-const TABS = ['Takeaways', 'Stats', 'Advanced', 'Clips']
+const TABS = ['Takeaways', 'Box Score', 'Clips', 'Advanced']
 
 const PLAYLISTS = [
   { label: 'All Clips',    key: 'all',        quality: '',     type: '' },
@@ -25,12 +24,10 @@ const PLAYLISTS = [
 export default function PlayerDetailPage({ playerId }) {
   const [player, setPlayer] = useState(null)
   const [scopes, setScopes] = useState(null)
+  const [games, setGames] = useState([])
 
-  // Tab data — all fetched together when scope changes
   const [statsData, setStatsData] = useState(null)
   const [takeawayEntries, setTakeawayEntries] = useState(null)
-  const [gameLog, setGameLog] = useState(null)
-  const [seasonSummary, setSeasonSummary] = useState(null)
   const [clipCounts, setClipCounts] = useState({})
 
   const [scope, setScope] = useState('')
@@ -44,26 +41,24 @@ export default function PlayerDetailPage({ playerId }) {
   const seasonVal = scopeType === 'season' ? scope.slice(7) : null
   const gameId    = scopeType === 'game'   ? scope           : null
 
-  // Load player + scopes on mount
+  // Load player + scopes + games on mount
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    Promise.all([getPlayer(playerId), getPlayerScopes(playerId)])
-      .then(([p, s]) => { if (!cancelled) { setPlayer(p); setScopes(s) } })
+    Promise.all([getPlayer(playerId), getPlayerScopes(playerId), getGames()])
+      .then(([p, s, g]) => { if (!cancelled) { setPlayer(p); setScopes(s); setGames(g) } })
       .catch(e => { if (!cancelled) setError(e.message) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [playerId])
 
-  // Load all tab data together when scope changes (after player+scopes ready)
+  // Load tab data together when scope changes (after player+scopes ready)
   useEffect(() => {
     if (!player || !scopes) return
 
     let cancelled = false
     setStatsData(null)
     setTakeawayEntries(null)
-    setGameLog(null)
-    setSeasonSummary(null)
     setClipCounts({})
 
     const statsFilters = scopeType === 'game'   ? { gameId }
@@ -76,8 +71,6 @@ export default function PlayerDetailPage({ playerId }) {
 
     getStats(statsFilters).then(d => { if (!cancelled) setStatsData(d) })
     getTakeaways(takeawayFilters).then(e => { if (!cancelled) setTakeawayEntries(e) })
-    if (scopeType === 'season') getPlayerGameLog(playerId, seasonVal).then(l => { if (!cancelled) setGameLog(l) })
-    if (scopeType === 'career') getPlayerSeasonSummary(playerId).then(s => { if (!cancelled) setSeasonSummary(s) })
 
     const clipGid = gameId ?? scopes.seasons?.[0]?.games?.[0]?.id
     if (clipGid) {
@@ -165,28 +158,10 @@ export default function PlayerDetailPage({ playerId }) {
 
       <div className={styles.content}>
         <div className={styles.contentInner}>
-          {tab === 'Takeaways' && <PlayerTakeawaysTab entries={takeawayEntries} />}
-          {tab === 'Stats'     && (
-            <PlayerStatsTab
-              statsData={statsData}
-              playerId={playerId}
-              scopeType={scopeType}
-              gameLog={gameLog}
-              seasonSummary={seasonSummary}
-            />
-          )}
-          {tab === 'Advanced' && (
-            <AdvancedTab
-              shots={statsData?.shots ?? null}
-              events={statsData?.events ?? []}
-              freeThrows={statsData?.freeThrows ?? []}
-              lineupStints={statsData?.lineupStints ?? []}
-              players={[{ playerId, name: player.name }]}
-              playerId={playerId}
-              showLineups={false}
-            />
-          )}
-          {tab === 'Clips' && <ClipsTab playlists={playlists} />}
+          {tab === 'Takeaways' && <Takeaways entries={takeawayEntries} />}
+          {tab === 'Box Score' && <BoxScore statsData={statsData} playerId={playerId} scopeType={scopeType} games={games} />}
+          {tab === 'Clips'     && <Clips playlists={playlists} />}
+          {tab === 'Advanced'  && statsData && <Advanced statsData={statsData} playerId={playerId} />}
         </div>
       </div>
     </div>

@@ -1,0 +1,217 @@
+.section {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  margin-bottom: 16px;
+}
+
+.subTitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 20px 0 10px;
+}
+.subTitle:first-child { margin-top: 0; }
+
+/* Leader cards */
+.leaderRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.leaderCard {
+  flex: 1;
+  min-width: 120px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.leaderName {
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  margin-bottom: 4px;
+}
+.leaderValue {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--text);
+  line-height: 1;
+}
+.leaderLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+/* Info blocks */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.infoBlock {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.infoTitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.infoText {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.attentionList {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+/* Half splits table */
+.halfSplits { margin-top: 24px; }
+.tableWrap { overflow-x: auto; }
+.splitTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+.splitTable th {
+  padding: 6px 10px;
+  text-align: right;
+  color: var(--text-faint);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.splitTable th:first-child { text-align: left; }
+.splitTable td {
+  padding: 8px 10px;
+  text-align: right;
+  color: var(--text);
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+.splitTable td:first-child { text-align: left; font-family: var(--font-display); font-size: 15px; }
+.splitSec { display: block; font-size: 10px; color: var(--text-dim); }
+
+/* Breakdown grid (zone + contest) */
+.breakdownGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Leaders grid (4 tables) */
+.leadersGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Advanced stats */
+.advGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.advCol {
+  flex: 1;
+  min-width: 140px;
+}
+.advRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.advRow:last-child { border-bottom: none; }
+.advLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.advValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Takeaways */
+.takeawayColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.takeawayLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.takeawayList {
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.takeawayGreen li { color: var(--green); }
+.takeawayRed   li { color: var(--red); }
+
+.placeholder {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dim);
+  padding: 32px 0;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .section { padding: 16px 0; }
+  .infoGrid { grid-template-columns: 1fr; }
+  .breakdownGrid { grid-template-columns: 1fr; }
+  .leaderRow { flex-direction: row; overflow-x: auto; flex-wrap: nowrap; }
+  .leaderCard { min-width: 110px; }
+  .advGrid { flex-direction: column; }
+  .advCol { min-width: unset; }
+  .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
+}

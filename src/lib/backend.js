@@ -7,10 +7,6 @@
 //   dispatch pattern. Read functions are complete; write functions slot in below them.
 import JSON5 from 'json5'
 import { getYouTubeId } from './youtube.js'
-import {
-  fgStats, ftStats, countEvents, made, num, safe, round,
-  zoneFromXY, pctText,
-} from './statsCore.js'
 
 // ── Cache ─────────────────────────────────────────────────────────────────────
 
@@ -342,135 +338,6 @@ async function _getStats(filters = {}) {
   }
 }
 
-// Per-game box score rows for a player in a season, enriched with game metadata.
-async function _getPlayerGameLog(playerId, season) {
-  const [statsData, games] = await Promise.all([
-    _getStats({ season }),
-    _getGames(),
-  ])
-
-  const gameIds = [...new Set([
-    ...statsData.shots.map(s => s.game_id),
-    ...statsData.events.map(e => e.game_id),
-    ...statsData.freeThrows.map(ft => ft.game_id),
-  ])]
-
-  return gameIds
-    .map(gameId => {
-      const gameData = {
-        shots: statsData.shots.filter(s => s.game_id === gameId),
-        events: statsData.events.filter(e => e.game_id === gameId),
-        freeThrows: statsData.freeThrows.filter(ft => ft.game_id === gameId),
-        lineupStints: statsData.lineupStints.filter(st => st.game_id === gameId),
-      }
-
-      const pShots = gameData.shots.filter(s => s.player === playerId)
-      const pEvents = gameData.events.filter(e => e.player === playerId)
-      const pFt = gameData.freeThrows.filter(ft => ft.player === playerId)
-
-      if (!pShots.length && !pEvents.length && !pFt.length) return null
-
-      const fg = fgStats(pShots)
-      const ft = ftStats(pFt)
-      const AST = gameData.shots.filter(s => made(s) && s.assisted_by === playerId).length
-      const REB = countEvents(pEvents, 'rebound')
-      const STL = countEvents(pEvents, 'steal')
-      const BLK = countEvents(pEvents, 'block')
-      const TO = countEvents(pEvents, 'turnover')
-
-      const game = games.find(g => g.id === gameId)
-      return {
-        gameId,
-        gameLabel: game ? gameLabel(game) : gameId,
-        date: game?.date ?? '',
-        result: game?.result ?? '',
-        opponentName: game?.opponentName ?? '',
-        PTS: fg.shot_points + ft.ft_points,
-        REB,
-        AST,
-        STL,
-        BLK,
-        TO,
-        FGM: fg.FGM,
-        FGA: fg.FGA,
-        FG_pct: fg.FG_pct,
-        threePM: fg.threePM,
-        threePA: fg.threePA,
-        threeP_pct: fg.threeP_pct,
-        FTM: ft.FTM,
-        FTA: ft.FTA,
-        FT_pct: ft.FT_pct,
-      }
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.date.localeCompare(a.date))
-}
-
-// Per-season averages for a player, for the career view table.
-async function _getPlayerSeasonSummary(playerId) {
-  const [statsData, games] = await Promise.all([
-    _getStats({}),
-    _getGames(),
-  ])
-
-  const seasonMap = new Map()
-  for (const game of games) {
-    if (!seasonMap.has(game.season)) seasonMap.set(game.season, [])
-    seasonMap.get(game.season).push(game)
-  }
-
-  return [...seasonMap.entries()]
-    .sort((a, b) => b[0].localeCompare(a[0]))
-    .map(([season, sGames]) => {
-      const sGameIds = new Set(sGames.map(g => g.id))
-
-      const seasonShots = statsData.shots.filter(s => sGameIds.has(s.game_id))
-      const seasonEvents = statsData.events.filter(e => sGameIds.has(e.game_id))
-      const seasonFt = statsData.freeThrows.filter(ft => sGameIds.has(ft.game_id))
-
-      const pShots = seasonShots.filter(s => s.player === playerId)
-      const pEvents = seasonEvents.filter(e => e.player === playerId)
-      const pFt = seasonFt.filter(ft => ft.player === playerId)
-
-      const playerGameIds = new Set([
-        ...pShots.map(s => s.game_id),
-        ...pEvents.map(e => e.game_id),
-        ...pFt.map(ft => ft.game_id),
-      ])
-      const gameCount = playerGameIds.size
-      if (!gameCount) return null
-
-      const fg = fgStats(pShots)
-      const ft = ftStats(pFt)
-      const AST = seasonShots.filter(s => made(s) && s.assisted_by === playerId).length
-      const REB = countEvents(pEvents, 'rebound')
-      const STL = countEvents(pEvents, 'steal')
-      const BLK = countEvents(pEvents, 'block')
-      const TO = countEvents(pEvents, 'turnover')
-      const PTS = fg.shot_points + ft.ft_points
-
-      const wins = sGames.filter(g => playerGameIds.has(g.id) && g.result === 'W').length
-      const losses = sGames.filter(g => playerGameIds.has(g.id) && g.result === 'L').length
-
-      return {
-        season,
-        gameCount,
-        wins,
-        losses,
-        PTS_avg: round(PTS / gameCount, 1),
-        REB_avg: round(REB / gameCount, 1),
-        AST_avg: round(AST / gameCount, 1),
-        STL_avg: round(STL / gameCount, 1),
-        BLK_avg: round(BLK / gameCount, 1),
-        TO_avg: round(TO / gameCount, 1),
-        FG_pct: fg.FG_pct,
-        threeP_pct: fg.threeP_pct,
-        FT_pct: ft.FT_pct,
-      }
-    })
-    .filter(Boolean)
-}
-
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 
 const local = {
@@ -487,8 +354,6 @@ const local = {
   getGameScopes: _getGameScopes,
   getPlayerScopes: _getPlayerScopes,
   getStats: _getStats,
-  getPlayerGameLog: _getPlayerGameLog,
-  getPlayerSeasonSummary: _getPlayerSeasonSummary,
 }
 
 const impl = local
@@ -507,6 +372,4 @@ export const {
   getGameScopes,
   getPlayerScopes,
   getStats,
-  getPlayerGameLog,
-  getPlayerSeasonSummary,
 } = impl

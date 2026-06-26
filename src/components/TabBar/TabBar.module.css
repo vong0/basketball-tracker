@@ -1,19 +1,26 @@
 .bar {
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
   position: sticky;
   top: 56px;
   z-index: 30;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 
-.inner {
-  max-width: var(--content-width);
-  margin: 0 auto;
+.strip {
+  flex: 1;
   display: flex;
   align-items: stretch;
-  padding: 0 32px;
+  overflow-x: auto;
   gap: 4px;
+  scrollbar-width: none;
+  padding: 0 16px;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
+
+.strip::-webkit-scrollbar { display: none; }
 
 .tab {
   display: flex;
@@ -30,16 +37,32 @@
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tab:hover { color: var(--text); }
 
 .tabActive {
-  color: var(--text);
+  color: var(--orange);
   border-bottom-color: var(--orange);
 }
 
+.arrow {
+  width: 32px;
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow:disabled { opacity: 0.2; cursor: default; }
+
 @media (max-width: 640px) {
-  .inner { padding: 0 16px; gap: 0; }
-  .tab { padding: 0 10px; font-size: 13px; }
+  .arrow { display: flex; }
+  .strip { padding: 0; }
 }

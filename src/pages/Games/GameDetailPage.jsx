@@ -1,36 +1,31 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Banner from '../../components/Banner/Banner'
 import ScopeBar, { pickerClass } from '../../components/ScopeBar/ScopeBar.jsx'
 import TabBar from '../../components/TabBar/TabBar.jsx'
-import GameTakeawaysTab from '../../tabs/GameTakeawaysTab.jsx'
-import GameStatsTab from '../../tabs/GameStatsTab.jsx'
-import AdvancedTab from '../../tabs/AdvancedTab.jsx'
-import ClipsTab from '../../tabs/ClipsTab.jsx'
-import { getGame, getTakeaways, getGameScopes, getGameClips, getStats, gameLabel } from '../../lib/backend.js'
+import Overview from './views/Overview.jsx'
+import BoxScore from './views/BoxScore.jsx'
+import StatLeaders from './views/StatLeaders.jsx'
+import TeamSummary from './views/TeamSummary.jsx'
+import Takeaways from './views/Takeaways.jsx'
+import ShotChart from './views/ShotChart.jsx'
+import AdvancedStats from './views/AdvancedStats.jsx'
+import { getGame, getTakeaways, getGameScopes, getStats, gameLabel } from '../../lib/backend.js'
+import { filterStats } from '../../lib/statsCore.js'
 import styles from './GameDetailPage.module.css'
 
-const TABS = ['Takeaways', 'Stats', 'Advanced', 'Clips']
-
-const PLAYLISTS = [
-  { label: 'All Clips',    key: 'all',        quality: '',     type: '' },
-  { label: 'Good Offense', key: 'goodOffense', quality: 'good', type: 'offense' },
-  { label: 'Bad Offense',  key: 'badOffense',  quality: 'bad',  type: 'offense' },
-  { label: 'Good Defense', key: 'goodDefense', quality: 'good', type: 'defense' },
-  { label: 'Bad Defense',  key: 'badDefense',  quality: 'bad',  type: 'defense' },
-]
+const TABS = ['Overview', 'Box Score', 'Stat Leaders', 'Team Summary', 'Takeaways', 'Shot Chart', 'Advanced Stats']
+const TAB_IDS = TABS.map(t => t.toLowerCase().replace(/\s+/g, '-'))
 
 export default function GameDetailPage({ gameId }) {
   const [game, setGame] = useState(null)
   const [takeawayEntry, setTakeawayEntry] = useState(null)
   const [players, setPlayers] = useState([])
   const [statsData, setStatsData] = useState(null)
-  const [clipCounts, setClipCounts] = useState({})
-  const [scope, setScope] = useState('')
-  const [tab, setTab] = useState('Takeaways')
+  const [half, setHalf] = useState('ALL')
+  const [activeTab, setActiveTab] = useState('Overview')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Fetch everything in parallel on mount — no re-fetch on scope change
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -39,22 +34,37 @@ export default function GameDetailPage({ gameId }) {
       getTakeaways({ gameId }),
       getGameScopes(gameId),
       getStats({ gameId }),
-      ...PLAYLISTS.map(pl =>
-        getGameClips(gameId, { quality: pl.quality || undefined, type: pl.type || undefined })
-          .then(r => [pl.key, r.clips.length])
-      ),
-    ]).then(([g, takeaways, scopes, stats, ...clipPairs]) => {
+    ]).then(([g, takeaways, scopes, stats]) => {
       if (cancelled) return
       setGame(g)
       setTakeawayEntry(takeaways[0] ?? null)
       setPlayers(scopes)
       setStatsData(stats)
-      setClipCounts(Object.fromEntries(clipPairs))
     })
     .catch(e => { if (!cancelled) setError(e.message) })
     .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [gameId])
+
+  const filteredStats = useMemo(() => {
+    if (!statsData) return null
+    return half === 'ALL' ? statsData : filterStats(statsData, { half })
+  }, [statsData, half])
+
+  useEffect(() => {
+    if (!filteredStats) return
+    const sections = TAB_IDS.map(id => document.getElementById(id)).filter(Boolean)
+    if (!sections.length) return
+    const obs = new IntersectionObserver(
+      entries => {
+        const visible = entries.filter(e => e.isIntersecting)
+        if (visible.length) setActiveTab(TABS[TAB_IDS.indexOf(visible[0].target.id)])
+      },
+      { rootMargin: '-40% 0px -40% 0px', threshold: 0 }
+    )
+    sections.forEach(s => obs.observe(s))
+    return () => obs.disconnect()
+  }, [filteredStats])
 
   if (loading) {
     return (
@@ -75,8 +85,19 @@ export default function GameDetailPage({ gameId }) {
   }
 
   const resultClass = game.result === 'W' ? styles.badgeW : game.result === 'L' ? styles.badgeL : styles.badgeT
-  const clipsHref = scope ? `#/game/${game.id}?player=${scope}` : `#/game/${game.id}`
-  const playlists = PLAYLISTS.map(pl => ({ label: pl.label, count: clipCounts[pl.key] ?? 0, href: clipsHref }))
+
+  function renderView(id) {
+    switch (id) {
+      case 'overview':       return <Overview statsData={filteredStats} players={players} />
+      case 'box-score':      return <BoxScore statsData={filteredStats} players={players} />
+      case 'stat-leaders':   return <StatLeaders statsData={filteredStats} players={players} />
+      case 'team-summary':   return <TeamSummary statsData={filteredStats} />
+      case 'takeaways':      return <Takeaways entry={takeawayEntry} />
+      case 'shot-chart':     return <ShotChart statsData={filteredStats} />
+      case 'advanced-stats': return <AdvancedStats statsData={filteredStats} />
+      default: return null
+    }
+  }
 
   return (
     <div className={styles.page}>
@@ -107,36 +128,22 @@ export default function GameDetailPage({ gameId }) {
       </div>
 
       <ScopeBar>
-        <select
-          className={pickerClass}
-          value={scope}
-          onChange={e => setScope(e.target.value)}
-        >
-          <option value="">All Players</option>
-          {players.map(p => (
-            <option key={p.playerId} value={p.playerId}>{p.name}</option>
-          ))}
+        <select className={pickerClass} value={half} onChange={e => setHalf(e.target.value)}>
+          <option value="ALL">All halves</option>
+          <option value="1H">1st Half</option>
+          <option value="2H">2nd Half</option>
         </select>
       </ScopeBar>
 
-      <TabBar tabs={TABS} active={tab} onChange={setTab} />
+      <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} scrollMode={true} />
 
       <div className={styles.content}>
         <div className={styles.contentInner}>
-          {tab === 'Takeaways' && <GameTakeawaysTab entry={takeawayEntry} scope={scope} />}
-          {tab === 'Stats'     && <GameStatsTab statsData={statsData} scope={scope} players={players} />}
-          {tab === 'Advanced'  && (
-            <AdvancedTab
-              shots={statsData?.shots ?? null}
-              events={statsData?.events ?? []}
-              freeThrows={statsData?.freeThrows ?? []}
-              lineupStints={statsData?.lineupStints ?? []}
-              players={players}
-              playerId={scope || null}
-              showLineups={true}
-            />
-          )}
-          {tab === 'Clips' && <ClipsTab playlists={playlists} />}
+          {filteredStats && TAB_IDS.map(id => (
+            <section key={id} id={id}>
+              {renderView(id)}
+            </section>
+          ))}
         </div>
       </div>
     </div>

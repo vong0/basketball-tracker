@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import { getAdvancedStatsHub, getGamePageTabs, getPlayerPageTabs } from './src/spartans-website-api.js';
+const data = JSON.parse(fs.readFileSync('./data/spartans-data.json', 'utf8'));
+const hub = getAdvancedStatsHub(data, { seasonId:'2026-S2', gameId:'ALL', half:'ALL', view:'team', mode:'perGame' });
+if (!hub.tabs.advanced_box_score.rows.length) throw new Error('No advanced box score rows');
+const game = getGamePageTabs(data, { seasonId:'2026-S2', gameId:'2026-S2 G2', half:'ALL', player:'ALL' });
+if (!game.tabs.shot_chart_quality.shot_chart.shots.length) throw new Error('No game shots');
+const player = getPlayerPageTabs(data, { player:'Emanuel', seasonId:'2026-S2', gameId:'ALL', half:'ALL' });
+if (!player.tabs.scoring) throw new Error('No player scoring');
+console.log('smoke ok', hub.display.game_count, hub.tabs.advanced_box_score.rows.length, game.tabs.shot_chart_quality.shot_chart.shots.length);
