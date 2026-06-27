@@ -42,6 +42,8 @@ export default function GamesPage() {
     setSheetOpen(false)
   }
 
+  const resultCount = filteredGames?.length ?? 0
+
   return (
     <div className={styles.page}>
       <Banner />
@@ -103,6 +105,14 @@ export default function GamesPage() {
             Filters{(seasonFilter || resultFilter) ? ' ·' : ''}
           </button>
         </div>
+
+        {filteredGames && (
+          <div className={styles.filterInner}>
+            <span className={styles.resultCount}>
+              {resultCount} {resultCount === 1 ? 'game' : 'games'} found
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Mobile filter sheet */}
@@ -110,31 +120,40 @@ export default function GamesPage() {
         <>
           <div className={styles.filterSheetBackdrop} onClick={() => setSheetOpen(false)} />
           <div className={styles.filterSheet}>
-            <div className={styles.filterSheetTitle}>Filters</div>
-            <select
-              className={styles.filterSheetSelect}
-              value={seasonFilter}
-              onChange={e => setSeasonFilter(e.target.value)}
-            >
-              <option value="">All Seasons</option>
-              {(seasons ?? []).map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-            <select
-              className={styles.filterSheetSelect}
-              value={resultFilter}
-              onChange={e => setResultFilter(e.target.value)}
-            >
-              <option value="">All Results</option>
-              <option value="W">Wins</option>
-              <option value="L">Losses</option>
-            </select>
-            {hasFilter && (
-              <button className={styles.filterSheetClear} onClick={clearAll}>
-                Clear all
+            <div className={styles.filterSheetHeader}>
+              <span className={styles.filterSheetTitle}>Filters</span>
+              {hasFilter && (
+                <button className={styles.filterSheetClearLink} onClick={clearAll}>Clear all</button>
+              )}
+            </div>
+            <div className={styles.filterSheetItem}>
+              <select
+                className={styles.filterSheetSelect}
+                value={seasonFilter}
+                onChange={e => setSeasonFilter(e.target.value)}
+              >
+                <option value="">All Seasons</option>
+                {(seasons ?? []).map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.filterSheetItem}>
+              <select
+                className={styles.filterSheetSelect}
+                value={resultFilter}
+                onChange={e => setResultFilter(e.target.value)}
+              >
+                <option value="">All Results</option>
+                <option value="W">Wins</option>
+                <option value="L">Losses</option>
+              </select>
+            </div>
+            <div className={styles.filterSheetActions}>
+              <button className={styles.filterSheetDone} onClick={() => setSheetOpen(false)}>
+                Done
               </button>
-            )}
+            </div>
           </div>
         </>
       )}

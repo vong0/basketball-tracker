@@ -83,9 +83,13 @@
 }
 
 .placeholder {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 40px 32px;
+  text-align: center;
   font-size: 14px;
-  color: var(--text-dim);
-  padding: 32px 0;
+  color: var(--text-faint);
   font-style: italic;
 }
 

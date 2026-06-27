@@ -140,7 +140,6 @@ export default function GameDetailPage({ gameId, isMobile }) {
                   </div>
                 </div>
               </a>
-              <span className={styles.thumbLabel}>Watch Clips</span>
             </div>
           )}
         </div>

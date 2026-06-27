@@ -10,7 +10,7 @@
 
 @media (hover: hover) {
   .card:hover {
-    box-shadow: rgba(26, 26, 26, 0.28) 0px 3px 10px;
+    box-shadow: var(--shadow-hover);
   }
 }
 
@@ -39,39 +39,40 @@
   .thumbWrap:hover .thumb {
     transform: scale(1.03);
   }
-  .thumbWrap:hover .playOverlay {
-    opacity: 1;
+  .thumbWrap:hover .playCircle {
+    transform: scale(1.10);
   }
 }
 
+/* No dark overlay — transparent background */
 .playOverlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.25);
-  opacity: 0.85;
-  transition: opacity 0.15s;
+  background: transparent;
 }
 
 .playCircle {
-  width: 52px;
-  height: 52px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgb(245, 245, 245);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: rgba(26, 26, 26, 0.30) 0px 2px 8px;
+  transition: transform 0.2s ease;
 }
 
 .playIcon {
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 9px 0 9px 18px;
-  border-color: transparent transparent transparent #ffffff;
-  margin-left: 3px;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent #1a1a1a;
+  margin-left: 2px;
 }
 
 /* ── Card body ─────────────────────────── */
@@ -95,6 +96,7 @@
   font-weight: 500;
   color: var(--text-faint);
   letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .badge {
@@ -180,10 +182,9 @@
   text-align: center;
   text-decoration: none;
   font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-radius: var(--radius-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-pill);
   border: none;
   cursor: pointer;
   transition: background 0.15s;

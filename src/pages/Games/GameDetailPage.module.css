@@ -9,26 +9,31 @@
 
 .hero {
   background: var(--hero-bg);
-  padding: 24px 32px 28px;
+  padding: 24px 32px 0;
   flex-shrink: 0;
 }
 
 .heroInner {
   max-width: var(--content-width);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .heroTop {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   margin-bottom: 16px;
 }
 
 .gameLabel {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
   color: var(--header-dim);
   text-transform: uppercase;
 }
@@ -37,7 +42,7 @@
   display: inline-block;
   padding: 2px 10px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -49,85 +54,85 @@
   font-size: 12px;
   color: var(--header-dim);
   text-decoration: none;
-  margin-left: auto;
   transition: color 0.15s;
 }
 
 .gloryLink:hover { color: var(--header-text); }
 
-/* Score layout — two teams side by side */
+/* Score layout — centered two teams */
 .scoreLayout {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  gap: 24px;
   margin-bottom: 12px;
 }
 
 .teamSide {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
+  min-width: 100px;
 }
 
 .teamSideRight {
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .scoreNum {
-  font-size: 64px;
+  font-size: 48px;
   font-weight: 700;
   line-height: 1;
   color: var(--header-text);
 }
 
 .scoreNumFaded {
-  color: var(--header-dim);
-  font-weight: 400;
+  opacity: 0.40;
 }
 
 .scoreSep {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 300;
   color: var(--header-dim);
   flex-shrink: 0;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .heroTeamName {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--header-dim);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   margin-top: 4px;
 }
 
 .metaRow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--header-dim);
-  margin-bottom: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
 }
 
-.metaSep { color: rgba(255,255,255,0.2); }
-
-/* Thumbnail + play button */
+/* Full-width thumbnail below hero text */
 .heroThumb {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  width: 100%;
+  max-width: var(--content-width);
+  position: relative;
+  margin-top: 4px;
 }
 
 .thumbLink {
   position: relative;
   display: block;
-  width: 160px;
-  aspect-ratio: 16/9;
-  border-radius: var(--radius-md);
+  width: 100%;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  flex-shrink: 0;
   cursor: pointer;
 }
 
@@ -136,59 +141,48 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.25s ease;
 }
 
+@media (hover: hover) {
+  .thumbLink:hover .thumbImg {
+    transform: scale(1.02);
+  }
+  .thumbLink:hover .thumbPlayCircle {
+    transform: scale(1.10);
+  }
+}
+
+/* Light play button — same as game card */
 .thumbOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .thumbPlayCircle {
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.65);
+  background: rgb(245, 245, 245);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: rgba(26, 26, 26, 0.35) 0px 2px 12px;
+  transition: transform 0.2s ease;
 }
 
 .thumbPlayIcon {
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 6px 0 6px 12px;
-  border-color: transparent transparent transparent #ffffff;
-  margin-left: 2px;
+  border-width: 8px 0 8px 14px;
+  border-color: transparent transparent transparent #1a1a1a;
+  margin-left: 3px;
 }
-
-.thumbLabel {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--header-dim);
-}
-
-.heroPlayBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 20px;
-  padding: 9px 20px;
-  background: rgba(255,255,255,0.10);
-  color: var(--header-text);
-  border: 1px solid rgba(255,255,255,0.20);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.heroPlayBtn:hover { background: rgba(255,255,255,0.18); }
 
 /* ── Content ─────────────────────────── */
 
@@ -204,20 +198,22 @@
 }
 
 .viewSection {
-  scroll-margin-top: 104px;
+  scroll-margin-top: 110px;
 }
 
 .sectionHeading {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-  padding: 24px 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 28px 0 12px;
   border-top: 1px solid var(--border);
 }
 
 .viewSection:first-child .sectionHeading {
   border-top: none;
-  padding-top: 20px;
+  padding-top: 24px;
 }
 
 .placeholder {
@@ -230,10 +226,9 @@
 /* ── Responsive ──────────────────────── */
 
 @media (max-width: 640px) {
-  .hero { padding: 16px 16px 20px; }
-  .scoreNum { font-size: 44px; }
-  .scoreSep { font-size: 22px; }
-  .thumbLink { width: 100px; }
+  .hero { padding: 16px 16px 0; }
+  .scoreNum { font-size: 36px; }
+  .scoreSep { font-size: 20px; }
   .content { padding: 0 16px 48px; }
-  .viewSection { scroll-margin-top: 96px; }
+  .viewSection { scroll-margin-top: 104px; }
 }

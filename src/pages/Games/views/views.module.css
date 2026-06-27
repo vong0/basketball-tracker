@@ -5,11 +5,17 @@
 .section:last-child { border-bottom: none; }
 
 .sectionTitle {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.sectionDate {
+  font-size: 12px;
   color: var(--text-faint);
+  margin-top: -10px;
   margin-bottom: 14px;
 }
 
@@ -90,16 +96,34 @@
   overflow-x: hidden;
 }
 
-/* Takeaways */
+/* ── Takeaways — white card layout ─────── */
+
+.takeawayCard {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.takeawayCardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
 .takeawayColumns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 20px;
 }
 
 .takeawayLabel {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -108,27 +132,50 @@
 
 .takeawayList {
   margin: 0;
-  padding: 0 0 0 18px;
+  padding: 0;
+  list-style: none;
   font-size: 13px;
-  line-height: 1.7;
-  color: var(--text-dim);
+  line-height: 1.6;
+  color: var(--text);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+
+.takeawayList li {
+  padding-left: 14px;
+  position: relative;
+}
+
+.takeawayList li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--text-faint);
 }
 
 .takeawayGreen li { color: var(--win); }
-.takeawayRed   li { color: var(--loss); }
+.takeawayGreen li::before { color: var(--win); }
+
+.takeawayRed li { color: var(--loss); }
+.takeawayRed li::before { color: var(--loss); }
+
+/* ── Empty / placeholder ─────────────── */
 
 .placeholder {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 40px 32px;
+  text-align: center;
   font-size: 14px;
-  color: var(--text-dim);
-  padding: 32px 0;
-  font-style: italic;
+  color: var(--text-faint);
+  font-style: normal;
 }
 
 @media (max-width: 640px) {
   .section { padding: 14px 0; }
   .breakdownGrid { grid-template-columns: 1fr; }
   .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
+  .takeawayCard { padding: 16px; }
 }

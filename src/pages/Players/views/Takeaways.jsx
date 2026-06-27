@@ -6,11 +6,7 @@ export default function Takeaways({ entries }) {
   if (!entries) return <p className={styles.placeholder}>Loading…</p>
 
   if (!entries.length) {
-    return (
-      <div className={styles.section}>
-        <p className={styles.placeholder}>— No takeaways yet.</p>
-      </div>
-    )
+    return <p className={styles.placeholder}>No takeaways yet.</p>
   }
 
   return (
@@ -18,17 +14,17 @@ export default function Takeaways({ entries }) {
       {entries.map(entry => {
         const p = entry.players[0]
         return (
-          <div key={entry.gameId} className={styles.section}>
+          <div key={entry.gameId} className={styles.takeawayCard}>
             {entry.game && (
-              <>
-                <div className={styles.sectionTitle}>
-                  {gameLabel(entry.game)} — vs {entry.game.opponentName}
-                </div>
-                <div className={styles.sectionDate}>{entry.game.date}</div>
-              </>
+              <div className={styles.takeawayCardTitle}>
+                {gameLabel(entry.game)} — vs {entry.game.opponentName}
+                <span style={{ display: 'block', fontSize: 11, fontWeight: 400, color: 'var(--text-faint)', marginTop: 2 }}>
+                  {entry.game.date}
+                </span>
+              </div>
             )}
             {!p || (!p.strengths?.length && !p.improvements?.length) ? (
-              <p className={styles.placeholder}>— No takeaways for this game.</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-faint)' }}>No takeaways for this game.</p>
             ) : (
               <div className={styles.takeawayColumns}>
                 {p.strengths?.length > 0 && (

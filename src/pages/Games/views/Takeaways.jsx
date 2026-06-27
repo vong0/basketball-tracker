@@ -4,29 +4,27 @@ import styles from './views.module.css'
 export default function Takeaways({ entry }) {
   const isEmpty = !entry || (!entry.team?.length && !entry.players?.length)
 
+  if (isEmpty) {
+    return <p className={styles.placeholder}>No takeaways for this game.</p>
+  }
+
   return (
-    <div className={styles.section}>
-      {isEmpty ? (
-        <p className={styles.placeholder}>— No takeaways for this game.</p>
-      ) : (
-        <>
-          {entry.team?.length > 0 && (
-            <div style={{ marginBottom: 24 }}>
-              <div className={styles.sectionTitle}>Team</div>
-              <ul className={styles.takeawayList}>
-                {entry.team.map((note, i) => <li key={i}>{note}</li>)}
-              </ul>
-            </div>
-          )}
-          {entry.players.map(p => (
-            <div key={p.playerId} style={{ marginBottom: 24 }}>
-              <div className={styles.sectionTitle}>{p.name}</div>
-              <PlayerTakeawayBlock player={p} />
-            </div>
-          ))}
-        </>
+    <>
+      {entry.team?.length > 0 && (
+        <div className={styles.takeawayCard}>
+          <div className={styles.takeawayCardTitle}>Team</div>
+          <ul className={styles.takeawayList}>
+            {entry.team.map((note, i) => <li key={i}>{note}</li>)}
+          </ul>
+        </div>
       )}
-    </div>
+      {entry.players.map(p => (
+        <div key={p.playerId} className={styles.takeawayCard}>
+          <div className={styles.takeawayCardTitle}>{p.name}</div>
+          <PlayerTakeawayBlock player={p} />
+        </div>
+      ))}
+    </>
   )
 }
 

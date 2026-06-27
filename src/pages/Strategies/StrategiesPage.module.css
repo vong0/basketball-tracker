@@ -579,8 +579,11 @@
 }
 
 .empty {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 60px 32px;
   text-align: center;
-  padding: 60px 0;
   color: var(--text-faint);
 }
 

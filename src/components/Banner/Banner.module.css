@@ -1,9 +1,9 @@
 .banner {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 0;
   padding: 0 24px;
-  height: 52px;
+  height: 56px;
   background: var(--header-bg);
   position: sticky;
   top: 0;
@@ -12,9 +12,8 @@
 
 @media (max-width: 640px) {
   .banner {
-    height: 48px;
+    height: 56px;
     padding: 0 16px;
-    gap: 16px;
   }
 }
 
@@ -28,19 +27,20 @@
   color: var(--header-text);
   flex-shrink: 0;
   padding: 4px 0;
+  margin-right: 8px;
 }
 
 .wordmark {
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   color: var(--header-text);
 }
 
 @media (max-width: 640px) {
-  .wordmark { font-size: 14px; }
+  .wordmark { font-size: 16px; }
 }
 
 /* ── Nav ─────────────────────────────── */
@@ -60,15 +60,16 @@
 .navLink {
   display: flex;
   align-items: center;
-  padding: 0 14px;
+  padding: 0 20px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
   color: var(--header-dim);
   text-decoration: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s;
   white-space: nowrap;
+  height: 56px;
 }
 
 @media (hover: hover) {
@@ -128,9 +129,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  height: 48px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 0 20px;
+  height: 56px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 }
 
 .drawerBrand {
@@ -142,10 +144,10 @@
 }
 
 .drawerWordmark {
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
 }
 
@@ -163,9 +165,10 @@
 .drawerLink {
   display: flex;
   align-items: center;
-  padding: 17px 20px;
+  padding: 0 20px;
+  height: 56px;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.80);
   text-decoration: none;
