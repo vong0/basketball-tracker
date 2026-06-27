@@ -131,6 +131,23 @@
   margin: 0 auto;
 }
 
+.viewSection {
+  scroll-margin-top: 100px;
+}
+
+.sectionHeading {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  padding: 28px 0 0;
+  border-top: 1px solid var(--border);
+}
+.viewSection:first-child .sectionHeading {
+  border-top: none;
+  padding-top: 20px;
+}
+
 .placeholder {
   font-family: var(--font-body);
   font-size: 14px;
@@ -170,4 +187,5 @@
   .scoreDash { font-size: 28px; }
   .scoreOpp { font-size: 36px; }
   .content { padding: 0 16px 48px; }
+  .viewSection { scroll-margin-top: 92px; }
 }

@@ -1,27 +1,40 @@
 import { useMemo } from 'react'
 import { getPlayerAdvancedTabs } from '../../../lib/statsCore.js'
-import StatCardGrid from '../../../components/StatCardGrid/StatCardGrid.jsx'
-import ShotChartSVG from '../../../components/ShotChartSVG/ShotChartSVG.jsx'
-import StatTable from '../../../components/StatTable/StatTable.jsx'
 import styles from './views.module.css'
 
-const ZONE_COLS = [
-  { key: 'label', label: 'Zone', align: 'left' },
-  { key: 'FG', label: 'FG' }, { key: 'FG_pct', label: 'FG%' },
-  { key: 'rate', label: 'RATE' }, { key: 'PTS', label: 'PTS' }, { key: 'PPS', label: 'PPS' },
-]
-const CONTEST_COLS = [
-  { key: 'label', label: 'Contest', align: 'left' },
-  { key: 'FG', label: 'FG' }, { key: 'FG_pct', label: 'FG%' },
-  { key: 'rate', label: 'RATE' }, { key: 'PTS', label: 'PTS' }, { key: 'PPS', label: 'PPS' },
-]
-
 const SECTION_KEYS = ['scoring', 'creation', 'screening', 'defense', 'lineup']
-const SECTION_TITLES = { scoring: 'Scoring', creation: 'Creation', screening: 'Screening', defense: 'Defense', lineup: 'Lineup' }
+const SECTION_TITLES = {
+  scoring:  'Points & Efficiency',
+  creation: 'Creation & Passing',
+  screening: 'Screening',
+  defense:  'Rebounding & Defense',
+  lineup:   'Lineup Impact',
+}
+
+function AdvCards({ cards }) {
+  return (
+    <div className={styles.advCol}>
+      {(cards ?? []).map(c => (
+        <div key={c.key} className={styles.advRow}>
+          <span className={styles.advLabel}>{c.label}</span>
+          <span className={styles.advValue}>{c.value ?? '—'}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function Advanced({ statsData, playerId }) {
   const adv = useMemo(() => getPlayerAdvancedTabs(statsData, playerId), [statsData, playerId])
   if (!adv) return null
+
+  const sectionCards = {
+    scoring:   [...adv.scoring.points_efficiency, ...adv.scoring.shot_quality],
+    creation:  adv.creation_passing,
+    screening: adv.screening,
+    defense:   adv.rebounding_defense,
+    lineup:    adv.lineup_impact,
+  }
 
   return (
     <div>
@@ -34,48 +47,14 @@ export default function Advanced({ statsData, playerId }) {
         ))}
       </div>
 
-      <section id="adv-scoring" className={styles.section}>
-        <div className={styles.subTitle}>Points &amp; Efficiency</div>
-        <div className={styles.scoringGrid}>
-          <StatCardGrid cards={adv.scoring.points_efficiency} cols={2} />
-          <StatCardGrid cards={adv.scoring.shot_quality} cols={2} />
-        </div>
-        {adv.scoring.shot_chart.shots.length > 0 && (
-          <ShotChartSVG shots={adv.scoring.shot_chart.shots} showList={true} />
-        )}
-        <div className={styles.breakdownGrid}>
-          <div>
-            <div className={styles.subTitle}>Zone Breakdown</div>
-            <StatTable rows={adv.scoring.shot_chart.zone_breakdown.filter(z => z.FGA > 0)}
-              cols={ZONE_COLS} getRow={z => z} nameKey="label" />
+      {SECTION_KEYS.map(key => (
+        <section key={key} id={`adv-${key}`} className={styles.section}>
+          <div className={styles.subTitle}>{SECTION_TITLES[key]}</div>
+          <div className={styles.advGrid}>
+            <AdvCards cards={sectionCards[key]} />
           </div>
-          <div>
-            <div className={styles.subTitle}>Contest Breakdown</div>
-            <StatTable rows={adv.scoring.shot_chart.contest_breakdown.filter(z => z.FGA > 0)}
-              cols={CONTEST_COLS} getRow={z => z} nameKey="label" />
-          </div>
-        </div>
-      </section>
-
-      <section id="adv-creation" className={styles.section}>
-        <div className={styles.subTitle}>Creation &amp; Passing</div>
-        <StatCardGrid cards={adv.creation_passing} cols={3} />
-      </section>
-
-      <section id="adv-screening" className={styles.section}>
-        <div className={styles.subTitle}>Screening</div>
-        <StatCardGrid cards={adv.screening} cols={3} />
-      </section>
-
-      <section id="adv-defense" className={styles.section}>
-        <div className={styles.subTitle}>Rebounding &amp; Defense</div>
-        <StatCardGrid cards={adv.rebounding_defense} cols={3} />
-      </section>
-
-      <section id="adv-lineup" className={styles.section}>
-        <div className={styles.subTitle}>Lineup Impact</div>
-        <StatCardGrid cards={adv.lineup_impact} cols={3} />
-      </section>
+        </section>
+      ))}
     </div>
   )
 }

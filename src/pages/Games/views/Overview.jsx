@@ -55,34 +55,48 @@ export default function Overview({ statsData, players }) {
       {half_splits.length > 0 && (
         <div className={styles.halfSplits}>
           <div className={styles.subTitle}>Half Splits</div>
-          <div className={styles.tableWrap}>
-            <table className={styles.splitTable}>
-              <thead>
-                <tr>
-                  {['Half','PTS','FG','3PT','FT','TS%','AST','TOV','Fouls','OREB','DREB','STL','BLK','Bad%'].map(h => <th key={h}>{h}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {half_splits.map(row => (
-                  <tr key={row.half}>
-                    <td>{row.half}</td>
-                    <td>{row.PTS}</td>
-                    <td>{row.FG?.value}<span className={styles.splitSec}>{row.FG?.secondary}</span></td>
-                    <td>{row.threePoint?.value}<span className={styles.splitSec}>{row.threePoint?.secondary}</span></td>
-                    <td>{row.FT?.value}<span className={styles.splitSec}>{row.FT?.secondary}</span></td>
-                    <td>{row.TS_pct}</td>
-                    <td>{row.AST}</td>
-                    <td>{row.TOV}</td>
-                    <td>{row.Fouls}</td>
-                    <td>{row.OREB}</td>
-                    <td>{row.DREB}</td>
-                    <td>{row.STL}</td>
-                    <td>{row.BLK}</td>
-                    <td>{row.Bad_Shot_Rate_pct}</td>
+
+          {/* Mobile: cards */}
+          <div className={styles.halfSplitsCards}>
+            {half_splits.map(row => (
+              <div key={row.half}>
+                <div className={styles.subTitle}>{row.half === '1H' ? '1st Half' : '2nd Half'}</div>
+                <StatCardGrid cards={row.cards} cols={3} />
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className={styles.halfSplitsTable}>
+            <div className={styles.tableWrap}>
+              <table className={styles.splitTable}>
+                <thead>
+                  <tr>
+                    {['Half','PTS','FG','3PT','FT','TS%','AST','TOV','Fouls','OREB','DREB','STL','BLK','Bad%'].map(h => <th key={h}>{h}</th>)}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {half_splits.map(row => (
+                    <tr key={row.half}>
+                      <td>{row.half}</td>
+                      <td>{row.PTS}</td>
+                      <td>{row.FG?.value}<span className={styles.splitSec}>{row.FG?.secondary}</span></td>
+                      <td>{row.threePoint?.value}<span className={styles.splitSec}>{row.threePoint?.secondary}</span></td>
+                      <td>{row.FT?.value}<span className={styles.splitSec}>{row.FT?.secondary}</span></td>
+                      <td>{row.TS_pct}</td>
+                      <td>{row.AST}</td>
+                      <td>{row.TOV}</td>
+                      <td>{row.Fouls}</td>
+                      <td>{row.OREB}</td>
+                      <td>{row.DREB}</td>
+                      <td>{row.STL}</td>
+                      <td>{row.BLK}</td>
+                      <td>{row.Bad_Shot_Rate_pct}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

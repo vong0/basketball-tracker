@@ -63,6 +63,7 @@
 .arrow:disabled { opacity: 0.2; cursor: default; }
 
 @media (max-width: 640px) {
+  .bar { top: 48px; }
   .arrow { display: flex; }
   .strip { padding: 0; }
 }

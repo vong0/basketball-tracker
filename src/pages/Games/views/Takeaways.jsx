@@ -2,24 +2,30 @@ import styles from './views.module.css'
 
 // entry: TakeawayEntry ({ team: [], players: [{ playerId, name, strengths, improvements }] })
 export default function Takeaways({ entry }) {
-  if (!entry) return <div className={styles.section}><p className={styles.placeholder}>No takeaways for this game yet.</p></div>
+  const isEmpty = !entry || (!entry.team?.length && !entry.players?.length)
 
   return (
     <div className={styles.section}>
-      {entry.team?.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
-          <div className={styles.sectionTitle}>Team</div>
-          <ul className={styles.takeawayList}>
-            {entry.team.map((note, i) => <li key={i}>{note}</li>)}
-          </ul>
-        </div>
+      {isEmpty ? (
+        <p className={styles.placeholder}>— No takeaways for this game.</p>
+      ) : (
+        <>
+          {entry.team?.length > 0 && (
+            <div style={{ marginBottom: 24 }}>
+              <div className={styles.sectionTitle}>Team</div>
+              <ul className={styles.takeawayList}>
+                {entry.team.map((note, i) => <li key={i}>{note}</li>)}
+              </ul>
+            </div>
+          )}
+          {entry.players.map(p => (
+            <div key={p.playerId} style={{ marginBottom: 24 }}>
+              <div className={styles.sectionTitle}>{p.name}</div>
+              <PlayerTakeawayBlock player={p} />
+            </div>
+          ))}
+        </>
       )}
-      {entry.players.map(p => (
-        <div key={p.playerId} style={{ marginBottom: 24 }}>
-          <div className={styles.sectionTitle}>{p.name}</div>
-          <PlayerTakeawayBlock player={p} />
-        </div>
-      ))}
     </div>
   )
 }

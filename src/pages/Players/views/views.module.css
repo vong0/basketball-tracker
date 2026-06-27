@@ -101,9 +101,43 @@
   font-style: italic;
 }
 
+/* Advanced stats */
+.advGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.advCol {
+  flex: 1;
+  min-width: 180px;
+}
+.advRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.advRow:last-child { border-bottom: none; }
+.advLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.advValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
 @media (max-width: 640px) {
   .scoringGrid { grid-template-columns: 1fr; }
   .breakdownGrid { grid-template-columns: 1fr; }
   .subNav { top: 96px; }
   .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
+  .advGrid { flex-direction: column; }
+  .advCol { min-width: unset; }
 }

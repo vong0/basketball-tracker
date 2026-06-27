@@ -8,7 +8,7 @@
   font-style: italic;
 }
 
-.tableWrap { overflow-x: auto; }
+.tableWrap { overflow-x: auto; max-width: 100%; min-width: 0; }
 
 .table {
   width: 100%;
@@ -83,7 +83,7 @@
   .tableWrap { display: none; }
   .cardGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 }

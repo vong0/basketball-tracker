@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import Banner from '../../components/Banner/Banner'
-import ScopeBar, { pickerClass } from '../../components/ScopeBar/ScopeBar.jsx'
 import TabBar from '../../components/TabBar/TabBar.jsx'
 import Overview from './views/Overview.jsx'
 import BoxScore from './views/BoxScore.jsx'
@@ -10,7 +9,6 @@ import Takeaways from './views/Takeaways.jsx'
 import ShotChart from './views/ShotChart.jsx'
 import AdvancedStats from './views/AdvancedStats.jsx'
 import { getGame, getTakeaways, getGameScopes, getStats, gameLabel } from '../../lib/backend.js'
-import { filterStats } from '../../lib/statsCore.js'
 import { navigate } from '../../lib/routing.js'
 import styles from './GameDetailPage.module.css'
 
@@ -22,7 +20,6 @@ export default function GameDetailPage({ gameId, isMobile }) {
   const [takeawayEntry, setTakeawayEntry] = useState(null)
   const [players, setPlayers] = useState([])
   const [statsData, setStatsData] = useState(null)
-  const [half, setHalf] = useState('ALL')
   const [activeTab, setActiveTab] = useState('Overview')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -47,13 +44,8 @@ export default function GameDetailPage({ gameId, isMobile }) {
     return () => { cancelled = true }
   }, [gameId])
 
-  const filteredStats = useMemo(() => {
-    if (!statsData) return null
-    return half === 'ALL' ? statsData : filterStats(statsData, { half })
-  }, [statsData, half])
-
   useEffect(() => {
-    if (!filteredStats) return
+    if (!statsData) return
     const sections = TAB_IDS.map(id => document.getElementById(id)).filter(Boolean)
     if (!sections.length) return
     const obs = new IntersectionObserver(
@@ -65,7 +57,7 @@ export default function GameDetailPage({ gameId, isMobile }) {
     )
     sections.forEach(s => obs.observe(s))
     return () => obs.disconnect()
-  }, [filteredStats])
+  }, [statsData])
 
   if (loading) {
     return (
@@ -89,13 +81,13 @@ export default function GameDetailPage({ gameId, isMobile }) {
 
   function renderView(id) {
     switch (id) {
-      case 'overview':       return <Overview statsData={filteredStats} players={players} />
-      case 'box-score':      return <BoxScore statsData={filteredStats} players={players} />
-      case 'stat-leaders':   return <StatLeaders statsData={filteredStats} players={players} />
-      case 'team-summary':   return <TeamSummary statsData={filteredStats} />
+      case 'overview':       return <Overview statsData={statsData} players={players} />
+      case 'box-score':      return <BoxScore statsData={statsData} players={players} />
+      case 'stat-leaders':   return <StatLeaders statsData={statsData} players={players} />
+      case 'team-summary':   return <TeamSummary statsData={statsData} />
       case 'takeaways':      return <Takeaways entry={takeawayEntry} />
-      case 'shot-chart':     return <ShotChart statsData={filteredStats} />
-      case 'advanced-stats': return <AdvancedStats statsData={filteredStats} />
+      case 'shot-chart':     return <ShotChart statsData={statsData} />
+      case 'advanced-stats': return <AdvancedStats statsData={statsData} />
       default: return null
     }
   }
@@ -133,20 +125,13 @@ export default function GameDetailPage({ gameId, isMobile }) {
         </div>
       </div>
 
-      <ScopeBar>
-        <select className={pickerClass} value={half} onChange={e => setHalf(e.target.value)}>
-          <option value="ALL">All halves</option>
-          <option value="1H">1st Half</option>
-          <option value="2H">2nd Half</option>
-        </select>
-      </ScopeBar>
-
       <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} scrollMode={true} />
 
       <div className={styles.content}>
         <div className={styles.contentInner}>
-          {filteredStats && TAB_IDS.map(id => (
-            <section key={id} id={id}>
+          {statsData && TAB_IDS.map((id, i) => (
+            <section key={id} id={id} className={styles.viewSection}>
+              <div className={styles.sectionHeading}>{TABS[i]}</div>
               {renderView(id)}
             </section>
           ))}

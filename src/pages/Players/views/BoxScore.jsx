@@ -1,17 +1,8 @@
 import { useMemo } from 'react'
-import { getPlayerGameLog, getPlayerSeasonAverages } from '../../../lib/statsCore.js'
+import { getPlayerGameLog, getPlayerSeasonAverages, PLAYER_GAME_LOG_COLS } from '../../../lib/statsCore.js'
 import StatTable from '../../../components/StatTable/StatTable.jsx'
 import StatCardGrid from '../../../components/StatCardGrid/StatCardGrid.jsx'
 import styles from './views.module.css'
-
-const GAME_LOG_COLS = [
-  { key: 'game_id', label: 'Game', align: 'left' },
-  { key: 'PTS', label: 'PTS' }, { key: 'REB', label: 'REB' },
-  { key: 'AST', label: 'AST' }, { key: 'STL', label: 'STL' },
-  { key: 'BLK', label: 'BLK' }, { key: 'TO', label: 'TO' },
-  { key: 'FG', label: 'FG' }, { key: 'threePoint', label: '3PT' },
-  { key: 'FT', label: 'FT' }, { key: 'pm', label: '+/-' },
-]
 
 export default function BoxScore({ statsData, playerId, scopeType, games }) {
   const gameLog = useMemo(() => {
@@ -59,7 +50,7 @@ export default function BoxScore({ statsData, playerId, scopeType, games }) {
           <div className={styles.subTitle}>Game Log</div>
           <StatTable
             rows={gameLog}
-            cols={GAME_LOG_COLS}
+            cols={PLAYER_GAME_LOG_COLS}
             getRow={r => {
               const g = gamesMap[r.game_id]
               return { ...r, game_id: g ? `${g.opponentName} (${g.result ?? ''})` : r.game_id }

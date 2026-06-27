@@ -94,6 +94,8 @@
 
 /* Half splits table */
 .halfSplits { margin-top: 24px; }
+.halfSplitsCards { display: none; }
+.halfSplitsTable { display: block; }
 .tableWrap { overflow-x: auto; }
 .splitTable {
   width: 100%;
@@ -135,6 +137,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 /* Advanced stats */
@@ -214,4 +218,6 @@
   .advGrid { flex-direction: column; }
   .advCol { min-width: unset; }
   .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
+  .halfSplitsCards { display: block; }
+  .halfSplitsTable { display: none; }
 }

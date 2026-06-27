@@ -6,12 +6,13 @@ import Takeaways from './views/Takeaways.jsx'
 import BoxScore from './views/BoxScore.jsx'
 import Clips from './views/Clips.jsx'
 import Advanced from './views/Advanced.jsx'
+import ShotChart from './views/ShotChart.jsx'
 import {
   getPlayer, getPlayerScopes, getTakeaways, getClips, getStats, getGames,
 } from '../../lib/backend.js'
 import styles from './PlayerDetailPage.module.css'
 
-const TABS = ['Takeaways', 'Box Score', 'Clips', 'Advanced']
+const TABS = ['Playlists', 'Takeaways', 'Box Score', 'Shot Chart', 'Advanced Stats']
 
 function scopeToClipScope(scope) {
   if (!scope) return {}
@@ -80,9 +81,9 @@ export default function PlayerDetailPage({ playerId, isMobile }) {
     setClipsData(null)
   }, [scope])
 
-  // Lazy-load clips when Clips tab is active
+  // Lazy-load clips when Playlists tab is active
   useEffect(() => {
-    if (tab !== 'Clips' || clipsData || clipsLoading) return
+    if (tab !== 'Playlists' || clipsData || clipsLoading) return
     setClipsLoading(true)
     getClips(scopeToClipScope(scope))
       .then(result => setClipsData(result))
@@ -161,9 +162,7 @@ export default function PlayerDetailPage({ playerId, isMobile }) {
 
       <div className={styles.content}>
         <div className={styles.contentInner}>
-          {tab === 'Takeaways' && <Takeaways entries={takeawayEntries} />}
-          {tab === 'Box Score' && <BoxScore statsData={statsData} playerId={playerId} scopeType={scopeType} games={games} />}
-          {tab === 'Clips'     && (
+          {tab === 'Playlists'      && (
             <Clips
               allClips={clipsData?.clips ?? null}
               player={player}
@@ -172,7 +171,10 @@ export default function PlayerDetailPage({ playerId, isMobile }) {
               loading={clipsLoading}
             />
           )}
-          {tab === 'Advanced'  && statsData && <Advanced statsData={statsData} playerId={playerId} />}
+          {tab === 'Takeaways'      && <Takeaways entries={takeawayEntries} />}
+          {tab === 'Box Score'      && <BoxScore statsData={statsData} playerId={playerId} scopeType={scopeType} games={games} />}
+          {tab === 'Shot Chart'     && statsData && <ShotChart statsData={statsData} playerId={playerId} />}
+          {tab === 'Advanced Stats' && statsData && <Advanced statsData={statsData} playerId={playerId} />}
         </div>
       </div>
     </div>
