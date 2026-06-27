@@ -45,6 +45,47 @@ function _eventPoints(events, type, subtype = null) {
   })
 }
 
+function _normText(v) {
+  return String(v ?? '').toLowerCase().trim().replace(/[\s-]+/g, '_')
+}
+function _creationMethod(e) {
+  if (e?.event_type !== 'creation') return null
+  const raw = _normText(e.creation_method ?? e.creationMethod ?? e.creation_type ?? e.creationType ?? e.method ?? e.method_type)
+  const sub = _normText(e.event_subtype)
+  const v = raw || sub
+  if (['paint_touch','painttouch','paint_touch_created','paint','paint_dump','dump_off','dumpoff','drive_dump','drive_and_dump','interior','interior_dump'].includes(v)) return 'paint_touch'
+  if (['drive_kick','drivekick','drive_kick_created','kickout','kick_out','drive_and_kick','drive_to_kick'].includes(v)) return 'drive_kick'
+  if (['other','advantage','advantage_created','other_advantage','general_advantage','extra_pass','pass_advantage'].includes(v)) return 'other'
+  return null
+}
+function _creationOutcome(e) {
+  if (e?.event_type !== 'creation') return null
+  const raw = _normText(e.creation_outcome ?? e.creationOutcome ?? e.outcome ?? e.result_type)
+  const sub = _normText(e.event_subtype)
+  const v = raw || sub
+  if (['potential_assist','potential_ast','pot_ast','missed_assist','miss_assist'].includes(v)) return 'potential_assist'
+  if (['made_assist','assist','made_ast','ast'].includes(v)) return 'made_assist'
+  if (['foul_created','ft_created','free_throws_created','shooting_foul_created'].includes(v)) return 'foul_created'
+  if (['advantage_only','advantage','advantage_created','paint_touch_created','drive_kick_created','other'].includes(v)) return 'advantage_only'
+  return null
+}
+function _countCreation(events, { outcome = null, method = null } = {}) {
+  return _sum(events, e => {
+    if (e.event_type !== 'creation') return 0
+    if (outcome && _creationOutcome(e) !== outcome) return 0
+    if (method && _creationMethod(e) !== method) return 0
+    return _num(e.count) || 1
+  })
+}
+function _creationPoints(events, { outcome = null, method = null } = {}) {
+  return _sum(events, e => {
+    if (e.event_type !== 'creation') return 0
+    if (outcome && _creationOutcome(e) !== outcome) return 0
+    if (method && _creationMethod(e) !== method) return 0
+    return _num(e.points_created)
+  })
+}
+
 function _pct(v) {
   if (v === null || v === undefined || !Number.isFinite(Number(v))) return null
   return Number((Number(v) * 100).toFixed(1))
@@ -93,12 +134,19 @@ function _teamStats(data) {
   const AST     = assistedShots.length
   const AST_PTS = _shotPoints(assistedShots)
 
-  const Pot_AST     = _countEvents(events, 'creation', 'potential_assist')
-  const Pot_AST_PTS = _eventPoints(events, 'creation', 'potential_assist')
-  const Adv_Created = _countEvents(events, 'creation', 'advantage_created')
-  const Adv_PTS     = _eventPoints(events, 'creation', 'advantage_created')
-  const PaintTouch  = _countEvents(events, 'creation', 'paint_touch_created')
-  const DriveKick   = _countEvents(events, 'creation', 'drive_kick_created')
+  const Pot_AST     = _countCreation(events, { outcome: 'potential_assist' })
+  const Pot_AST_PTS = _creationPoints(events, { outcome: 'potential_assist' })
+  const Adv_Created = _countCreation(events, { method: 'other' })
+  const Adv_PTS     = _creationPoints(events, { method: 'other' })
+  const PaintTouch  = _countCreation(events, { method: 'paint_touch' })
+  const PaintTouch_PTS = _creationPoints(events, { method: 'paint_touch' })
+  const DriveKick   = _countCreation(events, { method: 'drive_kick' })
+  const DriveKick_PTS  = _creationPoints(events, { method: 'drive_kick' })
+  const Creation_Total = Adv_Created + PaintTouch + DriveKick
+
+  const Pot_AST_PaintTouch = _countCreation(events, { outcome: 'potential_assist', method: 'paint_touch' })
+  const Pot_AST_DriveKick  = _countCreation(events, { outcome: 'potential_assist', method: 'drive_kick' })
+  const Pot_AST_Other      = _countCreation(events, { outcome: 'potential_assist', method: 'other' })
 
   const Scr_AST = _countEvents(events, 'screen', 'screen_assist')
   const Scr_Opp = _countEvents(events, 'screen', 'screen_opportunity')
@@ -145,7 +193,9 @@ function _teamStats(data) {
     twoPM: fg.twoPM, twoPA: fg.twoPA, twoPT_pct: fg.twoPT_pct,
     FTM: ft.FTM, FTA: ft.FTA, FT_pct: ft.FT_pct, FT_PTS: ft.FT_PTS,
     eFG: fg.eFG, TS_pct, AST, AST_PTS, Pot_AST, Pot_AST_PTS,
-    Adv_Created, Adv_PTS, Scr_AST, Scr_Opp, Scr_Adv, Scr_PTS,
+    Adv_Created, Adv_PTS, PaintTouch_PTS, DriveKick_PTS, Creation_Total,
+    Pot_AST_PaintTouch, Pot_AST_DriveKick, Pot_AST_Other,
+    Scr_AST, Scr_Opp, Scr_Adv, Scr_PTS,
     PaintTouch, DriveKick, TOV, OREB, DREB, REB, STL, BLK, Deflections, Charges, Fouls,
     TransPTS, Poss_Used, PTS_per_Poss, Open_rate, Light_rate, Bad_rate, Assisted_pct,
     Off_Rtg, Def_Rtg, Net_Rtg,
