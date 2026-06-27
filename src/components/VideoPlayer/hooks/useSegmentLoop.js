@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { LOOP_LEAD } from '../constants';
+import { LOOP_LEAD } from '../lib/constants';
 
 export function useSegmentLoop({ ytPlayerRef, playerReady, activeIdx, activeSegment }) {
   const [currentTime, setCurrentTime] = useState(0);

@@ -279,3 +279,18 @@
 .dotBad      { background: var(--red);     box-shadow: 0 0 8px rgba(248, 113, 113, 0.6); }
 .dotNeutral  { background: var(--gray-dot); }
 .dotOpponent { background: #fff; }
+
+/* Game label badge shown in multi-game playlists before the row body */
+.gameLabel {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-bottom: 3px;
+  align-self: flex-start;
+}

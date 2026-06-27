@@ -3,7 +3,7 @@ import Banner from '../../components/Banner/Banner';
 import styles from './StrategiesPage.module.css';
 import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
 import { getYouTubeId } from '../../lib/youtube';
-import { loadYouTubeAPI } from '../../lib/youtube';
+import { parseLabel } from '../../lib/parseLabel';
 import { getStrategies } from '../../lib/backend.js';
 
 function groupByDefenseType(strategies) {
@@ -34,7 +34,6 @@ function ClipCard({ clip, isActive, onPlay }) {
 function DescriptionBlock({ lines }) {
   const items = Array.isArray(lines) ? lines : [lines];
 
-  // Group consecutive "-" lines into bullet lists
   const blocks = [];
   let bulletBuffer = [];
 
@@ -91,37 +90,23 @@ function DescriptionBlock({ lines }) {
 
 // ── Strategy card ─────────────────────────────────────────────────────────────
 
-function StrategyCard({ strategy, activeClip, setActiveClip, isMobile }) {
+function StrategyCard({ strategy, isMobile }) {
   const [open, setOpen] = useState(false);
+  const [activeClip, setActiveClip] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const s = strategy;
 
-  // Check if this card owns the active clip
-  const activeClipBelongsHere = activeClip && s.clips.some(
-    c => c.youtubeUrl === activeClip.youtubeUrl && c.start === activeClip.start
-  );
-
-  const videoId = activeClipBelongsHere ? getYouTubeId(activeClip.youtubeUrl) : null;
-  const cutSegments = activeClipBelongsHere
+  const activeVideoId = activeClip ? getYouTubeId(activeClip.youtubeUrl) : null;
+  const cutSegments = activeClip
     ? [{ start: activeClip.start, end: activeClip.end, name: activeClip.label }]
     : [];
+  const parsedSegments = cutSegments.map(seg => parseLabel(seg.name || ''));
 
   const handlePlay = (clip) => {
-    if (
-      activeClip &&
-      activeClip.youtubeUrl === clip.youtubeUrl &&
-      activeClip.start === clip.start
-    ) {
-      // Same clip — toggle off
-      setActiveClip(null);
-    } else {
-      setActiveClip(clip);
-    }
-  };
-
-  const handleClose = () => {
-    if (activeClipBelongsHere) setActiveClip(null);
-    setOpen(false);
+    const isSame = activeClip
+      && activeClip.youtubeUrl === clip.youtubeUrl
+      && activeClip.start === clip.start;
+    setActiveClip(isSame ? null : clip);
   };
 
   return (
@@ -129,7 +114,7 @@ function StrategyCard({ strategy, activeClip, setActiveClip, isMobile }) {
       <button
         className={styles.cardHeader}
         onClick={() => {
-          if (open && activeClipBelongsHere) setActiveClip(null);
+          if (open && activeClip) setActiveClip(null);
           setOpen((o) => !o);
         }}
         aria-expanded={open}
@@ -165,7 +150,7 @@ function StrategyCard({ strategy, activeClip, setActiveClip, isMobile }) {
                     key={i}
                     clip={clip}
                     isActive={
-                      activeClip &&
+                      !!activeClip &&
                       activeClip.youtubeUrl === clip.youtubeUrl &&
                       activeClip.start === clip.start
                     }
@@ -173,37 +158,30 @@ function StrategyCard({ strategy, activeClip, setActiveClip, isMobile }) {
                   />
                 ))}
               </div>
+
+              {activeClip && activeVideoId && (
+                <div className={styles.clipPlayer}>
+                  <div className={styles.clipPlayerInner}>
+                    <VideoPlayer
+                      videoId={activeVideoId}
+                      cutSegments={cutSegments}
+                      parsedSegments={parsedSegments}
+                      activeIdx={0}
+                      setActiveIdx={() => {}}
+                      visibleIndices={[0]}
+                      isFullscreen={isFullscreen}
+                      setIsFullscreen={setIsFullscreen}
+                      isMobile={isMobile}
+                      hideCounter
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {s.clips.length === 0 && (
             <p className={styles.noClips}>No film clips added yet.</p>
-          )}
-
-          {activeClipBelongsHere && videoId && (
-            <div className={styles.clipPlayer}>
-              <div className={styles.clipPlayerInner}>
-                <VideoPlayer
-                  videoId={videoId}
-                  cutSegments={cutSegments}
-                  parsedSegments={cutSegments.map(() => ({
-                    actions: [],
-                    summary: '',
-                    title: activeClip.label,
-                    team: 'us',
-                    quality: 'neutral',
-                    type: 'O',
-                  }))}
-                  activeIdx={0}
-                  setActiveIdx={() => {}}
-                  visibleIndices={[0]}
-                  isFullscreen={isFullscreen}
-                  setIsFullscreen={setIsFullscreen}
-                  isMobile={isMobile}
-                  hideCounter={true}
-                />
-              </div>
-            </div>
           )}
         </div>
       )}
@@ -308,12 +286,6 @@ export default function StrategiesPage({ isMobile }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState(FILTER_ALL);
-  const [activeClip, setActiveClip] = useState(null);
-
-  // Pre-warm the YouTube API so first click is fast
-  useEffect(() => {
-    loadYouTubeAPI();
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -359,7 +331,6 @@ export default function StrategiesPage({ isMobile }) {
     <div className={styles.page}>
       <Banner isMobile={isMobile} />
 
-      {/* Hero */}
       <div className={styles.heroBanner}>
         <div className={styles.heroInner}>
           <div className={styles.kicker}>PLAYBOOK</div>
@@ -378,7 +349,6 @@ export default function StrategiesPage({ isMobile }) {
         </div>
       </div>
 
-      {/* Body */}
       <div className={styles.scroll}>
         <div className={styles.inner}>
           {error && <p className={styles.stateMsg}>Could not load strategies. ({error})</p>}
@@ -411,8 +381,6 @@ export default function StrategiesPage({ isMobile }) {
                         <StrategyCard
                           key={s.id}
                           strategy={s}
-                          activeClip={activeClip}
-                          setActiveClip={setActiveClip}
                           isMobile={isMobile}
                         />
                       ))}

@@ -11,6 +11,7 @@ import Player from './pages/Player/Player';
 import PlayersPage from './pages/Players/PlayersPage.jsx';
 import PlayerDetailPage from './pages/Players/PlayerDetailPage.jsx';
 import TeamDetailPage from './pages/Players/TeamDetailPage.jsx';
+import PlayerClipsPage from './pages/Players/PlayerClipsPage.jsx';
 
 export default function App() {
   const [route, setRoute] = useState(parseHash());
@@ -33,7 +34,7 @@ export default function App() {
   }
 
   if (route.view === 'gameDetail') {
-    return <GameDetailPage gameId={route.gameId} />;
+    return <GameDetailPage gameId={route.gameId} isMobile={isMobile} />;
   }
 
   if (route.view === 'game') {
@@ -49,7 +50,11 @@ export default function App() {
   }
 
   if (route.view === 'playerDetail') {
-    return <PlayerDetailPage playerId={route.playerId} />;
+    return <PlayerDetailPage playerId={route.playerId} isMobile={isMobile} />;
+  }
+
+  if (route.view === 'playerClips') {
+    return <PlayerClipsPage playerId={route.playerId} preset={route.preset} isMobile={isMobile} />;
   }
 
   if (route.view === 'takeaways') {

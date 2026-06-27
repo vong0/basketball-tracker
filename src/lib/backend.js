@@ -126,34 +126,40 @@ async function _getGame(id) {
 
 // ── Clips ─────────────────────────────────────────────────────────────────────
 
-async function _getGameClips(gameId, filters = {}) {
-  const game = await _getGame(gameId)
-  const llcData = await fetchLlc('./data/' + game.clipsFile)
+// scope: { gameId?, gameIds?, season? }
+// Returns: { clips, games }
+// Each clip: { start, end, name, videoId, gameId, gameLabel }
+// Clips sorted: game date ascending, then start time within each game.
+// Local: parallel file fetches per game (implementation detail).
+// Supabase: single query — SELECT * FROM clips WHERE game_id IN (...).
+async function _getClips(scope = {}) {
+  let games = await _getGames()
 
-  let clips = (llcData.cutSegments ?? [])
-    .filter(s => typeof s.start === 'number' && typeof s.end === 'number')
-    .map(s => ({
-      start: Math.floor(s.start),
-      end: Math.ceil(s.end),
-      name: s.name ?? '',
-    }))
-    .sort((a, b) => a.start - b.start)
-
-  if (filters.quality || filters.type || filters.player) {
-    clips = clips.filter(c => {
-      const name = c.name
-      if (filters.quality && !name.includes(filters.quality)) return false
-      if (filters.type && !name.includes(filters.type)) return false
-      if (filters.player && !name.toLowerCase().includes(filters.player.toLowerCase())) return false
-      return true
-    })
+  if (scope.gameId) {
+    games = games.filter(g => g.id === scope.gameId)
+  } else if (scope.gameIds?.length) {
+    const set = new Set(scope.gameIds)
+    games = games.filter(g => set.has(g.id))
+  } else if (scope.season) {
+    games = games.filter(g => g.season === scope.season)
   }
 
-  return {
-    youtubeUrl: game.youtubeUrl,
-    videoId: game.videoId,
-    clips,
-  }
+  const buckets = await Promise.all(games.map(async g => {
+    const llcData = await fetchLlc('./data/' + g.clipsFile)
+    return (llcData.cutSegments ?? [])
+      .filter(s => typeof s.start === 'number' && typeof s.end === 'number')
+      .map(s => ({
+        start:     Math.floor(s.start),
+        end:       Math.ceil(s.end),
+        name:      s.name ?? '',
+        videoId:   g.videoId,
+        gameId:    g.id,
+        gameLabel: gameLabel(g),
+      }))
+      .sort((a, b) => a.start - b.start)
+  }))
+
+  return { clips: buckets.flat(), games }
 }
 
 // ── Players ───────────────────────────────────────────────────────────────────
@@ -344,7 +350,7 @@ const local = {
   getSeasons: _getSeasons,
   getGames: _getGames,
   getGame: _getGame,
-  getGameClips: _getGameClips,
+  getClips: _getClips,
   getPlayers: _getPlayers,
   getPlayer: _getPlayer,
   getOpponents: _getOpponents,
@@ -362,7 +368,7 @@ export const {
   getSeasons,
   getGames,
   getGame,
-  getGameClips,
+  getClips,
   getPlayers,
   getPlayer,
   getOpponents,

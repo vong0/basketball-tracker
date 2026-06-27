@@ -10,21 +10,31 @@ import { useSeekDrag } from './hooks/useSeekDrag';
 import { useSwipeGesture } from './hooks/useSwipeGesture';
 import { useModalPlayback } from './hooks/useModalPlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { LOOP_LEAD } from './constants';
+import { LOOP_LEAD } from './lib/constants';
 import { dotKey } from '../../lib/parseLabel';
 import styles from './VideoPlayer.module.css';
 
 function VideoPlayerInner({
   videoId, cutSegments, parsedSegments, activeIdx, setActiveIdx,
   visibleIndices, isFullscreen, setIsFullscreen, isMobile, hideCounter,
+  hidden,      // hide the player (keep iframe alive, pause playback)
+  multiVideo,  // clips span multiple YouTube videos; each clip has a .videoId field
 }, ref) {
   const containerRef = useRef(null);
   const seekbarRef = useRef(null);
   const reelRef = useRef(null);
   const [showInfo, setShowInfo] = useState(false);
 
-  const { ytPlayerRef, playerReady, isPlaying, initialLoading, currentRate, setRate,
-    iframeContainerRef, iframeScaleWrapRef } = useYouTubePlayer({ videoId, isMobile, isFullscreen });
+  const effectiveVideoId = multiVideo
+    ? (cutSegments[activeIdx]?.videoId ?? null)
+    : videoId;
+
+  const { ytPlayerRef, playerReady, playerReadySeq, isPlaying, initialLoading, currentRate, setRate,
+    iframeContainerRef, iframeScaleWrapRef } = useYouTubePlayer({
+    videoId: effectiveVideoId,
+    isMobile,
+    isFullscreen,
+  });
 
   const activeSegment = activeIdx >= 0 ? cutSegments[activeIdx] : null;
 
@@ -131,7 +141,7 @@ function VideoPlayerInner({
       p.seekTo(seg.start, true);
       if (!modalSuppressPlayRef.current) p.playVideo();
     } catch (e) {}
-  }, [activeIdx, playerReady, cutSegments]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeIdx, playerReady, playerReadySeq, cutSegments]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pause when no clip is selected (e.g. filter matched zero clips).
   useEffect(() => {
@@ -139,6 +149,13 @@ function VideoPlayerInner({
     const p = ytPlayerRef.current;
     if (p && p.pauseVideo) try { p.pauseVideo(); } catch (e) {}
   }, [activeIdx, playerReady]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pause when hidden.
+  useEffect(() => {
+    if (!hidden || !playerReady) return;
+    const p = ytPlayerRef.current;
+    if (p && p.pauseVideo) try { p.pauseVideo(); } catch (e) {}
+  }, [hidden, playerReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -178,7 +195,11 @@ function VideoPlayerInner({
   const handleReelPointerDown = makePointerDownHandler(reelRef);
 
   return (
-    <div ref={containerRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
+    <div
+      ref={containerRef}
+      className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}
+      style={hidden ? { display: 'none' } : undefined}
+    >
       <div className={styles.videoArea}>
         {isMobile ? (
           <div ref={swipeWrapRef} className={styles.swipeWrap}>
@@ -192,7 +213,10 @@ function VideoPlayerInner({
             </NeighborSlots>
           </div>
         ) : (
-          <div ref={iframeContainerRef} className={styles.iframeContainer} />
+          <>
+            <div ref={iframeContainerRef} className={styles.iframeContainer} />
+            {initialLoading && <div className={styles.iframeLoadBlocker} />}
+          </>
         )}
 
         {currentRate !== 1 && <div className={styles.speedBadge}>{currentRate}×</div>}
@@ -226,6 +250,7 @@ function VideoPlayerInner({
             </div>
           </div>
         )}
+
       </div>
 
       {useFsMobileChrome && activeSegment && (

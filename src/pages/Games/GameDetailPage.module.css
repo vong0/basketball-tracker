@@ -98,6 +98,26 @@
 
 .metaSep { color: var(--border-strong); }
 
+.heroPlayBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 18px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.heroPlayBtn:hover { opacity: 0.85; }
+
 /* ── Content ─────────────────────────── */
 
 .content {
@@ -117,6 +137,29 @@
   color: var(--text-dim);
   padding: 32px 0;
   font-style: italic;
+}
+
+/* ── Clips tab ───────────────────────── */
+
+.clipsContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  min-height: 0;
+}
+
+.clipsLayout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.clipsVideo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Responsive ──────────────────────── */

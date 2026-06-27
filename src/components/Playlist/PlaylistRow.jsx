@@ -17,7 +17,11 @@ function ActionText({ action, fallback }) {
   return <span><b>{subject || fallback}</b></span>;
 }
 
-export default function PlaylistRow({ segment, parsed, isActive, onClick }) {
+export default function PlaylistRow({
+  segment, parsed, isActive, onClick,
+  timeLabel,  // string — overrides the timestamp (e.g. "#3" in multi-game mode)
+  gameLabel,  // string — small badge shown before the row body (e.g. "G3")
+}) {
   const rowRef = useRef(null);
   usePlaylistScroll(isActive, rowRef);
 
@@ -30,24 +34,24 @@ export default function PlaylistRow({ segment, parsed, isActive, onClick }) {
       onClick={onClick}
       className={isActive ? (styles.row + ' ' + styles.rowActive) : styles.row}
     >
-      <span className={styles.rowTime}>{formatTime(segment.start)}</span>
+      <span className={styles.rowTime}>
+        {timeLabel ?? formatTime(segment.start)}
+      </span>
       <div className={styles.rowBody}>
+        {gameLabel && (
+          <span className={styles.gameLabel}>{gameLabel}</span>
+        )}
         {summary && (
           <div className={styles.actionLine + ' ' + styles.summaryLine}>
             {summary}
           </div>
         )}
-        {actions.map((a, i) => {
-          const noDot = false;
-          return (
-            <div key={i} className={styles.actionLine}>
-              {!noDot && (
-                <span className={`${styles.dot} ${DOT_CLASSES[dotKey(a)]}`} />
-              )}
-              <ActionText action={a} fallback={segment.name} />
-            </div>
-          );
-        })}
+        {actions.map((a, i) => (
+          <div key={i} className={styles.actionLine}>
+            <span className={`${styles.dot} ${DOT_CLASSES[dotKey(a)]}`} />
+            <ActionText action={a} fallback={segment.name} />
+          </div>
+        ))}
         {actions.length === 0 && !summary && (
           <div className={styles.actionLine}>
             <span className={styles.actionText}>{segment.name}</span>

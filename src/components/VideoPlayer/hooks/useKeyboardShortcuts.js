@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { SPEED_FAST, SPEED_SLOW, CLICK_DEBOUNCE_MS, SEEK_DELTA_SECONDS } from '../constants';
+import { SPEED_FAST, SPEED_SLOW, CLICK_DEBOUNCE_MS, SEEK_DELTA_SECONDS } from '../lib/constants';
 
 export function useKeyboardShortcuts({
   isMobile, togglePlay, seekDelta, navSegment, toggleFullscreen,

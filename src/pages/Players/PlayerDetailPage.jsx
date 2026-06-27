@@ -7,33 +7,34 @@ import BoxScore from './views/BoxScore.jsx'
 import Clips from './views/Clips.jsx'
 import Advanced from './views/Advanced.jsx'
 import {
-  getPlayer, getPlayerScopes, getTakeaways, getGameClips, getStats, getGames,
+  getPlayer, getPlayerScopes, getTakeaways, getClips, getStats, getGames,
 } from '../../lib/backend.js'
 import styles from './PlayerDetailPage.module.css'
 
 const TABS = ['Takeaways', 'Box Score', 'Clips', 'Advanced']
 
-const PLAYLISTS = [
-  { label: 'All Clips',    key: 'all',        quality: '',     type: '' },
-  { label: 'Good Offense', key: 'goodOffense', quality: 'good', type: 'offense' },
-  { label: 'Bad Offense',  key: 'badOffense',  quality: 'bad',  type: 'offense' },
-  { label: 'Good Defense', key: 'goodDefense', quality: 'good', type: 'defense' },
-  { label: 'Bad Defense',  key: 'badDefense',  quality: 'bad',  type: 'defense' },
-]
+function scopeToClipScope(scope) {
+  if (!scope) return {}
+  if (scope.startsWith('season:')) return { season: scope.slice(7) }
+  return { gameId: scope }
+}
 
-export default function PlayerDetailPage({ playerId }) {
+export default function PlayerDetailPage({ playerId, isMobile }) {
   const [player, setPlayer] = useState(null)
   const [scopes, setScopes] = useState(null)
   const [games, setGames] = useState([])
 
   const [statsData, setStatsData] = useState(null)
   const [takeawayEntries, setTakeawayEntries] = useState(null)
-  const [clipCounts, setClipCounts] = useState({})
 
   const [scope, setScope] = useState('')
   const [tab, setTab] = useState('Takeaways')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  // Clips tab: lazy-loaded per scope
+  const [clipsData, setClipsData] = useState(null)
+  const [clipsLoading, setClipsLoading] = useState(false)
 
   const scopeType = !scope ? 'career'
     : scope.startsWith('season:') ? 'season'
@@ -52,14 +53,13 @@ export default function PlayerDetailPage({ playerId }) {
     return () => { cancelled = true }
   }, [playerId])
 
-  // Load tab data together when scope changes (after player+scopes ready)
+  // Load stats + takeaways when scope changes
   useEffect(() => {
     if (!player || !scopes) return
 
     let cancelled = false
     setStatsData(null)
     setTakeawayEntries(null)
-    setClipCounts({})
 
     const statsFilters = scopeType === 'game'   ? { gameId }
       : scopeType === 'season' ? { player: playerId, season: seasonVal }
@@ -72,16 +72,23 @@ export default function PlayerDetailPage({ playerId }) {
     getStats(statsFilters).then(d => { if (!cancelled) setStatsData(d) })
     getTakeaways(takeawayFilters).then(e => { if (!cancelled) setTakeawayEntries(e) })
 
-    const clipGid = gameId ?? scopes.seasons?.[0]?.games?.[0]?.id
-    if (clipGid) {
-      Promise.all(PLAYLISTS.map(pl =>
-        getGameClips(clipGid, { quality: pl.quality || undefined, type: pl.type || undefined, player: playerId })
-          .then(r => [pl.key, r.clips.length])
-      )).then(pairs => { if (!cancelled) setClipCounts(Object.fromEntries(pairs)) })
-    }
-
     return () => { cancelled = true }
-  }, [player, scopes, scope])
+  }, [player, scopes, scope]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Invalidate clips when scope changes
+  useEffect(() => {
+    setClipsData(null)
+  }, [scope])
+
+  // Lazy-load clips when Clips tab is active
+  useEffect(() => {
+    if (tab !== 'Clips' || clipsData || clipsLoading) return
+    setClipsLoading(true)
+    getClips(scopeToClipScope(scope))
+      .then(result => setClipsData(result))
+      .catch(e => console.error('Could not load clips:', e))
+      .finally(() => setClipsLoading(false))
+  }, [tab, clipsData, clipsLoading, scope])
 
   if (loading) {
     return (
@@ -100,10 +107,6 @@ export default function PlayerDetailPage({ playerId }) {
       </div>
     )
   }
-
-  const clipGid = gameId ?? scopes?.seasons?.[0]?.games?.[0]?.id
-  const clipsBase = clipGid ? `#/game/${clipGid}?player=${playerId}` : '#/'
-  const playlists = PLAYLISTS.map(pl => ({ label: pl.label, count: clipCounts[pl.key] ?? 0, href: clipsBase }))
 
   return (
     <div className={styles.page}>
@@ -160,7 +163,15 @@ export default function PlayerDetailPage({ playerId }) {
         <div className={styles.contentInner}>
           {tab === 'Takeaways' && <Takeaways entries={takeawayEntries} />}
           {tab === 'Box Score' && <BoxScore statsData={statsData} playerId={playerId} scopeType={scopeType} games={games} />}
-          {tab === 'Clips'     && <Clips playlists={playlists} />}
+          {tab === 'Clips'     && (
+            <Clips
+              allClips={clipsData?.clips ?? null}
+              player={player}
+              playerId={playerId}
+              isMobile={isMobile}
+              loading={clipsLoading}
+            />
+          )}
           {tab === 'Advanced'  && statsData && <Advanced statsData={statsData} playerId={playerId} />}
         </div>
       </div>

@@ -4,7 +4,7 @@ import {
   SWIPE_COMMIT_PX, SWIPE_VELOCITY_PX_MS, SWIPE_MIN_FLICK_PX, SWIPE_STALE_MS,
   SWIPE_MOVE_THRESHOLD_PX, SWIPE_EDGE_RESIST, SWIPE_EDGE_CAP_PX,
   SWIPE_SNAP_MS, SWIPE_COMMIT_MS, SWIPE_NEIGHBOR_GAP_PX,
-} from '../constants';
+} from '../lib/constants';
 
 const RESET_STATE = {
   pointerDown: false, startX: 0, startY: 0, startTime: 0,

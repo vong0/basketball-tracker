@@ -26,6 +26,11 @@ export function parseHash() {
   if (h === '#/opponents') return { view: 'opponents' };
   const oppM = h.match(/^#\/opponents\/([\w-]+)$/);
   if (oppM) return { view: 'opponent', teamId: oppM[1] };
+  const pcm = h.match(/^#\/player-clips\/([\w-]+)/);
+  if (pcm) {
+    const preset = new URLSearchParams(h.includes('?') ? h.slice(h.indexOf('?')) : '').get('preset');
+    return { view: 'playerClips', playerId: pcm[1], preset };
+  }
   return { view: 'landing' };
 }
 

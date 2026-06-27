@@ -11,12 +11,13 @@ import ShotChart from './views/ShotChart.jsx'
 import AdvancedStats from './views/AdvancedStats.jsx'
 import { getGame, getTakeaways, getGameScopes, getStats, gameLabel } from '../../lib/backend.js'
 import { filterStats } from '../../lib/statsCore.js'
+import { navigate } from '../../lib/routing.js'
 import styles from './GameDetailPage.module.css'
 
 const TABS = ['Overview', 'Box Score', 'Stat Leaders', 'Team Summary', 'Takeaways', 'Shot Chart', 'Advanced Stats']
 const TAB_IDS = TABS.map(t => t.toLowerCase().replace(/\s+/g, '-'))
 
-export default function GameDetailPage({ gameId }) {
+export default function GameDetailPage({ gameId, isMobile }) {
   const [game, setGame] = useState(null)
   const [takeawayEntry, setTakeawayEntry] = useState(null)
   const [players, setPlayers] = useState([])
@@ -124,6 +125,11 @@ export default function GameDetailPage({ gameId }) {
             <span className={styles.metaSep}>·</span>
             <span>{game.date}</span>
           </div>
+          {game.videoId && (
+            <button className={styles.heroPlayBtn} onClick={() => navigate('#/game/' + game.id)}>
+              ▶ View Clips
+            </button>
+          )}
         </div>
       </div>
 

@@ -1,9 +1,37 @@
-import { useState, useRef } from 'react';
-import { isFilterActive } from '../../../lib/deriveFilterOptions';
+import { useState, useRef, useMemo } from 'react';
 
-export function useFilterState({ cutSegments, visibleIndices, filterChoice, onFilterOpen, onFilterClose }) {
+function deriveFilterOptions(parsedSegments) {
+  const players = new Set();
+  let hasOpp = false;
+
+  for (const parsed of (parsedSegments ?? [])) {
+    if (!parsed?.actions) continue;
+    for (const a of parsed.actions) {
+      if (a.team === 'O') hasOpp = true;
+      else if (a.team === 'U') {
+        for (const p of a.players) {
+          if (p && p !== 'all') players.add(p);
+        }
+      }
+    }
+  }
+
+  return {
+    players:      [...players].sort((a, b) => a.localeCompare(b)),
+    hasOpponents: hasOpp,
+  };
+}
+
+export function useFilterState({
+  cutSegments, parsedSegments, visibleIndices, filterChoice, onFilterOpen, onFilterClose,
+}) {
   const [filterOpen, setFilterOpen] = useState(false);
   const filterBtnRef = useRef(null);
+
+  const filterOptions = useMemo(
+    () => deriveFilterOptions(parsedSegments),
+    [parsedSegments]
+  );
 
   const openFilter = () => {
     if (onFilterOpen) onFilterOpen();
@@ -15,10 +43,10 @@ export function useFilterState({ cutSegments, visibleIndices, filterChoice, onFi
     if (onFilterClose) onFilterClose();
   };
 
-  const filterActive = isFilterActive(filterChoice);
+  const filterActive = !!(filterChoice && (filterChoice.player || (filterChoice.preset && filterChoice.preset !== 'all')));
   const total = cutSegments.length;
   const visible = visibleIndices ? visibleIndices.length : total;
   const visibleSet = visibleIndices || cutSegments.map((_, i) => i);
 
-  return { filterOpen, filterBtnRef, openFilter, closeFilter, filterActive, total, visible, visibleSet };
+  return { filterOpen, filterBtnRef, openFilter, closeFilter, filterActive, filterOptions, total, visible, visibleSet };
 }

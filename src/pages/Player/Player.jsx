@@ -6,8 +6,8 @@ import Playlist from '../../components/Playlist/Playlist';
 import ShortcutsModal from '../../components/ShortcutsModal/ShortcutsModal';
 import { parseLabel, segmentMatchesFilter } from '../../lib/parseLabel';
 import { navigate } from '../../lib/routing';
-import { deriveFilterOptions, buildFilter, EMPTY_CHOICE } from '../../lib/deriveFilterOptions';
-import { getGame, getGameClips } from '../../lib/backend.js';
+import { buildFilter } from '../../lib/clipsCore';
+import { getClips } from '../../lib/backend.js';
 import styles from './Player.module.css';
 
 export default function Player({ gameId, isMobile }) {
@@ -18,7 +18,7 @@ export default function Player({ gameId, isMobile }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [videoCollapsed, setVideoCollapsed] = useState(false);
-  const [filterChoice, setFilterChoice] = useState(EMPTY_CHOICE);
+  const [filterChoice, setFilterChoice] = useState({ player: null, preset: 'all' });
   const videoPlayerRef = useRef(null);
 
   const toggleVideoCollapsed = useCallback(
@@ -36,7 +36,6 @@ export default function Player({ gameId, isMobile }) {
     videoPlayerRef.current?.resumeIfWasPlaying?.();
   }, []);
 
-  // Global `/` toggles the shortcuts modal. `i` is handled inside VideoPlayer.
   useEffect(() => {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -56,21 +55,15 @@ export default function Player({ gameId, isMobile }) {
     setCutSegments(null);
     setLoadError(null);
 
-    (async () => {
-      try {
-        const [gameData, clipsData] = await Promise.all([
-          getGame(gameId),
-          getGameClips(gameId),
-        ]);
-        if (cancelled) return;
-        setGame(gameData);
-        setCutSegments(clipsData.clips);
-      } catch (err) {
-        if (cancelled) return;
-        console.error('Could not load game:', err);
-        setLoadError(String(err.message || err));
-      }
-    })();
+    getClips({ gameId }).then(({ clips, games }) => {
+      if (cancelled) return;
+      setGame(games[0] ?? null);
+      setCutSegments(clips);
+    }).catch(err => {
+      if (cancelled) return;
+      console.error('Could not load game:', err);
+      setLoadError(String(err.message || err));
+    });
 
     return () => { cancelled = true; };
   }, [gameId]);
@@ -79,10 +72,6 @@ export default function Player({ gameId, isMobile }) {
   const parsedSegments = useMemo(
     () => segments.map(s => parseLabel(s.name || '')),
     [segments]
-  );
-  const filterOptions = useMemo(
-    () => deriveFilterOptions(parsedSegments),
-    [parsedSegments]
   );
 
   const filter = useMemo(() => buildFilter(filterChoice), [filterChoice]);
@@ -155,7 +144,6 @@ export default function Player({ gameId, isMobile }) {
             visibleIndices={visibleIndices}
             filterChoice={filterChoice}
             setFilterChoice={setFilterChoice}
-            filterOptions={filterOptions}
             isMobile={isMobile}
             onHelp={openHelp}
             onFilterOpen={() => videoPlayerRef.current?.pauseAndRemember?.()}

@@ -12,19 +12,19 @@ export default function Playlist({
   visibleIndices,
   filterChoice,
   setFilterChoice,
-  filterOptions,
   isMobile,
   onHelp,
   onFilterOpen,
   onFilterClose,
   videoCollapsed,
   onToggleVideoCollapsed,
+  multiGame,  // show clip numbers + game badges instead of timestamps
 }) {
-  const { filterOpen, filterBtnRef, openFilter, closeFilter, filterActive, total, visible, visibleSet } =
-    useFilterState({ cutSegments, visibleIndices, filterChoice, onFilterOpen, onFilterClose });
+  const { filterOpen, filterBtnRef, openFilter, closeFilter, filterActive, filterOptions, total, visible, visibleSet } =
+    useFilterState({ cutSegments, parsedSegments, visibleIndices, filterChoice, onFilterOpen, onFilterClose });
 
-  const activeCount = filterOptions
-    ? (filterChoice.player ? 1 : 0) + (filterChoice.rating ? 1 : 0) + (filterChoice.possession ? 1 : 0)
+  const activeCount = filterChoice
+    ? (filterChoice.player ? 1 : 0) + (filterChoice.preset && filterChoice.preset !== 'all' ? 1 : 0)
     : 0;
 
   return (
@@ -52,45 +52,42 @@ export default function Playlist({
           <div className={styles.title}>{title || 'PLAYLIST'}</div>
         </div>
         <div className={styles.headerActions}>
-          {filterOptions && (
-            <button
-              ref={filterBtnRef}
-              className={filterActive ? `${styles.filterBtn} ${styles.filterBtnActive}` : styles.filterBtn}
-              onClick={() => filterOpen ? closeFilter() : openFilter()}
-              aria-label="Filter clips"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-              </svg>
-              <span>Filters{activeCount > 0 ? ` · ${activeCount}` : ''}</span>
-            </button>
-          )}
-          {filterOptions && (
-            <FilterPopover
-              opened={filterOpen}
-              onClose={closeFilter}
-              choice={filterChoice}
-              setChoice={setFilterChoice}
-              options={filterOptions}
-              visible={visible}
-              total={total}
-            />
-          )}
-          <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>
+          <button
+            ref={filterBtnRef}
+            className={filterActive ? `${styles.filterBtn} ${styles.filterBtnActive}` : styles.filterBtn}
+            onClick={() => filterOpen ? closeFilter() : openFilter()}
+            aria-label="Filter clips"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            <span>Filters{activeCount > 0 ? ` · ${activeCount}` : ''}</span>
+          </button>
+          <FilterPopover
+            opened={filterOpen}
+            onClose={closeFilter}
+            choice={filterChoice}
+            setChoice={setFilterChoice}
+            options={filterOptions}
+            visible={visible}
+            total={total}
+          />
+          {onHelp && <button className={styles.helpBtn} onClick={onHelp} aria-label="Help">?</button>}
         </div>
       </div>
       <div className={styles.scroll}>
         {visibleSet.length === 0 ? (
           <div className={styles.emptyState}>No clips match the filter.</div>
         ) : (
-          visibleSet.map(i => (
+          visibleSet.map((i, pos) => (
             <PlaylistRow
               key={i}
               segment={cutSegments[i]}
               parsed={parsedSegments[i]}
-              index={i}
               isActive={i === activeIdx}
               onClick={() => setActiveIdx(i)}
+              timeLabel={multiGame ? `#${pos + 1}` : undefined}
+              gameLabel={multiGame ? cutSegments[i].gameLabel : undefined}
             />
           ))
         )}
