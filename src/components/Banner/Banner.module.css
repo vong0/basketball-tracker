@@ -3,15 +3,14 @@
   align-items: center;
   gap: 32px;
   padding: 0 24px;
-  height: 56px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  height: 52px;
+  background: var(--header-bg);
   position: sticky;
   top: 0;
   z-index: 40;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 640px) {
   .banner {
     height: 48px;
     padding: 0 16px;
@@ -19,46 +18,29 @@
   }
 }
 
+/* ── Brand ─────────────────────────────── */
+
 .brand {
   display: flex;
-  text-decoration: none;
   align-items: center;
-  gap: 12px;
-  background: none;
-  border: none;
-  padding: 4px 8px;
-  margin-left: -8px;
-  border-radius: 4px;
-  color: inherit;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--header-text);
   flex-shrink: 0;
-}
-
-@media (hover: hover) {
-  .brand:hover {
-    background: rgba(255, 92, 26, 0.08);
-  }
-  .brand:hover .wordmark {
-    color: var(--orange);
-  }
-}
-
-.brand:active {
-  background: rgba(255, 92, 26, 0.14);
+  padding: 4px 0;
 }
 
 .wordmark {
-  font-family: var(--font-display);
-  font-size: 24px;
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--header-text);
 }
 
-@media (max-width: 900px) {
-  .brand { gap: 8px; }
-  .wordmark { font-size: 18px; }
+@media (max-width: 640px) {
+  .wordmark { font-size: 14px; }
 }
 
 /* ── Nav ─────────────────────────────── */
@@ -67,7 +49,7 @@
   display: flex;
   align-items: stretch;
   height: 100%;
-  gap: 4px;
+  gap: 0;
   flex: 1;
 }
 
@@ -78,27 +60,26 @@
 .navLink {
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 14px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-dim);
+  color: var(--header-dim);
   text-decoration: none;
   border-bottom: 3px solid transparent;
   transition: color 0.15s, border-color 0.15s;
-  -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
 
 @media (hover: hover) {
   .navLink:hover {
-    color: var(--text);
+    color: var(--header-text);
   }
 }
 
 .navLinkActive {
-  color: var(--text);
-  border-bottom-color: var(--orange);
+  color: var(--header-text);
+  border-bottom-color: var(--accent);
 }
 
 /* ── Hamburger (mobile only) ─────────── */
@@ -112,20 +93,14 @@
   height: 36px;
   background: none;
   border: none;
-  border-radius: 6px;
-  color: var(--text);
+  border-radius: 4px;
+  color: var(--header-text);
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s;
-  -webkit-tap-highlight-color: transparent;
 }
 
 @media (max-width: 640px) {
   .hamburger { display: flex; }
-}
-
-@media (hover: hover) {
-  .hamburger:hover { background: var(--bg-elevated); }
 }
 
 /* ── Drawer ──────────────────────────── */
@@ -134,85 +109,80 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .drawer {
   position: fixed;
   top: 0;
+  left: 0;
   right: 0;
-  bottom: 0;
   z-index: 51;
-  width: min(260px, 80vw);
-  background: var(--bg-elevated);
-  border-left: 1px solid var(--border);
+  background: #1a1a1a;
   display: flex;
   flex-direction: column;
-  padding-top: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 48px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.drawerBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.drawerWordmark {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.drawerClose {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.70);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .drawerLink {
   display: flex;
   align-items: center;
-  padding: 16px 24px;
+  padding: 17px 20px;
   font-family: var(--font-body);
   font-size: 16px;
-  font-weight: 500;
-  color: var(--text-dim);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.80);
   text-decoration: none;
-  border-left: 3px solid transparent;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.12s;
 }
 
 @media (hover: hover) {
   .drawerLink:hover {
-    background: var(--bg-hover);
-    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.95);
   }
 }
 
 .drawerLinkActive {
-  color: var(--text);
-  border-left-color: var(--orange);
+  color: #ffffff;
+  background: rgba(37, 99, 235, 0.15);
+  border-left: 3px solid var(--accent);
+  padding-left: 17px;
 }
-
-/* ── Divider (game mode) ─────────────── */
-
-.divider {
-  width: 2px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: 1px;
-  flex-shrink: 0;
-}
-
-/* ── GameInfo (game mode) ────────────── */
-
-.gameInfo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-display);
-  font-size: 18px;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  color: var(--text);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@media (max-width: 900px) {
-  .gameInfo { font-size: 14px; gap: 8px; }
-}
-
-.dotSep {
-  color: var(--text-faint);
-  font-size: 12px;
-}
-
-.resultW { color: var(--green); }
-.resultL { color: var(--red); }
-.resultT { color: var(--text-dim); }

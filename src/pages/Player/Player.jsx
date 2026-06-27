@@ -96,12 +96,14 @@ export default function Player({ gameId, isMobile }) {
     return (
       <div className={styles.app}>
         <Banner />
-        <div className={styles.errorBox}>
-          <div>Could not load this game.</div>
-          <div className={styles.errorDetail}>{loadError}</div>
-          <button className={styles.errorBack} onClick={() => navigate('#/')}>
-            ← Back to games
-          </button>
+        <div className={`${styles.main} dark-zone`}>
+          <div className={styles.errorBox}>
+            <div>Could not load this game.</div>
+            <div className={styles.errorDetail}>{loadError}</div>
+            <button className={styles.errorBack} onClick={() => navigate('#/')}>
+              ← Back to games
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -117,8 +119,8 @@ export default function Player({ gameId, isMobile }) {
 
   return (
     <div className={styles.app}>
-      {!isFullscreen && <Banner game={game} />}
-      <div className={`${styles.main} ${videoCollapsed ? styles.videoCollapsed : ''}`}>
+      {!isFullscreen && <Banner />}
+      <div className={`${styles.main} ${videoCollapsed ? styles.videoCollapsed : ''} dark-zone`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
             ref={videoPlayerRef}

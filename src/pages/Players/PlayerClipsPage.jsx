@@ -72,7 +72,7 @@ export default function PlayerClipsPage({ playerId, preset: initialPreset, isMob
   return (
     <div className={styles.app}>
       {!isFullscreen && <Banner isMobile={isMobile} />}
-      <div className={`${styles.main} ${videoCollapsed ? styles.videoCollapsed : ''}`}>
+      <div className={`${styles.main} ${videoCollapsed ? styles.videoCollapsed : ''} dark-zone`}>
         <div className={styles.videoWrap}>
           <VideoPlayer
             ref={videoRef}

@@ -1,8 +1,8 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;        /* fallback for browsers without dvh */
-  height: 100dvh;       /* dynamic viewport: accounts for mobile URL bar */
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -20,13 +20,11 @@
   }
   .main .videoWrap {
     flex: 0 0 auto;
-    height: 45vh;      /* fallback */
+    height: 45vh;
     height: 40dvh;
     min-height: 0;
     transition: height 0.2s ease;
   }
-  /* Collapsed: video shrinks to a thumbnail strip so the playlist owns the
-     screen. Useful for browsing 50+ clips on a phone. */
   .main.videoCollapsed .videoWrap {
     height: 80px;
   }
@@ -41,6 +39,7 @@
   min-height: 0;
 }
 
+/* Error box uses dark-zone vars since it's inside .dark-zone */
 .errorBox {
   flex: 1;
   display: flex;
@@ -49,7 +48,6 @@
   justify-content: center;
   gap: 12px;
   padding: 32px;
-  font-family: var(--font-mono);
   color: var(--text);
   text-align: center;
 }
@@ -73,6 +71,6 @@
 }
 
 .errorBack:hover {
-  border-color: var(--orange);
-  color: var(--orange);
+  border-color: var(--accent);
+  color: var(--accent);
 }

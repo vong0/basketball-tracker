@@ -7,9 +7,9 @@
 
 /* ── Hero banner ── */
 .heroBanner {
-  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  padding: 32px 32px 24px;
+  padding: 24px 32px;
   flex-shrink: 0;
 }
 
@@ -19,27 +19,28 @@
 }
 
 .kicker {
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--orange);
-  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 6px;
 }
 
 .heroRow {
   display: flex;
   align-items: flex-start;
-  flex-direction: column;  /* stack vertically always */
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 6px;
 }
 
 .heading {
-  font-family: var(--font-display);
-  font-size: 40px;
-  letter-spacing: 0.04em;
+  font-size: 32px;
+  font-weight: 700;
   margin: 0;
   line-height: 1;
+  color: var(--text);
 }
 
 .sub {
@@ -49,24 +50,23 @@
 }
 
 .toggleBtn {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 500;
   text-transform: uppercase;
+  letter-spacing: 0.06em;
   background: none;
   border: 1px solid var(--border-strong);
   color: var(--text-dim);
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
-  flex-shrink: 0;
   align-self: flex-start;
 }
 
 @media (hover: hover) {
   .toggleBtn:hover {
-    border-color: var(--text-faint);
+    border-color: var(--accent);
     color: var(--text);
   }
 }
@@ -74,8 +74,7 @@
 /* ── Scroll area ── */
 .scroll {
   flex: 1;
-  padding: 32px 32px 64px;
-  background: var(--bg-elevated);
+  padding: 24px 32px 64px;
 }
 
 .inner {
@@ -85,7 +84,7 @@
 
 /* ── Game section ── */
 .gameSection {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .gameHeader {
@@ -93,7 +92,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 4px;
+  padding: 10px 0;
   background: none;
   border: none;
   border-bottom: 1px solid var(--border);
@@ -110,16 +109,14 @@
 }
 
 .gameTitle {
-  font-family: var(--font-display);
-  font-size: 28px;
-  letter-spacing: 0.04em;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
 }
 
 .gameOpponent {
   font-size: 13px;
   color: var(--text-faint);
-  font-family: var(--font-mono);
-  letter-spacing: 0.06em;
 }
 
 /* ── Player list ── */
@@ -131,15 +128,14 @@
 
 /* ── Player card ── */
 .card {
-  background: var(--bg-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  transition: border-color 0.15s, background 0.15s;
+  box-shadow: var(--shadow-card);
 }
 
 .cardOpen {
-  background: #1a1a22;
   border-color: var(--border-strong);
 }
 
@@ -158,9 +154,9 @@
 }
 
 .playerName {
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 0.04em;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .headerRight {
@@ -170,25 +166,23 @@
 }
 
 .badgeStr {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  background: rgba(74, 222, 128, 0.12);
-  color: var(--green);
-  padding: 3px 7px;
-  border-radius: 3px;
+  letter-spacing: 0.04em;
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--win);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
 }
 
 .badgeImp {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  background: rgba(255, 92, 26, 0.12);
+  letter-spacing: 0.04em;
+  background: rgba(249, 115, 22, 0.12);
   color: var(--orange);
-  padding: 3px 7px;
-  border-radius: 3px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
 }
 
 .chevron {
@@ -197,9 +191,7 @@
   flex-shrink: 0;
 }
 
-.chevronOpen {
-  transform: rotate(180deg);
-}
+.chevronOpen { transform: rotate(180deg); }
 
 /* ── Card body ── */
 .cardBody {
@@ -230,7 +222,7 @@
 .accentGreen {
   width: 3px;
   height: 16px;
-  background: var(--green);
+  background: var(--win);
   border-radius: 2px;
   flex-shrink: 0;
 }
@@ -244,14 +236,13 @@
 }
 
 .columnLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
 }
 
-.labelGreen { color: var(--green); }
+.labelGreen  { color: var(--win); }
 .labelOrange { color: var(--orange); }
 
 .list {
@@ -273,7 +264,7 @@
 }
 
 .bulletGreen {
-  color: var(--green);
+  color: var(--win);
   flex-shrink: 0;
   font-size: 14px;
   margin-top: 1px;
@@ -287,14 +278,14 @@
 }
 
 /* ── States ── */
-.error   { font-family: var(--font-mono); font-size: 12px; color: var(--red); }
-.loading { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
-.empty   { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+.error   { font-size: 13px; color: var(--loss); }
+.loading { font-size: 13px; color: var(--text-faint); }
+.empty   { font-size: 13px; color: var(--text-faint); }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .heroBanner { padding: 24px 16px 20px; }
-  .heading { font-size: 32px; }
-  .scroll { padding: 20px 16px 40px; }
+  .heroBanner { padding: 16px 16px; }
+  .heading { font-size: 26px; }
+  .scroll { padding: 16px 16px 40px; }
   .columns { grid-template-columns: 1fr; }
 }

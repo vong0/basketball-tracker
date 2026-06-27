@@ -78,6 +78,8 @@ export default function GameDetailPage({ gameId, isMobile }) {
   }
 
   const resultClass = game.result === 'W' ? styles.badgeW : game.result === 'L' ? styles.badgeL : styles.badgeT
+  const spartansWon = game.result === 'W'
+  const thumbUrl = game.videoId ? `https://img.youtube.com/vi/${game.videoId}/maxresdefault.jpg` : null
 
   function renderView(id) {
     switch (id) {
@@ -99,7 +101,7 @@ export default function GameDetailPage({ gameId, isMobile }) {
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroTop}>
-            <div className={styles.gameLabel}>{gameLabel(game)}</div>
+            <span className={styles.gameLabel}>{gameLabel(game)}</span>
             <span className={`${styles.resultBadge} ${resultClass}`}>{game.result}</span>
             {game.gloryLeagueUrl && (
               <a href={game.gloryLeagueUrl} target="_blank" rel="noopener noreferrer" className={styles.gloryLink}>
@@ -107,20 +109,39 @@ export default function GameDetailPage({ gameId, isMobile }) {
               </a>
             )}
           </div>
-          <div className={styles.scoreRow}>
-            <span className={styles.score}>{game.teamScore}</span>
-            <span className={styles.scoreDash}>–</span>
-            <span className={styles.scoreOpp}>{game.opponentScore}</span>
+
+          <div className={styles.scoreLayout}>
+            <div className={styles.teamSide}>
+              <span className={`${styles.scoreNum} ${spartansWon ? '' : styles.scoreNumFaded}`}>
+                {game.teamScore}
+              </span>
+              <span className={styles.heroTeamName}>Spartans</span>
+            </div>
+            <span className={styles.scoreSep}>–</span>
+            <div className={`${styles.teamSide} ${styles.teamSideRight}`}>
+              <span className={`${styles.scoreNum} ${spartansWon ? styles.scoreNumFaded : ''}`}>
+                {game.opponentScore}
+              </span>
+              <span className={styles.heroTeamName}>{game.opponentName}</span>
+            </div>
           </div>
+
           <div className={styles.metaRow}>
-            <span>vs {game.opponentName}</span>
-            <span className={styles.metaSep}>·</span>
             <span>{game.date}</span>
           </div>
-          {game.videoId && (
-            <button className={styles.heroPlayBtn} onClick={() => navigate('#/game/' + game.id)}>
-              ▶ View Clips
-            </button>
+
+          {thumbUrl && (
+            <div className={styles.heroThumb}>
+              <a href={`#/game/${game.id}`} className={styles.thumbLink} aria-label="Watch clips">
+                <img src={thumbUrl} alt="Game thumbnail" className={styles.thumbImg} />
+                <div className={styles.thumbOverlay}>
+                  <div className={styles.thumbPlayCircle}>
+                    <div className={styles.thumbPlayIcon} />
+                  </div>
+                </div>
+              </a>
+              <span className={styles.thumbLabel}>Watch Clips</span>
+            </div>
           )}
         </div>
       </div>

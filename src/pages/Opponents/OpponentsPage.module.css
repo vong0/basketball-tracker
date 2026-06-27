@@ -7,52 +7,55 @@
 
 /* ── Hero ── */
 .heroBanner {
-  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  padding: 32px 32px 24px;
+  padding: 24px 32px;
   flex-shrink: 0;
 }
+
 .heroInner {
   max-width: var(--content-width);
   margin: 0 auto;
 }
+
 .kicker {
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--orange);
-  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 6px;
 }
+
 .heroRow {
   display: flex;
   align-items: baseline;
   gap: 14px;
 }
+
 .heading {
-  font-family: var(--font-display);
-  font-size: 40px;
-  letter-spacing: 0.04em;
+  font-size: 32px;
+  font-weight: 700;
   margin: 0;
   line-height: 1;
+  color: var(--text);
 }
+
 .heroCount {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-faint);
-  letter-spacing: 0.1em;
 }
 
 /* ── Scroll ── */
 .scroll {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-elevated);
 }
+
 .inner {
   max-width: var(--content-width);
   margin: 0 auto;
-  padding: 28px 32px 64px;
-  margin: 0 auto;
+  padding: 24px 32px 64px;
 }
 
 /* ── Landing grid ── */
@@ -66,88 +69,88 @@
 .teamCard {
   display: flex;
   flex-direction: column;
-  background: var(--bg-hover);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  text-align: left;
-  color: inherit;
-  font-family: inherit;
-  padding: 0;
-  transition: border-color 0.15s, background 0.15s;
+  transition: box-shadow 0.15s;
 }
+
 @media (hover: hover) {
   .teamCard:hover {
-    border-color: rgba(255, 92, 26, 0.35);
-    background: #1f1f26;
+    box-shadow: rgba(26, 26, 26, 0.28) 0px 3px 10px;
   }
 }
+
 .teamCardPhoto {
   position: relative;
-  height: 130px;
-  background: #000;
+  height: 120px;
+  background: #e8e8e8;
   overflow: hidden;
   flex-shrink: 0;
 }
+
 .teamCardImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.55;
+  opacity: 0.75;
 }
+
 .teamCardOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 40%, rgba(26, 26, 32, 0.8) 100%);
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.45) 100%);
 }
+
 .teamCardNoPhoto {
   width: 100%;
   height: 100%;
-  background: #0d0d10;
+  background: var(--bg-section);
 }
+
 .teamCardInfo {
   padding: 12px 14px 14px;
 }
+
 .teamCardName {
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 0.04em;
-  line-height: 1;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
   margin-bottom: 6px;
+  color: var(--text);
 }
+
 .teamCardMeta {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .teamCardBadge {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-faint);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
   padding: 2px 7px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
+
 .teamCardNone {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  color: var(--text-faint);
 }
 
 /* ── State messages ── */
 .stateMsg {
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-faint);
-  padding: 28px 32px 64px;
+  padding: 28px 0;
 }
 
 /* ── Detail page ── */
@@ -155,18 +158,18 @@
   min-height: 100%;
 }
 
-/* Sticky nav bar inside scroll */
 .detailNav {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 24px;
-  background: var(--bg-elevated);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 10;
 }
+
 .backBtn {
   display: flex;
   align-items: center;
@@ -175,66 +178,68 @@
   border: none;
   cursor: pointer;
   color: var(--text-dim);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 4px 0;
   transition: color 0.15s;
 }
-.backBtn:hover {
-  color: var(--text);
-}
+
+.backBtn:hover { color: var(--text); }
+
 .detailNavSep {
   color: var(--border-strong);
   font-size: 16px;
 }
+
 .detailNavTitle {
-  font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 0.04em;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 /* Hero */
 .detailHero {
   position: relative;
-  height: 220px;
-  background: #000;
+  height: 200px;
+  background: #1a1a1a;
   overflow: hidden;
   flex-shrink: 0;
 }
+
 .detailHeroImg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.4;
+  opacity: 0.35;
 }
+
 .detailHeroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 30%, #131318 100%);
+  background: linear-gradient(to bottom, transparent 30%, #1a1a1a 100%);
 }
+
 .detailHeroContent {
   position: absolute;
   bottom: 20px;
   left: 24px;
 }
+
 .detailHeroName {
-  font-family: var(--font-display);
-  font-size: 52px;
-  letter-spacing: 0.04em;
+  font-size: 44px;
+  font-weight: 700;
   margin: 0;
   line-height: 1;
   color: #fff;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
 }
 
 /* Body */
 .detailBody {
   max-width: var(--content-width);
-  margin: 0 auto;
   margin: 0 auto;
   padding: 24px 24px 64px;
   display: flex;
@@ -244,20 +249,22 @@
 
 /* Notes card */
 .notesCard {
-  background: var(--bg-hover);
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-card);
 }
+
 .notesLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--orange);
-  letter-spacing: 0.14em;
+  color: var(--accent);
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
+
 .notesList {
   list-style: none;
   margin: 0;
@@ -266,6 +273,7 @@
   flex-direction: column;
   gap: 6px;
 }
+
 .notesItem {
   display: flex;
   gap: 8px;
@@ -274,48 +282,47 @@
   color: var(--text-dim);
   line-height: 1.5;
 }
+
 .notesDash {
-  color: var(--orange);
+  color: var(--accent);
   flex-shrink: 0;
   margin-top: 1px;
 }
 
 /* Scout section */
 .scoutLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-faint);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
+
 .playerList {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
 .noPlayers {
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-faint);
   text-align: center;
   padding: 40px 0;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 /* ── Player card ── */
 .playerCard {
-  background: var(--bg-hover);
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
-.playerCardDim {
-  opacity: 0.5;
-  border-color: var(--border);
-}
+
+.playerCardDim { opacity: 0.5; }
+
 .playerCardTop {
   display: flex;
   gap: 14px;
@@ -326,9 +333,10 @@
 /* Avatar */
 .avatarWrap {
   overflow: hidden;
-  border: 2px solid var(--border-strong);
-  background: #000;
+  border: 2px solid var(--border);
+  background: var(--bg-section);
 }
+
 .avatarImg {
   width: 100%;
   height: 100%;
@@ -336,15 +344,16 @@
   object-position: top center;
   display: block;
 }
+
 .avatarPlaceholder {
-  border: 2px solid var(--border-strong);
-  background: #0a0a0d;
+  border: 2px solid var(--border);
+  background: var(--bg-section);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-size: 26px;
-  color: var(--orange);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 /* Player meta */
@@ -352,29 +361,31 @@
   flex: 1;
   min-width: 0;
 }
+
 .playerNumber {
-  font-family: var(--font-display);
-  font-size: 26px;
-  letter-spacing: 0.04em;
+  font-size: 24px;
+  font-weight: 700;
   line-height: 1;
   margin-bottom: 5px;
+  color: var(--text);
 }
+
 .playerProfile {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-dim);
   line-height: 1.5;
 }
+
 .noThreatBadge {
   display: inline-block;
   margin-top: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  letter-spacing: 0.08em;
   color: var(--text-faint);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-hover);
   padding: 2px 8px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
 }
 
@@ -384,33 +395,36 @@
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--border);
 }
+
 .threatCol {
   padding: 12px 14px;
-  background: rgba(248, 113, 113, 0.07);
+  background: rgba(220, 38, 38, 0.05);
   border-right: 1px solid var(--border);
 }
+
 .defendCol {
   padding: 12px 14px;
-  background: rgba(251, 191, 36, 0.07);
+  background: rgba(251, 191, 36, 0.05);
 }
+
 .threatLabel {
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  color: #f87171;
-  letter-spacing: 0.12em;
+  color: var(--loss);
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   margin-bottom: 8px;
 }
+
 .defendLabel {
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  color: #fbbf24;
-  letter-spacing: 0.12em;
+  color: #d97706;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   margin-bottom: 8px;
 }
+
 .bulletList {
   list-style: none;
   margin: 0;
@@ -419,23 +433,26 @@
   flex-direction: column;
   gap: 5px;
 }
+
 .threatItem,
 .defendItem {
   display: flex;
   gap: 7px;
   align-items: flex-start;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-dim);
   line-height: 1.5;
 }
+
 .threatDot {
-  color: #f87171;
+  color: var(--loss);
   flex-shrink: 0;
   font-size: 11px;
   margin-top: 1px;
 }
+
 .defendArrow {
-  color: #fbbf24;
+  color: #d97706;
   flex-shrink: 0;
   font-size: 11px;
   margin-top: 1px;
@@ -443,38 +460,17 @@
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .heroBanner {
-    padding: 24px 16px 20px;
-  }
-  .heading {
-    font-size: 32px;
-  }
-  .inner {
-    padding: 20px 16px 40px;
-  }
-  .detailHero {
-    height: 170px;
-  }
-  .detailHeroName {
-    font-size: 38px;
-  }
-  .detailBody {
-    padding: 16px 16px 48px;
-  }
-  .playerCardGrid {
-    grid-template-columns: 1fr;
-  }
-  .threatCol {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .landingGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .heroBanner { padding: 16px 16px; }
+  .heading { font-size: 26px; }
+  .inner { padding: 16px 16px 40px; }
+  .detailHero { height: 160px; }
+  .detailHeroName { font-size: 32px; }
+  .detailBody { padding: 16px 16px 48px; }
+  .playerCardGrid { grid-template-columns: 1fr; }
+  .threatCol { border-right: none; border-bottom: 1px solid var(--border); }
+  .landingGrid { grid-template-columns: 1fr 1fr; gap: 10px; }
 }
+
 @media (max-width: 500px) {
-  .landingGrid {
-    grid-template-columns: 1fr;
-  }
+  .landingGrid { grid-template-columns: 1fr; }
 }

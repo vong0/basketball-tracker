@@ -8,9 +8,8 @@
 /* ── Hero ────────────────────────────── */
 
 .hero {
-  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
-  border-bottom: 1px solid var(--border);
-  padding: 28px 32px 24px;
+  background: var(--hero-bg);
+  padding: 24px 32px 28px;
 }
 
 .heroInner {
@@ -25,11 +24,12 @@
 }
 
 .photoWrap {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
+  border: 3px solid rgba(255,255,255,0.15);
 }
 
 .photo {
@@ -41,42 +41,39 @@
 .initials {
   width: 100%;
   height: 100%;
-  background: var(--orange);
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
   font-size: 32px;
+  font-weight: 700;
   color: #fff;
-  letter-spacing: 0.04em;
 }
 
 .heroInfo { display: flex; flex-direction: column; gap: 4px; }
 
 .heroName {
-  font-family: var(--font-display);
-  font-size: 48px;
-  letter-spacing: 0.04em;
+  font-size: 36px;
+  font-weight: 700;
   line-height: 1;
-  color: var(--text);
+  color: var(--header-text);
 }
 
 .heroMeta {
-  font-family: var(--font-body);
   font-size: 13px;
-  color: var(--text-dim);
+  color: var(--header-dim);
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.metaSep { color: var(--text-faint); }
+.metaSep { color: rgba(255,255,255,0.25); }
 
 /* ── Content ─────────────────────────── */
 
 .content {
   flex: 1;
-  background: var(--bg-elevated);
+  background: var(--bg);
   padding: 0 32px 64px;
 }
 
@@ -86,7 +83,6 @@
 }
 
 .placeholder {
-  font-family: var(--font-body);
   font-size: 14px;
   color: var(--text-dim);
   padding: 32px 0;
@@ -96,9 +92,9 @@
 /* ── Responsive ──────────────────────── */
 
 @media (max-width: 640px) {
-  .hero { padding: 20px 16px 16px; }
-  .heroName { font-size: 36px; }
-  .photoWrap { width: 60px; height: 60px; }
+  .hero { padding: 16px 16px 20px; }
+  .heroName { font-size: 26px; }
+  .photoWrap { width: 68px; height: 68px; }
   .initials { font-size: 24px; }
   .content { padding: 0 16px 48px; }
 }

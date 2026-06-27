@@ -5,135 +5,207 @@
   background: var(--bg);
 }
 
-.heroBanner {
-  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+/* ── Filter bar ────────────────────────── */
+
+.filterBar {
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  padding: 32px 32px 24px;
-  flex-shrink: 0;
+  padding: 12px 24px;
 }
 
-.heroInner {
+.filterInner {
   max-width: var(--content-width);
   margin: 0 auto;
-}
-
-.scroll {
-  flex: 1;
-  padding: 24px 32px 64px;
-  background: var(--bg-elevated);
-}
-
-.headingBlock {
-  max-width: var(--content-width);
-  margin: 0 auto;
-}
-
-.headingRow {
-  display: flex;
-  align-items: baseline;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-}
-
-.kicker {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--orange);
-  margin-bottom: 8px;
-}
-
-.heading {
-  font-family: var(--font-display);
-  font-size: 56px;
-  letter-spacing: 0.04em;
-  margin: 0;
-  line-height: 1;
-}
-
-.count {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-faint);
-}
-
-/* ── Filters ─────────────────────────── */
-
-.filterRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
 }
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.searchInput::placeholder { color: var(--text-faint); }
+.searchInput:focus { border-color: var(--accent); }
 
 .filterSelect {
   appearance: none;
-  background: var(--bg-hover);
+  background: var(--bg-section);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: var(--text);
   font-family: var(--font-body);
   font-size: 13px;
-  padding: 7px 28px 7px 12px;
+  padding: 8px 28px 8px 12px;
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
+  outline: none;
   transition: border-color 0.15s;
 }
 
-.filterSelect:focus {
-  outline: none;
-  border-color: var(--orange);
-}
+.filterSelect:focus { border-color: var(--accent); }
 
 .filterClear {
   background: none;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: none;
   color: var(--text-dim);
   font-family: var(--font-body);
   font-size: 13px;
-  padding: 7px 12px;
+  padding: 8px 4px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  text-decoration: underline;
+  transition: color 0.15s;
+  white-space: nowrap;
 }
 
-.filterClear:hover {
-  border-color: var(--text-dim);
+.filterClear:hover { color: var(--text); }
+
+/* Mobile: hide individual controls, show filter pill */
+.filterPill {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.filterPillActive {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.filterSheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background: var(--bg-card);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+  padding: 20px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filterSheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: rgba(0,0,0,0.35);
+}
+
+.filterSheetTitle {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text);
+  margin-bottom: 4px;
+}
+
+.filterSheetSelect {
+  appearance: none;
+  width: 100%;
+  padding: 12px 32px 12px 14px;
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  outline: none;
+}
+
+.filterSheetClear {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 12px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .filterBar { padding: 10px 16px; }
+  .filterInner { gap: 8px; flex-wrap: nowrap; }
+  .searchWrap { min-width: 0; flex: 1; }
+  .filterSelect { display: none; }
+  .filterClear { display: none; }
+  .filterPill { display: flex; flex-shrink: 0; }
 }
 
 /* ── Grid ────────────────────────────── */
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+.content {
+  flex: 1;
+  padding: 20px 24px 64px;
+}
+
+.contentInner {
   max-width: var(--content-width);
   margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .content { padding: 16px 16px 48px; }
+  .grid { grid-template-columns: 1fr; gap: 12px; }
 }
 
 .loading {
-  font-family: var(--font-body);
   font-size: 14px;
   color: var(--text-dim);
   font-style: italic;
-  max-width: var(--content-width);
-  margin: 0 auto;
-}
-
-.errorBox {
-  padding: 32px;
-  font-family: var(--font-mono);
-  color: var(--red);
-}
-
-@media (max-width: 640px) {
-  .heroBanner { padding: 20px 16px 16px; }
-  .scroll { padding: 16px 16px 40px; }
-  .heading { font-size: 40px; }
-  .grid { grid-template-columns: 1fr; gap: 12px; }
 }

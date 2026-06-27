@@ -7,9 +7,9 @@
 
 /* ── Hero ── */
 .heroBanner {
-  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  padding: 32px 32px 0;
+  padding: 24px 32px 0;
   flex-shrink: 0;
 }
 
@@ -19,11 +19,12 @@
 }
 
 .kicker {
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--orange);
-  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 6px;
 }
 
 .heroRow {
@@ -34,11 +35,11 @@
 }
 
 .heading {
-  font-family: var(--font-display);
-  font-size: 40px;
-  letter-spacing: 0.04em;
+  font-size: 32px;
+  font-weight: 700;
   margin: 0;
   line-height: 1;
+  color: var(--text);
 }
 
 .heroCount {
@@ -48,17 +49,16 @@
 }
 
 .heroCountNum {
-  font-family: var(--font-display);
-  font-size: 28px;
-  color: var(--orange);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
   line-height: 1;
 }
 
 .heroCountLabel {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-faint);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -74,39 +74,33 @@
   min-width: 80px;
   justify-content: center;
   padding: 5px 14px;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-faint);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-hover);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
   transition: all 0.15s ease;
 }
 
 .filterBtn:hover {
   color: var(--text);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--border-strong);
 }
 
 .filterBtnActive {
-  background: var(--orange);
-  color: #111;
-  border-color: var(--orange);
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
-.filterBtnActive:hover {
-  color: #111;
-}
+.filterBtnActive:hover { color: #fff; }
 
 /* ── Scroll / layout ── */
 .scroll {
   flex: 1;
-  padding: 32px 32px 64px;
-  background: var(--bg-elevated);
+  padding: 24px 32px 64px;
 }
 
 .inner {
@@ -135,32 +129,31 @@
 }
 
 .desktopTocInner {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--bg-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
 }
 
 .desktopTocHeading {
   padding: 10px 14px;
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--orange);
-  letter-spacing: 0.14em;
+  color: var(--accent);
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   border-bottom: 1px solid var(--border);
 }
 
 .desktopTocGroup {
   padding: 6px 14px;
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   color: var(--text-faint);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--bg-section);
 }
 
 .desktopTocItem {
@@ -172,14 +165,14 @@
   border-bottom: 1px solid var(--border);
   color: var(--text-dim);
   font-size: 12px;
-  font-family: var(--font-body);
   cursor: pointer;
   display: block;
-  transition: color 0.15s ease;
+  transition: color 0.15s, background 0.12s;
 }
 
 .desktopTocItem:hover {
-  color: var(--orange);
+  color: var(--accent);
+  background: var(--bg-hover);
 }
 
 /* ── Mobile TOC ── */
@@ -194,15 +187,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  background: var(--bg-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  color: var(--orange);
-  font-family: var(--font-mono);
-  font-size: 11px;
+  color: var(--accent);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -214,21 +206,20 @@
 
 .mobileTocMenu {
   margin-top: 4px;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--bg-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border);
 }
 
 .mobileTocGroup {
   padding: 6px 14px;
-  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   color: var(--text-faint);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-section);
 }
 
 .mobileTocItem {
@@ -240,7 +231,6 @@
   border-bottom: 1px solid var(--border);
   color: var(--text-dim);
   font-size: 14px;
-  font-family: var(--font-body);
   cursor: pointer;
 }
 
@@ -261,39 +251,38 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 0.04em;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text);
   margin: 0;
-  text-transform: uppercase;
 }
 
 .sectionCount {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-faint);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .sectionRule {
   height: 2px;
-  width: 48px;
-  background: linear-gradient(90deg, var(--orange), transparent);
+  width: 32px;
+  background: var(--accent);
+  border-radius: 1px;
 }
 
 /* ── Strategy card ── */
 .card {
-  background: var(--bg-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   margin-bottom: 8px;
+  box-shadow: var(--shadow-card);
 }
 
 .cardHeader {
@@ -308,12 +297,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  transition: background 0.15s ease;
+  transition: background 0.12s;
 }
 
-.cardHeader:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
+.cardHeader:hover { background: var(--bg-hover); }
 
 .cardHeaderLeft {
   flex: 1;
@@ -329,24 +316,22 @@
 }
 
 .cardName {
-  font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 0.03em;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text);
   margin: 0;
   line-height: 1.2;
 }
 
 .clipBadge {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: rgba(129, 140, 248, 0.12);
-  color: #818cf8;
-  border: 1px solid rgba(129, 140, 248, 0.2);
-  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.10);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.20);
+  border-radius: var(--radius-sm);
   padding: 2px 7px;
   flex-shrink: 0;
 }
@@ -365,9 +350,7 @@
   transition: transform 0.2s ease;
 }
 
-.chevronOpen {
-  transform: rotate(180deg);
-}
+.chevronOpen { transform: rotate(180deg); }
 
 /* ── Card body ── */
 .cardBody {
@@ -422,11 +405,10 @@
 }
 
 .clipsSectionLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-faint);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   margin-bottom: 8px;
 }
@@ -444,58 +426,51 @@
   gap: 10px;
   width: 100%;
   padding: 10px 14px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--bg-section);
+  border: 1px solid var(--border);
   color: var(--text-dim);
   font-size: 13px;
   font-weight: 500;
-  font-family: var(--font-body);
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.12s, border-color 0.12s;
 }
 
 .clipCard:hover {
-  background: rgba(255, 92, 26, 0.08);
-  border-color: rgba(255, 92, 26, 0.3);
+  background: var(--bg-hover);
+  border-color: var(--accent);
   color: var(--text);
 }
 
 .clipPlay {
-  color: #818cf8;
+  color: var(--accent);
   font-size: 13px;
   flex-shrink: 0;
 }
 
-.clipLabel {
-  flex: 1;
-}
+.clipLabel { flex: 1; }
 
 .clipGame {
-  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-faint);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   flex-shrink: 0;
 }
 
 .clipCardActive {
-  background: rgba(255, 92, 26, 0.12);
-  border-color: rgba(255, 92, 26, 0.4);
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.30);
   color: var(--text);
 }
 
-.clipCardActive .clipPlay {
-  color: var(--orange);
-}
+.clipCardActive .clipPlay { color: var(--accent); }
 
 .noClips {
   margin: 12px 0 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--border-strong);
 }
 
@@ -507,7 +482,7 @@
   height: 0;
   padding-bottom: calc(56.25% + 48px);
   background: #000;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -525,7 +500,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -533,9 +508,8 @@
 }
 
 .modalBox {
-  background: #0a0a0d;
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
+  background: #1a1a1a;
+  border-radius: var(--radius-md);
   width: 100%;
   max-width: 860px;
   display: flex;
@@ -548,36 +522,31 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
   flex-shrink: 0;
 }
 
 .modalTitle {
-  font-family: var(--font-display);
-  font-size: 18px;
-  letter-spacing: 0.04em;
-  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
 }
 
 .modalClose {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-strong);
-  color: var(--text-dim);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.70);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 
-.modalClose:hover {
-  color: var(--text);
-  border-color: var(--orange);
-}
+.modalClose:hover { color: #fff; }
 
 .modalVideo {
   position: relative;
@@ -605,8 +574,7 @@
 
 /* ── States ── */
 .stateMsg {
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-faint);
 }
 
@@ -622,31 +590,16 @@
 }
 
 .emptyText {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  font-size: 13px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .heroBanner {
-    padding: 24px 16px 0;
-  }
-
-  .heading {
-    font-size: 32px;
-  }
-
-  .scroll {
-    padding: 20px 16px 40px;
-  }
-
-  .desktopToc {
-    display: none;
-  }
-
-  .mobileToc {
-    display: block;
-  }
+  .heroBanner { padding: 16px 16px 0; }
+  .heading { font-size: 26px; }
+  .scroll { padding: 16px 16px 40px; }
+  .desktopToc { display: none; }
+  .mobileToc { display: block; }
 }

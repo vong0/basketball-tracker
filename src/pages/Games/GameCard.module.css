@@ -1,26 +1,30 @@
 .card {
   display: flex;
   flex-direction: column;
-  background: var(--bg-hover);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: box-shadow 0.15s;
 }
 
 @media (hover: hover) {
   .card:hover {
-    border-color: var(--border-strong);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: rgba(26, 26, 26, 0.28) 0px 3px 10px;
   }
 }
+
+/* ── Thumbnail ─────────────────────────── */
 
 .thumbWrap {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: var(--bg-elevated);
+  background: #e8e8e8;
   overflow: hidden;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
 }
 
 .thumb {
@@ -28,125 +32,165 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.2s ease;
 }
 
+@media (hover: hover) {
+  .thumbWrap:hover .thumb {
+    transform: scale(1.03);
+  }
+  .thumbWrap:hover .playOverlay {
+    opacity: 1;
+  }
+}
+
+.playOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.playCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playIcon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 9px 0 9px 18px;
+  border-color: transparent transparent transparent #ffffff;
+  margin-left: 3px;
+}
+
+/* ── Card body ─────────────────────────── */
+
 .body {
-  padding: 16px 18px 18px;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
 }
 
 .topRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-.id {
-  font-family: var(--font-mono);
+.gameId {
   font-size: 11px;
+  font-weight: 500;
   color: var(--text-faint);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .badge {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 3px;
-  font-family: var(--font-mono);
+  border-radius: var(--radius-pill);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.badgeWin {
-  background: rgba(74, 222, 128, 0.15);
-  color: var(--green);
-  border: 1px solid rgba(74, 222, 128, 0.4);
-}
-
-.badgeLoss {
-  background: rgba(248, 113, 113, 0.15);
-  color: var(--red);
-  border: 1px solid rgba(248, 113, 113, 0.4);
-}
-
-.badgeTie {
-  background: rgba(156, 163, 175, 0.15);
-  color: var(--text-dim);
-  border: 1px solid rgba(156, 163, 175, 0.4);
-}
-
-.name {
-  font-family: var(--font-display);
-  font-size: 24px;
   letter-spacing: 0.04em;
-  line-height: 1.1;
 }
 
-.opponent {
-  font-size: 13px;
-  color: var(--text-dim);
+.badgeWin  { background: var(--win);  color: #fff; }
+.badgeLoss { background: var(--loss); color: #fff; }
+.badgeTie  { background: var(--text-faint); color: #fff; }
+
+/* ── Score row ─────────────────────────── */
+
+.scoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
-.score {
-  font-family: var(--font-mono);
-  font-size: 14px;
+.teamBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.teamBlockRight {
+  align-items: flex-end;
+}
+
+.scoreNum {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
   color: var(--text);
-  letter-spacing: 0.04em;
-  margin-top: 2px;
 }
+
+.scoreNumFaded {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.teamName {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.scoreSep {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  align-self: center;
+  margin-bottom: 4px;
+}
+
+/* ── Date ─────────────────────────────── */
 
 .date {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-faint);
-  letter-spacing: 0.04em;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 14px;
-}
-
-.clipsLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: var(--orange);
-  color: #fff;
-  font-family: var(--font-body);
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  color: var(--text-faint);
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
+
+/* ── Overview button ─────────────────── */
+
+.overviewBtn {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background: #1a1a1a;
+  color: #ffffff;
+  text-align: center;
   text-decoration: none;
-  border-radius: 20px;
-  transition: background 0.15s, transform 0.08s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-@media (hover: hover) {
-  .clipsLink:hover {
-    background: #e54e12;
-  }
-}
-
-.clipsLink:active { transform: scale(0.97); }
-
-.detailLink {
-  font-family: var(--font-body);
   font-size: 13px;
-  color: var(--text-dim);
-  text-decoration: none;
-  transition: color 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
 }
 
 @media (hover: hover) {
-  .detailLink:hover { color: var(--text); }
+  .overviewBtn:hover {
+    background: #333333;
+  }
 }

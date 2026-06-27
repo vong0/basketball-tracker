@@ -9,37 +9,41 @@
 .scroll {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-elevated);
 }
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(135deg, #1a1a20 0%, var(--bg) 100%);
-  border-bottom: 1px solid var(--border);
+  background: var(--hero-bg);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   padding: 48px 32px 40px;
 }
+
 .heroInner {
   max-width: var(--content-width);
   margin: 0 auto;
 }
+
 .kicker {
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--orange);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.45);
   margin-bottom: 10px;
   text-transform: uppercase;
 }
+
 .heading {
-  font-family: var(--font-display);
-  font-size: 64px;
-  letter-spacing: 0.04em;
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0 0 12px;
   line-height: 1;
+  color: #ffffff;
 }
+
 .sub {
   font-size: 15px;
-  color: var(--text-dim);
+  color: rgba(255,255,255,0.55);
   margin: 0;
   line-height: 1.5;
   max-width: 480px;
@@ -49,15 +53,16 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  padding: 32px 32px 64px;
+  gap: 14px;
+  padding: 28px 32px 64px;
   max-width: var(--content-width);
   margin: 0 auto;
 }
+
 .gridMobile {
   grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 20px 16px 48px;
+  gap: 10px;
+  padding: 16px 16px 48px;
 }
 
 /* ── Card ── */
@@ -66,35 +71,31 @@
   display: flex;
   flex-direction: column;
   text-decoration: none;
-  background: var(--bg-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-top: 2px solid var(--accent, var(--border-strong));
-  border-radius: 6px;
+  border-top: 2px solid var(--accent);
+  border-radius: var(--radius-md);
   padding: 20px 20px 18px;
   color: inherit;
-  transition: background 0.15s, border-color 0.15s, transform 0.08s;
-  -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s;
 }
+
 @media (hover: hover) {
   .card:hover {
-    background: #1f1f26;
-    border-color: var(--accent, var(--border-strong));
-    transform: translateY(-2px);
+    box-shadow: rgba(26, 26, 26, 0.28) 0px 3px 10px;
   }
-}
-.card:active {
-  transform: translateY(0);
 }
 
 .cardTop {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
-.cardIcon {
-  flex-shrink: 0;
-}
+
+.cardIcon { flex-shrink: 0; }
+
 .externalIcon {
   color: var(--text-faint);
   flex-shrink: 0;
@@ -102,35 +103,39 @@
 }
 
 .cardKicker {
-  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--accent, var(--orange));
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
+
 .cardTitle {
-  font-family: var(--font-display);
-  font-size: 28px;
-  letter-spacing: 0.04em;
-  line-height: 1;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
   margin-bottom: 8px;
+  color: var(--text);
 }
+
 .cardDesc {
   font-size: 13px;
   color: var(--text-dim);
   line-height: 1.5;
   flex: 1;
 }
+
 .cardArrow {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   margin-top: 14px;
+  color: var(--accent);
   opacity: 0.6;
   transition: opacity 0.15s, transform 0.15s;
 }
+
 @media (hover: hover) {
   .card:hover .cardArrow {
     opacity: 1;
@@ -140,10 +145,7 @@
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .hero {
-    padding: 32px 16px 28px;
-  }
-  .heading {
-    font-size: 48px;
-  }
+  .hero { padding: 32px 16px 28px; }
+  .heading { font-size: 36px; }
+  .grid { padding: 20px 16px 48px; }
 }

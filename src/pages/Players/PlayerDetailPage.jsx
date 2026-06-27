@@ -132,6 +132,8 @@ export default function PlayerDetailPage({ playerId, isMobile }) {
         </div>
       </div>
 
+      <TabBar tabs={TABS} active={tab} onChange={setTab} />
+
       <ScopeBar>
         <select
           className={pickerClass}
@@ -157,8 +159,6 @@ export default function PlayerDetailPage({ playerId, isMobile }) {
           ))}
         </select>
       </ScopeBar>
-
-      <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       <div className={styles.content}>
         <div className={styles.contentInner}>

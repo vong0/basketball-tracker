@@ -1,21 +1,22 @@
 .section {
-  padding: 24px 0;
+  padding: 20px 0;
   border-bottom: 1px solid var(--border);
 }
 .section:last-child { border-bottom: none; }
 
 .sectionTitle {
-  font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  color: var(--orange);
-  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 14px;
 }
 
 .subTitle {
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin: 20px 0 10px;
@@ -29,40 +30,50 @@
   gap: 10px;
   margin-bottom: 20px;
 }
+
 .noteBlock {
-  background: var(--bg-elevated);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-card);
 }
+
 .noteBlock.warn   { border-left: 3px solid var(--orange); }
-.noteBlock.danger { border-left: 3px solid var(--red); }
+.noteBlock.danger { border-left: 3px solid var(--loss); }
+
 .noteTitle {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--text-faint);
   margin-bottom: 8px;
 }
+
 .noteBody {
   font-size: 13px;
   color: var(--text-dim);
   line-height: 1.5;
 }
 
-/* (splitTable td kept for any legacy usage) */
 .splitTable td {
-  padding: 8px 10px;
+  padding: 8px 12px;
   text-align: right;
   color: var(--text);
   vertical-align: top;
   border-bottom: 1px solid var(--border);
 }
-.splitTable td:first-child { text-align: left; font-family: var(--font-display); font-size: 15px; }
+
+.splitTable td:first-child {
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .splitSec { display: block; font-size: 10px; color: var(--text-dim); }
 
-/* Breakdown grid (zone + contest) */
+/* Breakdown grid */
 .breakdownGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -70,7 +81,7 @@
   margin-top: 24px;
 }
 
-/* Leaders grid (4 tables) */
+/* Leaders */
 .leadersGrid {
   display: flex;
   flex-direction: column;
@@ -85,18 +96,19 @@
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
+
 .takeawayLabel {
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin-bottom: 8px;
 }
+
 .takeawayList {
   margin: 0;
   padding: 0 0 0 18px;
-  font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.7;
   color: var(--text-dim);
@@ -104,11 +116,11 @@
   flex-direction: column;
   gap: 4px;
 }
-.takeawayGreen li { color: var(--green); }
-.takeawayRed   li { color: var(--red); }
+
+.takeawayGreen li { color: var(--win); }
+.takeawayRed   li { color: var(--loss); }
 
 .placeholder {
-  font-family: var(--font-body);
   font-size: 14px;
   color: var(--text-dim);
   padding: 32px 0;
@@ -116,7 +128,7 @@
 }
 
 @media (max-width: 640px) {
-  .section { padding: 16px 0; }
+  .section { padding: 14px 0; }
   .breakdownGrid { grid-template-columns: 1fr; }
   .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
 }
