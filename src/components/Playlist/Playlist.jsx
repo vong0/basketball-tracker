@@ -24,7 +24,7 @@ export default function Playlist({
     useFilterState({ cutSegments, parsedSegments, visibleIndices, filterChoice, onFilterOpen, onFilterClose });
 
   const activeCount = filterChoice
-    ? (filterChoice.player ? 1 : 0) + (filterChoice.preset && filterChoice.preset !== 'all' ? 1 : 0)
+    ? (filterChoice.player ? 1 : 0) + (filterChoice.rating ? 1 : 0) + (filterChoice.possession ? 1 : 0)
     : 0;
 
   return (

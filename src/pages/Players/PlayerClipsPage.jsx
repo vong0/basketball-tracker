@@ -12,7 +12,7 @@ export default function PlayerClipsPage({ playerId, preset: initialPreset, isMob
   const [clips, setClips] = useState(null)
   const [activeIdx, setActiveIdx] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [filterChoice, setFilterChoice] = useState({ player: null, preset: 'all' })
+  const [filterChoice, setFilterChoice] = useState({ player: null, rating: null, possession: null })
   const videoRef = useRef(null)
 
   const activePreset = useMemo(

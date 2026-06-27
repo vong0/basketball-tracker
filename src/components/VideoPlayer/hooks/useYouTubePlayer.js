@@ -1,140 +1,125 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { loadYouTubeAPI } from '../../../lib/youtube';
-import * as pool from '../lib/iframePool';
 import { YT_IFRAME_WIDTH, YT_IFRAME_HEIGHT } from '../lib/constants';
 
 export function useYouTubePlayer({ videoId, isMobile, isFullscreen }) {
   const ytPlayerRef = useRef(null);
   const iframeContainerRef = useRef(null);
   const iframeScaleWrapRef = useRef(null);
-  const hasPlayedOnceRef = useRef(false);
+  const playerIsMobileRef = useRef(null);
+  const unmountedRef = useRef(false);
+  // Ref mirror of playerReady — updated synchronously so effects in the same
+  // flush can read the correct value before the state update causes a re-render.
+  const playerReadyRef = useRef(false);
   const [playerReady, setPlayerReady] = useState(false);
   const [playerReadySeq, setPlayerReadySeq] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [currentRate, setCurrentRate] = useState(1);
 
-  // markReady: increments playerReadySeq + sets playerReady. Both state setters
-  // are stable across renders (React guarantee), so useCallback needs no deps.
-  // The seq counter ensures the seek effect in VideoPlayer fires on every fresh
-  // attach, even if playerReady was already true due to React 18 batching.
   const markReady = useCallback(() => {
+    playerReadyRef.current = true;
     setPlayerReadySeq(s => s + 1);
     setPlayerReady(true);
   }, []);
 
+  // Always destroy and recreate the player when videoId or isMobile changes.
+  // loadVideoById (reuse existing player) was tried but proved unreliable: the
+  // seek to the clip start always lost the race against YouTube's own autoplay,
+  // regardless of whether the seek was dispatched via React effects or directly
+  // in onStateChange. The creation path (onReady → markReady → seek effect) is
+  // proven reliable and is the only path used for single-video mode.
   useEffect(() => {
-    if (!videoId) return;
+    if (!videoId) {
+      if (ytPlayerRef.current?.pauseVideo) try { ytPlayerRef.current.pauseVideo(); } catch (e) {}
+      setIsPlaying(false);
+      return;
+    }
 
-    if (isMobile) {
-      // Mobile: create/destroy per videoId — scale trick needs iframeScaleWrapRef
-      let cancelled = false;
-      loadYouTubeAPI().then((YT) => {
-        if (cancelled) return;
-        const mountTarget = iframeScaleWrapRef.current || iframeContainerRef.current;
-        if (!mountTarget) return;
+    // Destroy any existing player before creating a new one.
+    playerReadyRef.current = false;
+    if (ytPlayerRef.current?.destroy) {
+      try { ytPlayerRef.current.destroy(); } catch (e) {}
+      ytPlayerRef.current = null;
+    }
+    setPlayerReady(false);
+    setIsPlaying(false);
+
+    let cancelled = false;
+    const mountTarget = isMobile
+      ? (iframeScaleWrapRef.current || iframeContainerRef.current)
+      : iframeContainerRef.current;
+
+    loadYouTubeAPI().then((YT) => {
+      if (cancelled || unmountedRef.current || !mountTarget) return;
+
+      if (isMobile) {
         mountTarget.innerHTML = '';
-        const div = document.createElement('div');
-        div.id = 'yt-player-' + Math.random().toString(36).slice(2);
-        mountTarget.appendChild(div);
-
         const forceSize = () => {
           const iframe = mountTarget.querySelector('iframe');
-          if (iframe) {
-            iframe.style.background = '#000';
-            iframe.setAttribute('width', String(YT_IFRAME_WIDTH));
-            iframe.setAttribute('height', String(YT_IFRAME_HEIGHT));
-            iframe.style.width = YT_IFRAME_WIDTH + 'px';
-            iframe.style.height = YT_IFRAME_HEIGHT + 'px';
-          }
+          if (!iframe) return;
+          iframe.style.background = '#000';
+          iframe.setAttribute('width', String(YT_IFRAME_WIDTH));
+          iframe.setAttribute('height', String(YT_IFRAME_HEIGHT));
+          iframe.style.width = YT_IFRAME_WIDTH + 'px';
+          iframe.style.height = YT_IFRAME_HEIGHT + 'px';
         };
         forceSize();
         setTimeout(forceSize, 0);
         setTimeout(forceSize, 300);
+      }
 
-        ytPlayerRef.current = new YT.Player(div.id, {
-          videoId,
-          playerVars: {
-            controls: 0, rel: 0, fs: 0, disablekb: 1,
-            iv_load_policy: 3, playsinline: 1, vq: 'hd1080',
+      const div = document.createElement('div');
+      div.id = 'yt-player-' + Math.random().toString(36).slice(2);
+      mountTarget.appendChild(div);
+
+      playerIsMobileRef.current = isMobile;
+
+      ytPlayerRef.current = new YT.Player(div.id, {
+        videoId,
+        ...(isMobile ? { width: YT_IFRAME_WIDTH, height: YT_IFRAME_HEIGHT } : {}),
+        playerVars: {
+          controls: 0, rel: 0, fs: 0, disablekb: 1,
+          iv_load_policy: 3, playsinline: 1, vq: 'hd1080',
+        },
+        events: {
+          // unmountedRef guards all callbacks — it's only true after component unmount,
+          // NOT after videoId changes (unlike the old `cancelled` variable which was set
+          // on every videoId change cleanup, silently breaking all subsequent events).
+          onReady: (e) => {
+            if (unmountedRef.current) return;
+            try { e.target.mute(); } catch (err) {}
+            markReady();
           },
-          events: {
-            onReady: (e) => {
-              try { e.target.mute(); } catch (err) {}
-              if (!cancelled) markReady();
-            },
-            onStateChange: (e) => {
-              if (cancelled) return;
-              if (e.data === 1) {
-                setIsPlaying(true);
-                if (!hasPlayedOnceRef.current) {
-                  hasPlayedOnceRef.current = true;
-                  setInitialLoading(false);
-                }
-              } else if (e.data === 2 || e.data === 0) {
-                setIsPlaying(false);
-              }
-            },
+          onStateChange: (e) => {
+            if (unmountedRef.current) return;
+            if (e.data === 1) setIsPlaying(true);
+            else if (e.data === 2 || e.data === 0) setIsPlaying(false);
           },
-        });
+          onPlaybackRateChange: (e) => {
+            if (!unmountedRef.current) setCurrentRate(e.data);
+          },
+        },
       });
-      return () => {
-        cancelled = true;
-        setPlayerReady(false);
-        hasPlayedOnceRef.current = false;
-        if (ytPlayerRef.current?.destroy) {
-          try { ytPlayerRef.current.destroy(); } catch (e) {}
-          ytPlayerRef.current = null;
-        }
-      };
+    });
 
-    } else {
-      // Desktop: LRU pool — iframe stays alive across videoId switches
-
-      const slot = pool.acquire(videoId);
-      pool.attach(slot, iframeContainerRef.current);
-
-      // Set ytPlayerRef immediately if player was already created.
-      // This matches original behaviour: ytPlayerRef.current is set as soon as
-      // new YT.Player() is called, NOT waiting for onReady. Controls work right away.
-      if (slot.player) ytPlayerRef.current = slot.player;
-      if (slot.ready) markReady();
-      else setPlayerReady(false);
-
-      hasPlayedOnceRef.current = slot.hasPlayedOnce;
-      // Always start loading on fresh attach so the black blocker shows until
-      // the first play event, regardless of whether the slot is warm or cold.
-      setInitialLoading(true);
-
-      const cleanups = [
-        // 'created' fires when slot.player is first assigned (async YT load case).
-        // If YT was already loaded, slot.player is set synchronously in acquire()
-        // and we handled it above; this listener handles the deferred case.
-        pool.addListener(slot, 'created', (player) => {
-          ytPlayerRef.current = player;
-        }),
-        pool.addListener(slot, 'ready', markReady),
-        pool.addListener(slot, 'state', (data) => {
-          if (data === 1) {
-            setIsPlaying(true);
-            if (!hasPlayedOnceRef.current) hasPlayedOnceRef.current = true;
-            setInitialLoading(false);  // clear blocker on every play after mount
-          } else if (data === 2 || data === 0) {
-            setIsPlaying(false);
-          }
-        }),
-        pool.addListener(slot, 'rate', (rate) => setCurrentRate(rate)),
-      ];
-
-      return () => {
-        cleanups.forEach(c => c());
-        setPlayerReady(false);
-        ytPlayerRef.current = null;
-        hasPlayedOnceRef.current = false;
-        pool.detach(slot);
-      };
-    }
+    return () => { cancelled = true; };
   }, [videoId, isMobile]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Destroy player on component unmount.
+  useEffect(() => {
+    unmountedRef.current = false; // reset on (re)mount — handles StrictMode double-invoke
+    return () => {
+      unmountedRef.current = true;
+      playerReadyRef.current = false;
+      setPlayerReady(false);
+      setIsPlaying(false);
+      playerIsMobileRef.current = null;
+      if (ytPlayerRef.current?.destroy) {
+        try { ytPlayerRef.current.destroy(); } catch (e) {}
+        ytPlayerRef.current = null;
+      }
+    };
+  }, []);
 
   const setRate = useCallback((rate) => {
     const p = ytPlayerRef.current;
@@ -143,8 +128,7 @@ export function useYouTubePlayer({ videoId, isMobile, isFullscreen }) {
     setCurrentRate(rate);
   }, []);
 
-  // Mobile only: scale the fixed-size iframe to COVER the container.
-  // Tricks YouTube into serving HD; crops overflow edge-to-edge.
+  // Mobile only: scale fixed-size iframe to COVER the container (HD trick).
   useEffect(() => {
     if (!isMobile) return;
     const recompute = () => {
@@ -181,18 +165,16 @@ export function useYouTubePlayer({ videoId, isMobile, isFullscreen }) {
       ro.disconnect();
       window.removeEventListener('resize', recompute);
       document.removeEventListener('fullscreenchange', recompute);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
     };
   }, [isMobile, isFullscreen, playerReady]);
 
   return {
     ytPlayerRef,
+    playerReadyRef,
     playerReady,
     playerReadySeq,
     isPlaying,
-    initialLoading,
     currentRate,
     setRate,
     iframeContainerRef,

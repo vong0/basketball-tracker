@@ -46,13 +46,14 @@ export function countClips(clips, filter) {
 }
 
 // Translates FilterPopover UI choice to clip filter shape.
-// choice: { player: string|null, preset: 'all'|'goodOffense'|'goodDefense'|'badOffense'|'badDefense' }
+// choice: { player: string|null, rating: 'G'|'B'|null, possession: 'offense'|'defense'|null }
 export function buildFilter(choice) {
   if (!choice) return null
   const f = {}
-  const preset = PLAYLISTS.find(p => p.key === (choice.preset || 'all'))
-  if (preset?.filter) Object.assign(f, preset.filter)
   if (choice.player === 'opponents') f.team = 'O'
   else if (choice.player)            f.players = [choice.player, 'all']
+  if (choice.rating)                 f.quality = choice.rating
+  if (choice.possession === 'offense') f.type = 'O'
+  else if (choice.possession === 'defense') f.type = 'D'
   return Object.keys(f).length ? f : null
 }

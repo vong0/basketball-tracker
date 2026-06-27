@@ -43,7 +43,7 @@ export function useFilterState({
     if (onFilterClose) onFilterClose();
   };
 
-  const filterActive = !!(filterChoice && (filterChoice.player || (filterChoice.preset && filterChoice.preset !== 'all')));
+  const filterActive = !!(filterChoice && (filterChoice.player || filterChoice.rating || filterChoice.possession));
   const total = cutSegments.length;
   const visible = visibleIndices ? visibleIndices.length : total;
   const visibleSet = visibleIndices || cutSegments.map((_, i) => i);

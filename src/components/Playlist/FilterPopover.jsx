@@ -2,24 +2,27 @@ import { Modal, Select } from '@mantine/core';
 import styles from './FilterPopover.module.css';
 
 function FilterBody({ choice, setChoice, options, visible, total }) {
-  const reset = () => setChoice({ player: null, preset: 'all' });
+  const reset = () => setChoice({ player: null, rating: null, possession: null });
 
   const playerData = [
     { value: '', label: 'Any' },
     ...(options.hasOpponents ? [{ value: 'opponents', label: 'Opponents' }] : []),
     ...options.players.map(p => ({ value: p, label: p.charAt(0).toUpperCase() + p.slice(1) })),
   ];
-
-  const presetData = [
-    { value: 'all',         label: 'All' },
-    { value: 'goodOffense', label: 'Good Offense' },
-    { value: 'goodDefense', label: 'Good Defense' },
-    { value: 'badOffense',  label: 'Bad Offense' },
-    { value: 'badDefense',  label: 'Bad Defense' },
+  const ratingData = [
+    { value: '', label: 'Any' },
+    { value: 'G', label: 'Good' },
+    { value: 'B', label: 'Bad' },
+  ];
+  const possessionData = [
+    { value: '', label: 'Any' },
+    { value: 'offense', label: 'Offense' },
+    { value: 'defense', label: 'Defense' },
   ];
 
-  const onPlayerChange = (v) => setChoice({ ...choice, player: v || null });
-  const onPresetChange = (v) => setChoice({ ...choice, preset: v || 'all' });
+  const onPlayerChange     = (v) => setChoice({ ...choice, player: v || null });
+  const onRatingChange     = (v) => setChoice({ ...choice, rating: v || null });
+  const onPossessionChange = (v) => setChoice({ ...choice, possession: v || null });
 
   const showPlayers = playerData.length > 1;
 
@@ -31,30 +34,39 @@ function FilterBody({ choice, setChoice, options, visible, total }) {
 
       {showPlayers && (
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>Players</div>
+          <div className={styles.sectionTitle}>Player</div>
           <Select
             data={playerData}
             value={choice.player ?? ''}
             onChange={onPlayerChange}
             allowDeselect={false}
             maxDropdownHeight={200}
-            scrollAreaProps={{ type: 'always' }}
             classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
-            comboboxProps={{ withinPortal: false }}
           />
         </div>
       )}
 
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Preset</div>
+        <div className={styles.sectionTitle}>Rating</div>
         <Select
-          data={presetData}
-          value={choice.preset ?? 'all'}
-          onChange={onPresetChange}
+          data={ratingData}
+          value={choice.rating ?? ''}
+          onChange={onRatingChange}
           allowDeselect={false}
           maxDropdownHeight={200}
           classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
-          comboboxProps={{ withinPortal: false }}
+        />
+      </div>
+
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>Possession</div>
+        <Select
+          data={possessionData}
+          value={choice.possession ?? ''}
+          onChange={onPossessionChange}
+          allowDeselect={false}
+          maxDropdownHeight={200}
+          classNames={{ input: styles.selectInput, dropdown: styles.selectDropdown }}
         />
       </div>
 

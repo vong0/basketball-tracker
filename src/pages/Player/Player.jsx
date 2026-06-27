@@ -18,7 +18,7 @@ export default function Player({ gameId, isMobile }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [videoCollapsed, setVideoCollapsed] = useState(false);
-  const [filterChoice, setFilterChoice] = useState({ player: null, preset: 'all' });
+  const [filterChoice, setFilterChoice] = useState({ player: null, rating: null, possession: null });
   const videoPlayerRef = useRef(null);
 
   const toggleVideoCollapsed = useCallback(

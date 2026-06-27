@@ -29,12 +29,24 @@ function VideoPlayerInner({
     ? (cutSegments[activeIdx]?.videoId ?? null)
     : videoId;
 
-  const { ytPlayerRef, playerReady, playerReadySeq, isPlaying, initialLoading, currentRate, setRate,
+  const { ytPlayerRef, playerReadyRef, playerReady, playerReadySeq, isPlaying, currentRate, setRate,
     iframeContainerRef, iframeScaleWrapRef } = useYouTubePlayer({
     videoId: effectiveVideoId,
     isMobile,
     isFullscreen,
   });
+
+  const [showLoadBlocker, setShowLoadBlocker] = useState(true);
+
+  useEffect(() => {
+    if (isPlaying) setShowLoadBlocker(false);
+  }, [isPlaying]);
+
+  useEffect(() => {
+    setShowLoadBlocker(true);
+    const t = setTimeout(() => setShowLoadBlocker(false), 3000);
+    return () => clearTimeout(t);
+  }, [effectiveVideoId]);
 
   const activeSegment = activeIdx >= 0 ? cutSegments[activeIdx] : null;
 
@@ -131,8 +143,11 @@ function VideoPlayerInner({
   });
 
   // Seek to segment when activeIdx changes, auto-play unless a modal is suppressing it.
+  // playerReadyRef.current guards against the race where effectiveVideoId and activeIdx
+  // change together: the hook's effect calls loadVideoById and clears the ref synchronously,
+  // so this effect (running in the same flush) correctly skips until markReady() fires.
   useEffect(() => {
-    if (!playerReady || activeIdx < 0) return;
+    if (!playerReady || !playerReadyRef.current || activeIdx < 0) return;
     const seg = cutSegments[activeIdx];
     if (!seg) return;
     const p = ytPlayerRef.current;
@@ -208,14 +223,14 @@ function VideoPlayerInner({
                 <div ref={iframeContainerRef} className={styles.iframeContainerMobile}>
                   <div ref={iframeScaleWrapRef} className={styles.iframeScaleWrap} />
                 </div>
-                {initialLoading && <div className={styles.iframeLoadBlocker} />}
+                {showLoadBlocker && <div className={styles.iframeLoadBlocker} />}
               </div>
             </NeighborSlots>
           </div>
         ) : (
           <>
             <div ref={iframeContainerRef} className={styles.iframeContainer} />
-            {initialLoading && <div className={styles.iframeLoadBlocker} />}
+            {showLoadBlocker && <div className={styles.iframeLoadBlocker} />}
           </>
         )}
 
