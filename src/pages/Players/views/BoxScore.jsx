@@ -1,62 +1,29 @@
 import { useMemo } from 'react'
-import { getPlayerGameLog, getPlayerSeasonAverages, PLAYER_GAME_LOG_COLS } from '../../../lib/statsCore.js'
-import StatTable from '../../../components/StatTable/StatTable.jsx'
-import StatCardGrid from '../../../components/StatCardGrid/StatCardGrid.jsx'
+import { displayPlayerBoxScore } from '../../../lib/statDisplay.js'
+import MetricRow from '../../../components/MetricRow/MetricRow.jsx'
+import DataTable from '../../../components/DataTable/DataTable.jsx'
 import styles from './views.module.css'
 
 export default function BoxScore({ statsData, playerId, scopeType, games }) {
-  const gameLog = useMemo(() => {
-    if (!statsData || scopeType === 'game') return null
-    return getPlayerGameLog(statsData, playerId)
-  }, [statsData, playerId, scopeType])
-
-  const averages = useMemo(() => gameLog ? getPlayerSeasonAverages(gameLog) : null, [gameLog])
-  const gamesMap = useMemo(() => Object.fromEntries((games ?? []).map(g => [g.id, g])), [games])
+  const d = useMemo(
+    () => displayPlayerBoxScore(statsData, playerId, scopeType, games ?? []),
+    [statsData, playerId, scopeType, games]
+  )
 
   if (!statsData) return <div className={styles.section}><p className={styles.placeholder}>Loading…</p></div>
 
-  if (scopeType === 'game') {
-    const fg = statsData.shots.filter(s => s.player === playerId)
-    const fts = statsData.freeThrows.filter(ft => ft.player === playerId)
-    const madeShots = fg.filter(s => String(s.result).toLowerCase() === 'make')
-    const made3 = fg.filter(s => Number(s.points) === 3 && String(s.result).toLowerCase() === 'make')
-    const att3  = fg.filter(s => Number(s.points) === 3)
-    const FTM = fts.filter(ft => String(ft.result).toLowerCase() === 'make').length
-    const FTA = fts.length
-    const PTS = madeShots.reduce((t, s) => t + Number(s.points), 0) + FTM
-    const quickCards = [
-      { key: 'PTS', label: 'PTS', value: PTS },
-      { key: 'FG', label: 'FG', value: `${madeShots.length}/${fg.length}`, secondary: fg.length ? `${((madeShots.length / fg.length) * 100).toFixed(1)}%` : '—' },
-      { key: '3PT', label: '3PT', value: `${made3.length}/${att3.length}`, secondary: att3.length ? `${((made3.length / att3.length) * 100).toFixed(1)}%` : '—' },
-      { key: 'FT', label: 'FT', value: `${FTM}/${FTA}`, secondary: FTA ? `${((FTM / FTA) * 100).toFixed(1)}%` : '—' },
-    ]
-    return (
-      <div className={styles.section}>
-        <StatCardGrid cards={quickCards} cols={4} />
-      </div>
-    )
-  }
-
   return (
     <div className={styles.section}>
-      {averages && (
+      {d.metrics.length > 0 && (
         <>
-          <div className={styles.subTitle}>Averages</div>
-          <StatCardGrid cards={averages} cols={5} />
+          {scopeType !== 'game' && <div className={styles.subTitle}>Averages</div>}
+          <MetricRow cards={d.metrics} cols={scopeType === 'game' ? 4 : 5} />
         </>
       )}
-      {gameLog && gameLog.length > 0 && (
+      {d.gameLog && (
         <>
           <div className={styles.subTitle}>Game Log</div>
-          <StatTable
-            rows={gameLog}
-            cols={PLAYER_GAME_LOG_COLS}
-            getRow={r => {
-              const g = gamesMap[r.game_id]
-              return { ...r, game_id: g ? `${g.opponentName} (${g.result ?? ''})` : r.game_id }
-            }}
-            nameKey="game_id"
-          />
+          <DataTable desc={d.gameLog} />
         </>
       )}
     </div>

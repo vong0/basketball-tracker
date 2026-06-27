@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
-import { getTeamSummaryCards } from '../../../lib/statsCore.js'
-import StatCardGrid from '../../../components/StatCardGrid/StatCardGrid.jsx'
+import { displayTeamSummary } from '../../../lib/statDisplay.js'
+import GroupRow from '../../../components/GroupRow/GroupRow.jsx'
 import styles from './views.module.css'
 
 export default function TeamSummary({ statsData }) {
-  const cards = useMemo(() => getTeamSummaryCards(statsData), [statsData])
+  const d = useMemo(() => displayTeamSummary(statsData), [statsData])
   return (
     <div className={styles.section}>
-      <StatCardGrid cards={cards} cols={6} />
+      <GroupRow groups={d.groups} />
     </div>
   )
 }
