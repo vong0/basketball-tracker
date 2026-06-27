@@ -1,6 +1,91 @@
 {
   "teams": [
     {
+      "id": "garuda-titans",
+      "name": "Garuda Titans",
+      "photo": "data/photos/titans/team.png",
+      "notes": [
+        "Fast break team and they pass early. 3 good shooters.",
+        "Furthest back immediately runs back off miss and don't foul",
+        "Watch out for wing/corner to middle pass into push shot, deny the pass and contest"
+      ],
+      "players": [
+        {
+          "number": "5",
+          "name": "Shooter",
+          "photo": "data/photos/titans/05.png",
+          "profile": "Good shooter",
+          "threat": [
+            "Good shooter"
+          ],
+          "defend": [
+            "Do not leave him to help collapse or help defense another man"
+          ]
+        },
+        {
+          "number": "21",
+          "name": "The Brother",
+          "photo": "data/photos/titans/21.png",
+          "profile": "Good shooter and driver (#5 is his brother)",
+          "threat": [
+            "Good shooter and driver"
+          ],
+          "defend": [
+            "Do not leave him to help collapse or help defense another man"
+          ]
+        },
+        {
+          "number": "n/a",
+          "name": "No Number",
+          "photo": "data/photos/titans/unknown.png",
+          "profile": "Good shooter and driver",
+          "threat": [
+            "Good shooter and driver"
+          ],
+          "defend": [
+            "Do not leave him to help collapse or help defense another man"
+          ]
+        },
+        {
+          "number": "53",
+          "name": "Paint Scorer",
+          "photo": "data/photos/titans/53.png",
+          "profile": "Paint scorer (bank, tip in, floater)",
+          "threat": [
+            "Camps in the paint, watch out for him, gets it from the wing/corner",
+            "Good contact layup, extends arm for a side hook"
+          ],
+          "defend": [
+
+          ]
+        },
+        {
+          "number": "0",
+          "name": "Skinny dude",
+          "photo": "data/photos/titans/00.png",
+          "profile": "Non-shooter, sag off",
+          "threat": ["Athletic and fast. Don't get blocked by him."],
+          "defend": []
+        },
+        {
+          "number": "99",
+          "name": "",
+          "photo": "data/photos/titans/99.png",
+          "profile": "Non-shooter, sag off",
+          "threat": [],
+          "defend": []
+        },
+        {
+          "number": "10",
+          "name": "",
+          "photo": "data/photos/titans/10.png",
+          "profile": "Non-shooter, sag off",
+          "threat": [],
+          "defend": []
+        }
+      ]
+    },
+    {
       "id": "net-profits",
       "name": "Net Profits",
       "photo": "data/photos/profits/team.png",
@@ -83,7 +168,7 @@
       "photo": "data/photos/tam/team.png",
       "notes": [
         "2 shooters (#1 and #11). 1 very athletic driver (#10)",
-        "Good ball movement and good rotation on defense"
+        "Good ball movement and good rotation on defense (play 2-3 zone)"
       ],
       "players": [
         {
