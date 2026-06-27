@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { displayGameOverview } from '../../../lib/statDisplay.js'
+import { displayGameOverview } from '../../../lib/statsCore.js'
 import MetricRow from '../../../components/MetricRow/MetricRow.jsx'
 import GroupRow from '../../../components/GroupRow/GroupRow.jsx'
 import styles from './views.module.css'

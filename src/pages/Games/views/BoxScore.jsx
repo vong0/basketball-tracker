@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { displayGameBoxScore } from '../../../lib/statDisplay.js'
+import { displayGameBoxScore } from '../../../lib/statsCore.js'
 import DataTable from '../../../components/DataTable/DataTable.jsx'
 import styles from './views.module.css'
 

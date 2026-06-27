@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { displayShotChart } from '../../../lib/statDisplay.js'
+import { displayShotChart } from '../../../lib/statsCore.js'
 import ShotChartSVG from '../../../components/ShotChartSVG/ShotChartSVG.jsx'
 import DataTable from '../../../components/DataTable/DataTable.jsx'
 import styles from './views.module.css'

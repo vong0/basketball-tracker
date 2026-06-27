@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { displayTeamAdvancedStats } from '../../../lib/statDisplay.js'
+import { displayTeamAdvancedStats } from '../../../lib/statsCore.js'
 import GroupRow from '../../../components/GroupRow/GroupRow.jsx'
 import styles from './views.module.css'
 
