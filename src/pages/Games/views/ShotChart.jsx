@@ -9,7 +9,7 @@ export default function ShotChart({ statsData }) {
   if (!d.shots.length) return <div className={styles.section}><p className={styles.placeholder}>No shot data.</p></div>
   return (
     <div className={styles.section}>
-      <ShotChartSVG shots={d.shots} showList={true} />
+      <ShotChartSVG shots={d.shots} showList={true} showPlayerFilter={true} />
       <div className={styles.breakdownGrid}>
         <div>
           <div className={styles.subTitle}>Zone Breakdown</div>

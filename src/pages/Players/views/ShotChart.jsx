@@ -12,7 +12,7 @@ export default function ShotChart({ statsData, playerId }) {
 
   return (
     <div className={styles.section}>
-      <ShotChartSVG shots={d.shots} showList={true} />
+      <ShotChartSVG shots={d.shots} showList={true} showPlayerFilter={false} />
       <div className={styles.breakdownGrid}>
         <div>
           <div className={styles.subTitle}>Zone Breakdown</div>
