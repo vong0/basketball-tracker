@@ -11,7 +11,7 @@
 
 .picker {
   appearance: none;
-  background: #f5f5f5;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   color: var(--text);
@@ -28,7 +28,7 @@
   transition: border-color 0.15s;
 }
 
-.picker:focus { border-color: var(--accent); }
+.picker:focus { border-color: var(--accent-focus); }
 
 @media (max-width: 640px) {
   .bar { padding: 10px 16px; }

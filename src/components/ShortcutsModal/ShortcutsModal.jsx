@@ -11,7 +11,7 @@ export default function ShortcutsModal({ open, onClose, isMobile }) {
       title={isMobile ? 'GESTURES' : 'KEYBOARD SHORTCUTS'}
       centered
       size="md"
-      classNames={{ title: styles.modalTitle }}
+      classNames={{ title: styles.modalTitle, content: 'dark-zone', header: 'dark-zone' }}
     >
       {isMobile ? (
         <div className={styles.list}>

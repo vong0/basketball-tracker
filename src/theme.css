@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Barlow+Condensed:wght@600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ─────────────────────────────────────────
    Light theme — all pages except dark zones
@@ -8,46 +8,50 @@
   --content-width: 1100px;
 
   /* Backgrounds */
-  --bg:          #f5f5f5;
+  --bg:          #f0f0f0;
   --bg-card:     #ffffff;
-  --bg-elevated: #f5f5f5;
-  --bg-section:  #f5f5f5;
-  --bg-hover:    #eeeeee;
+  --bg-metric:   #f8f8f6;
+  --bg-elevated: #ffffff;
+  --bg-section:  #f0f0f0;
+  --bg-hover:    #f5f5f5;
 
   /* Borders */
-  --border:        rgb(211, 211, 211);
-  --border-strong: rgba(0, 0, 0, 0.22);
+  --border:        #e2e2e2;
+  --border-row:    #eeeeee;
+  --border-strong: #c8c8c8;
 
   /* Text */
-  --text:       rgba(0, 0, 0, 0.87);
-  --text-dim:   rgba(0, 0, 0, 0.60);
-  --text-faint: rgba(0, 0, 0, 0.45);
+  --text:       #111111;
+  --text-dim:   #555555;
+  --text-faint: #777777;
 
   /* Header / hero (always dark) */
-  --header-bg:   #1a1a1a;
-  --header-text: rgba(255, 255, 255, 0.90);
-  --header-dim:  rgba(255, 255, 255, 0.55);
-  --hero-bg:     linear-gradient(180deg, #1a1a1a 0%, #1e1e1e 100%);
+  --header-bg:   #0d0d0d;
+  --header-text: rgba(255, 255, 255, 0.92);
+  --header-dim:  rgba(255, 255, 255, 0.60);
+  --hero-bg:     linear-gradient(160deg, #0d0d0d 0%, #181818 100%);
 
   /* Accent */
-  --accent: #2563eb;
+  --accent:       #111111;
+  --accent-nav:   #ff5c1a;
+  --accent-focus: #2563eb;
 
-  /* Content highlight (teal-blue for featured stats — Glory's #29d) */
+  /* Content highlight */
   --highlight: #2299dd;
 
   /* Win / Loss */
-  --win:  #16a34a;
+  --win:  #15803d;
   --loss: #dc2626;
 
-  /* Compat aliases — used in strategies/takeaways content accents */
-  --orange: #f97316;
-  --green:  #16a34a;
+  /* Compat aliases */
+  --orange: #ff5c1a;
+  --green:  #15803d;
   --red:    #dc2626;
 
   /* Shadows */
-  --shadow-card:  rgba(26, 26, 26, 0.20) 0px 1px 4px;
-  --shadow-input: rgba(26, 26, 26, 0.20) 0px 1px 4px;
-  --shadow-hover: rgba(26, 26, 26, 0.28) 0px 3px 10px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-input: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-hover: 0 4px 20px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
 
   /* Border radii */
   --radius-sm:   4px;
@@ -55,9 +59,10 @@
   --radius-lg:   12px;
   --radius-pill: 999px;
 
-  /* Typography — DM Sans body, Barlow Condensed for display/scores */
+  /* Typography */
   --font-body:    'DM Sans', sans-serif;
   --font-display: 'Barlow Condensed', sans-serif;
+  --font-score:   'Anton', sans-serif;
   --font-mono:    'DM Sans', sans-serif;
 }
 
@@ -67,29 +72,34 @@
 .dark-zone {
   --bg:          #0a0a0d;
   --bg-card:     #131318;
+  --bg-metric:   #1a1a20;
   --bg-elevated: #131318;
   --bg-section:  #131318;
   --bg-hover:    #1a1a20;
 
   --border:        #1f1f24;
+  --border-row:    #1f1f24;
   --border-strong: #2e2e35;
 
   --text:       #f5f5f5;
   --text-dim:   rgba(255, 255, 255, 0.60);
   --text-faint: rgba(255, 255, 255, 0.38);
 
-  --accent:  #ff5c1a;
-  --orange:  #ff5c1a;
-  --green:   #4ade80;
-  --red:     #f87171;
-  --win:     #4ade80;
-  --loss:    #f87171;
+  --accent:       #ff5c1a;
+  --accent-nav:   #ff5c1a;
+  --accent-focus: #ff5c1a;
+  --orange:       #ff5c1a;
+  --green:        #4ade80;
+  --red:          #f87171;
+  --win:          #4ade80;
+  --loss:         #f87171;
 
   --shadow-card:  0 2px 8px rgba(0, 0, 0, 0.5);
   --shadow-input: 0 2px 8px rgba(0, 0, 0, 0.5);
 
   --font-body:    'DM Sans', sans-serif;
-  --font-display: 'Bebas Neue', sans-serif;
+  --font-display: 'Anton', sans-serif;
+  --font-score:   'Anton', sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
 
   color: var(--text);
@@ -101,13 +111,13 @@
    ───────────────────────────────────────── */
 :root {
   scrollbar-width: thin;
-  scrollbar-color: #c0c0c0 #ffffff;
+  scrollbar-color: #c8c8c8 #f0f0f0;
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #ffffff; }
-::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+::-webkit-scrollbar-track { background: #f0f0f0; }
+::-webkit-scrollbar-thumb { background: #c8c8c8; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
 
 .dark-zone {
   scrollbar-color: #444 #111;

@@ -41,7 +41,7 @@
 .initials {
   width: 100%;
   height: 100%;
-  background: var(--accent);
+  background: var(--accent-nav);
   display: flex;
   align-items: center;
   justify-content: center;

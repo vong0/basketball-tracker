@@ -6,7 +6,7 @@
   z-index: 30;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .strip {
@@ -30,30 +30,24 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-dim);
+  color: var(--text-faint);
   background: none;
   border: none;
-  border-bottom: none;
-  /* Underline close to text, not at container bottom */
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: color 0.15s, text-decoration-color 0.15s;
+  transition: color 0.15s, border-color 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 @media (hover: hover) {
-  .tab:hover { color: var(--text); }
+  .tab:hover { color: var(--text-dim); }
 }
 
 .tabActive {
   color: var(--text);
   font-weight: 600;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 2px;
+  border-bottom-color: var(--text);
 }
 
 .arrow {
@@ -61,7 +55,7 @@
   display: none;
   background: none;
   border: none;
-  color: var(--text-dim);
+  color: var(--text-faint);
   font-size: 20px;
   cursor: pointer;
   flex-shrink: 0;
@@ -72,7 +66,7 @@
 .arrow:disabled { opacity: 0.2; cursor: default; }
 
 @media (max-width: 640px) {
-  .bar { top: 56px; }
+  .bar { top: 48px; }
   .arrow { display: flex; }
   .strip { padding: 0; }
 }

@@ -13,8 +13,8 @@
 
 /* ── Hero ── */
 .hero {
-  background: var(--hero-bg);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
   padding: 48px 32px 40px;
 }
 
@@ -27,7 +27,7 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.45);
+  color: var(--text-faint);
   margin-bottom: 10px;
   text-transform: uppercase;
 }
@@ -38,12 +38,12 @@
   letter-spacing: -0.01em;
   margin: 0 0 12px;
   line-height: 1;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .sub {
   font-size: 15px;
-  color: rgba(255,255,255,0.55);
+  color: var(--text-dim);
   margin: 0;
   line-height: 1.5;
   max-width: 480px;
@@ -73,17 +73,17 @@
   text-decoration: none;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-top: 2px solid var(--accent);
   border-radius: var(--radius-md);
   padding: 20px 20px 18px;
   color: inherit;
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.15s, border-color 0.15s;
 }
 
 @media (hover: hover) {
   .card:hover {
-    box-shadow: rgba(26, 26, 26, 0.28) 0px 3px 10px;
+    box-shadow: var(--shadow-hover);
+    border-color: var(--border-strong);
   }
 }
 
@@ -106,7 +106,7 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--text-faint);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
@@ -131,8 +131,8 @@
   align-items: center;
   justify-content: flex-end;
   margin-top: 14px;
-  color: var(--accent);
-  opacity: 0.6;
+  color: var(--text-faint);
+  opacity: 0.7;
   transition: opacity 0.15s, transform 0.15s;
 }
 

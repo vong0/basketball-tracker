@@ -12,7 +12,7 @@
 
 @media (max-width: 640px) {
   .banner {
-    height: 56px;
+    height: 48px;
     padding: 0 16px;
   }
 }
@@ -39,16 +39,16 @@
 }
 
 .wordmark {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
   font-weight: 400;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--header-text);
 }
 
 @media (max-width: 640px) {
-  .wordmark { font-size: 18px; }
+  .wordmark { font-size: 19px; }
 }
 
 /* ── Nav ─────────────────────────────── */
@@ -68,40 +68,33 @@
 .navLink {
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 16px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
   color: var(--header-dim);
   text-decoration: none;
-  /* Underline under the text, not at the bottom of the 56px container */
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-  border-bottom: none;
-  transition: color 0.15s, background 0.15s, text-decoration-color 0.15s, font-weight 0.05s;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
   white-space: nowrap;
   height: 56px;
-  border-radius: 0;
+}
+
+@media (max-width: 640px) {
+  .navLink { height: 48px; }
 }
 
 @media (hover: hover) {
   .navLink:hover {
     background: rgba(255, 255, 255, 0.09);
     color: #ffffff;
-    font-weight: 600;
-    text-decoration-color: transparent;
   }
 }
 
 .navLinkActive {
   color: #ffffff;
   font-weight: 600;
-  /* White underline directly under the text */
-  text-decoration-color: #ffffff;
-  text-decoration-thickness: 3px;
-  text-underline-offset: 4px;
+  border-bottom-color: var(--accent-nav);
 }
 
 /* ── Hamburger (mobile only) ─────────── */
@@ -140,7 +133,7 @@
   left: 0;
   right: 0;
   z-index: 51;
-  background: #1a1a1a;
+  background: #0d0d0d;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
@@ -151,7 +144,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  height: 56px;
+  height: 48px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
@@ -165,10 +158,10 @@
 }
 
 .drawerWordmark {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  font-family: 'Anton', sans-serif;
+  font-size: 19px;
   font-weight: 400;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -187,13 +180,14 @@
   display: flex;
   align-items: center;
   padding: 0 20px;
-  height: 56px;
+  height: 52px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.80);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid transparent;
   transition: background 0.12s, color 0.12s;
 }
 
@@ -207,7 +201,6 @@
 .drawerLinkActive {
   color: #ffffff;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.06);
-  border-left: 3px solid #ffffff;
-  padding-left: 17px;
+  background: rgba(255, 92, 26, 0.08);
+  border-left-color: var(--accent-nav);
 }
