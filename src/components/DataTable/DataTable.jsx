@@ -27,17 +27,18 @@ function cardText(cell) {
   return cell ?? '—'
 }
 
-export default function DataTable({ desc, dense = false }) {
+export default function DataTable({ desc, dense = false, alternateRows = false }) {
   if (!desc) return null
   const { columns, rows } = desc
   if (!rows?.length) return <p className={styles.placeholder}>No data.</p>
 
   const nameCol = columns.find(c => c.type === 'name')
+  const tableClass = [styles.table, dense ? styles.dense : '', alternateRows ? styles.alternateRows : ''].filter(Boolean).join(' ')
 
   return (
     <>
       <div className={styles.tableWrap}>
-        <table className={`${styles.table}${dense ? ' ' + styles.dense : ''}`}>
+        <table className={tableClass}>
           <thead>
             <tr>
               {columns.map(c => (

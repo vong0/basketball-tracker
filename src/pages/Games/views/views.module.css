@@ -68,6 +68,70 @@
   line-height: 1.5;
 }
 
+/* ── Half splits table ──────────────── */
+
+.halfSplitsWrap {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.halfSplitsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.halfSplitsTh {
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 8px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.halfSplitsTdLabel {
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-row);
+  text-align: left;
+}
+
+.halfSplitsTd {
+  padding: 8px 10px;
+  text-align: right;
+  color: var(--text);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-row);
+  white-space: nowrap;
+}
+
+.halfSplitsTable tbody tr:last-child td,
+.halfSplitsTable tbody tr:last-child .halfSplitsTdLabel {
+  border-bottom: none;
+}
+
+.halfSplitsRowAlt td,
+.halfSplitsRowAlt .halfSplitsTdLabel { background: var(--bg-metric); }
+
+.halfSplitsSec {
+  display: block;
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-top: 1px;
+}
+
+/* ────────────────────────────────────── */
+
 .splitTable td {
   padding: 8px 12px;
   text-align: right;
@@ -161,11 +225,18 @@
   color: var(--text-faint);
 }
 
-.takeawayGreen li { color: var(--win); }
-.takeawayGreen li::before { color: var(--win); }
+.takeawayPlayerGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
 
-.takeawayRed li { color: var(--loss); }
-.takeawayRed li::before { color: var(--loss); }
+.takeawayStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
 /* ── Empty / placeholder ─────────────── */
 

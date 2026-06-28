@@ -1,6 +1,5 @@
 import styles from './views.module.css'
 
-// entry: TakeawayEntry ({ team: [], players: [{ playerId, name, strengths, improvements }] })
 export default function Takeaways({ entry }) {
   const isEmpty = !entry || (!entry.team?.length && !entry.players?.length)
 
@@ -18,23 +17,27 @@ export default function Takeaways({ entry }) {
           </ul>
         </div>
       )}
-      {entry.players.map(p => (
-        <div key={p.playerId} className={styles.takeawayCard}>
-          <div className={styles.takeawayCardTitle}>{p.name}</div>
-          <PlayerTakeawayBlock player={p} />
+      {entry.players?.length > 0 && (
+        <div className={styles.takeawayPlayerGrid}>
+          {entry.players.map(p => (
+            <div key={p.playerId} className={styles.takeawayCard}>
+              <div className={styles.takeawayCardTitle}>{p.name}</div>
+              <PlayerTakeawayBlock player={p} />
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </>
   )
 }
 
 function PlayerTakeawayBlock({ player }) {
   return (
-    <div className={styles.takeawayColumns}>
+    <div className={styles.takeawayStack}>
       {player.strengths?.length > 0 && (
         <div>
           <div className={styles.takeawayLabel}>Strengths</div>
-          <ul className={`${styles.takeawayList} ${styles.takeawayGreen}`}>
+          <ul className={styles.takeawayList}>
             {player.strengths.map((s, i) => <li key={i}>{s}</li>)}
           </ul>
         </div>
@@ -42,7 +45,7 @@ function PlayerTakeawayBlock({ player }) {
       {player.improvements?.length > 0 && (
         <div>
           <div className={styles.takeawayLabel}>Improvements</div>
-          <ul className={`${styles.takeawayList} ${styles.takeawayRed}`}>
+          <ul className={styles.takeawayList}>
             {player.improvements.map((s, i) => <li key={i}>{s}</li>)}
           </ul>
         </div>

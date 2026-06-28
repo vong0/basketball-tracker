@@ -8,7 +8,14 @@ import TeamSummary from './views/TeamSummary.jsx'
 import Takeaways from './views/Takeaways.jsx'
 import ShotChart from './views/ShotChart.jsx'
 import AdvancedStats from './views/AdvancedStats.jsx'
-import { getGame, getTakeaways, getGameScopes, getStats, gameLabel } from '../../lib/backend.js'
+import { getGame, getTakeaways, getGameScopes, getStats } from '../../lib/backend.js'
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (isNaN(d)) return dateStr
+  return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
+}
 import { navigate } from '../../lib/routing.js'
 import styles from './GameDetailPage.module.css'
 
@@ -101,7 +108,7 @@ export default function GameDetailPage({ gameId, isMobile }) {
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroTop}>
-            <span className={styles.gameLabel}>{gameLabel(game)}</span>
+            <span className={styles.gameLabel}>{game.id}</span>
             <span className={`${styles.resultBadge} ${resultClass}`}>{game.result}</span>
             {game.gloryLeagueUrl && (
               <a href={game.gloryLeagueUrl} target="_blank" rel="noopener noreferrer" className={styles.gloryLink}>
@@ -127,7 +134,7 @@ export default function GameDetailPage({ gameId, isMobile }) {
           </div>
 
           <div className={styles.metaRow}>
-            <span>{game.date}</span>
+            <span>{formatDate(game.date)}</span>
           </div>
 
           {thumbUrl && (

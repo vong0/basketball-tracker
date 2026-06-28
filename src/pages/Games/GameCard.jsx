@@ -4,7 +4,7 @@ function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d)) return dateStr;
-  return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function GameCard({ game }) {
@@ -34,7 +34,7 @@ export default function GameCard({ game }) {
 
       <div className={cardStyles.body}>
         <div className={cardStyles.topRow}>
-          <span className={cardStyles.gameId}>{game.game}</span>
+          <span className={cardStyles.gameId}>{game.id}</span>
           {game.result && (
             <span className={`${cardStyles.badge} ${badgeClass}`}>{game.result}</span>
           )}

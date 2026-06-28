@@ -33,11 +33,11 @@
   color: var(--text-faint);
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
+  text-decoration: none;
 }
 
 @media (hover: hover) {
@@ -48,7 +48,10 @@
 .tabActive {
   color: var(--text);
   font-weight: 700;
-  border-bottom-color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--text);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 .arrow {

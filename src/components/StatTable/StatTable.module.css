@@ -27,7 +27,7 @@
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
   padding: 8px 10px;
   background: #1a1a1a;
   border-bottom: none;
@@ -47,6 +47,14 @@
 }
 
 .table tr:hover td {
+  background: var(--bg-hover);
+}
+
+/* Alternate row tint — toggled via alternateRows prop */
+.alternateRows tbody tr:nth-child(even) td {
+  background: var(--bg-metric);
+}
+.alternateRows tbody tr:nth-child(even):hover td {
   background: var(--bg-hover);
 }
 

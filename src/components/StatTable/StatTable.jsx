@@ -23,12 +23,13 @@ function cardText(cell) {
   return cell ?? '—'
 }
 
-export default function StatTable({ rows, cols, getRow, nameKey }) {
+export default function StatTable({ rows, cols, getRow, nameKey, alternateRows = false }) {
   if (!rows.length) return <p className={styles.placeholder}>No data.</p>
+  const tableClass = [styles.table, alternateRows ? styles.alternateRows : ''].filter(Boolean).join(' ')
   return (
     <>
       <div className={styles.tableWrap}>
-        <table className={styles.table}>
+        <table className={tableClass}>
           <thead>
             <tr>
               {cols.map(c => (
