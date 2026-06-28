@@ -27,7 +27,7 @@ function cardText(cell) {
   return cell ?? '—'
 }
 
-export default function DataTable({ desc }) {
+export default function DataTable({ desc, dense = false }) {
   if (!desc) return null
   const { columns, rows } = desc
   if (!rows?.length) return <p className={styles.placeholder}>No data.</p>
@@ -37,7 +37,7 @@ export default function DataTable({ desc }) {
   return (
     <>
       <div className={styles.tableWrap}>
-        <table className={styles.table}>
+        <table className={`${styles.table}${dense ? ' ' + styles.dense : ''}`}>
           <thead>
             <tr>
               {columns.map(c => (

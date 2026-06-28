@@ -1,17 +1,19 @@
 .section {
   padding: 20px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-strong);
 }
 .section:last-child { border-bottom: none; }
 
 /* Sub-section label */
 .subTitle {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--text-dim);
   margin: 20px 0 10px;
+  padding-left: 8px;
+  border-left: 2px solid var(--border-strong);
 }
 .subTitle:first-child { margin-top: 0; }
 

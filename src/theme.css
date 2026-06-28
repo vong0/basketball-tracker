@@ -44,9 +44,10 @@
   --loss: #dc2626;
 
   /* Compat aliases */
-  --orange: #ff5c1a;
-  --green:  #15803d;
-  --red:    #dc2626;
+  --orange:   #ff5c1a;
+  --green:    #15803d;
+  --red:      #dc2626;
+  --gray-dot: #999999;
 
   /* Shadows */
   --shadow-card:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
@@ -93,6 +94,7 @@
   --red:          #f87171;
   --win:          #4ade80;
   --loss:         #f87171;
+  --gray-dot:     rgba(255, 255, 255, 0.35);
 
   --shadow-card:  0 2px 8px rgba(0, 0, 0, 0.5);
   --shadow-input: 0 2px 8px rgba(0, 0, 0, 0.5);

@@ -1,9 +1,65 @@
 [
-  { "id": "vong",    "name": "Matthew Vong",  "clipName": "vong",    "number": "", "position": "Big",   "photo": "", "active": true },
-  { "id": "mushi",   "name": "Mushi",         "clipName": "mushi",   "number": "", "position": "Guard", "photo": "", "active": true },
-  { "id": "matt",    "name": "Matthew Chiam", "clipName": "matt",    "number": "", "position": "Guard", "photo": "", "active": true },
-  { "id": "emanuel", "name": "Emanuel Kap",   "clipName": "kap",     "number": "", "position": "Guard", "photo": "", "active": true },
-  { "id": "alex",    "name": "Alex",          "clipName": "alex",    "number": "", "position": "Big",   "photo": "", "active": true },
-  { "id": "george",  "name": "George",        "clipName": "george",  "number": "", "position": "Guard", "photo": "", "active": true },
-  { "id": "adam",    "name": "Adam",          "clipName": "adam",    "number": "", "position": "Wing",  "photo": "", "active": true }
+  {
+    "id": "vong",
+    "name": "Vong",
+    "clipName": "vong",
+    "number": "",
+    "position": "Big",
+    "photo": "",
+    "active": true
+  },
+  {
+    "id": "mushi",
+    "name": "Mushi",
+    "clipName": "mushi",
+    "number": "",
+    "position": "Guard",
+    "photo": "",
+    "active": true
+  },
+  {
+    "id": "matt",
+    "name": "Matthew",
+    "clipName": "matt",
+    "number": "",
+    "position": "Guard",
+    "photo": "",
+    "active": true
+  },
+  {
+    "id": "emanuel",
+    "name": "Emanuel",
+    "clipName": "kap",
+    "number": "",
+    "position": "Guard",
+    "photo": "",
+    "active": true
+  },
+  {
+    "id": "alex",
+    "name": "Alex",
+    "clipName": "alex",
+    "number": "",
+    "position": "Big",
+    "photo": "",
+    "active": true
+  },
+  {
+    "id": "george",
+    "name": "George",
+    "clipName": "george",
+    "number": "",
+    "position": "Guard",
+    "photo": "",
+    "active": true
+  },
+  {
+    "id": "adam",
+    "name": "Adam",
+    "clipName": "adam",
+    "number": "",
+    "position": "Wing",
+    "photo": "",
+    "active": true
+  }
 ]

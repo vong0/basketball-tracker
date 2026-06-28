@@ -1,6 +1,6 @@
 .section {
   padding: 20px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-strong);
 }
 .section:last-child { border-bottom: none; }
 
@@ -21,14 +21,16 @@
   margin-bottom: 14px;
 }
 
-/* Sub-section label — small uppercase, stays subtle */
+/* Sub-section label */
 .subTitle {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--text-dim);
   margin: 20px 0 10px;
+  padding-left: 8px;
+  border-left: 2px solid var(--border-strong);
 }
 .subTitle:first-child { margin-top: 0; }
 
@@ -41,14 +43,15 @@
 }
 
 .noteBlock {
-  background: var(--bg-metric);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px 16px;
+  box-shadow: var(--shadow-card);
 }
 
-.noteBlock.warn   { border-left: 3px solid var(--orange); background: #fffaf0; }
-.noteBlock.danger { border-left: 3px solid var(--loss);   background: #fff7f5; }
+.noteBlock.warn   { border-left: 3px solid var(--orange); background: #fffbf5; }
+.noteBlock.danger { border-left: 3px solid var(--loss);   background: #fff6f5; }
 
 .noteTitle {
   font-size: 11px;
@@ -86,23 +89,23 @@
 .breakdownGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-top: 24px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
-/* Leaders */
+/* Leaders — two columns on desktop */
 .leadersGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
   min-width: 0;
-  overflow-x: hidden;
 }
 
 /* ── Takeaways ─────────────────────────── */
 
 .takeawayCard {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
@@ -167,7 +170,7 @@
 /* ── Empty / placeholder ─────────────── */
 
 .placeholder {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
@@ -180,6 +183,7 @@
 @media (max-width: 640px) {
   .section { padding: 14px 0; }
   .breakdownGrid { grid-template-columns: 1fr; }
+  .leadersGrid { grid-template-columns: 1fr; gap: 20px; }
   .takeawayColumns { grid-template-columns: 1fr; gap: 16px; }
   .takeawayCard { padding: 16px; }
 }

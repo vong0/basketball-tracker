@@ -5,8 +5,8 @@
   top: 56px;
   z-index: 30;
   background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  border-bottom: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
 .strip {
@@ -42,11 +42,12 @@
 
 @media (hover: hover) {
   .tab:hover { color: var(--text-dim); }
+  .tabActive:hover { color: var(--text); }
 }
 
 .tabActive {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700;
   border-bottom-color: var(--text);
 }
 

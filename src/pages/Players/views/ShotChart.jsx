@@ -16,11 +16,11 @@ export default function ShotChart({ statsData, playerId }) {
       <div className={styles.breakdownGrid}>
         <div>
           <div className={styles.subTitle}>Zone Breakdown</div>
-          <DataTable desc={d.zoneBreakdown} />
+          <DataTable desc={d.zoneBreakdown} dense />
         </div>
         <div>
           <div className={styles.subTitle}>Contest Breakdown</div>
-          <DataTable desc={d.contestBreakdown} />
+          <DataTable desc={d.contestBreakdown} dense />
         </div>
       </div>
     </div>

@@ -113,7 +113,6 @@ function HubCard({ section }) {
           </svg>
         )}
       </div>
-      <div className={styles.cardKicker}>{section.kicker}</div>
       <div className={styles.cardTitle}>{section.title}</div>
       <div className={styles.cardDesc}>{section.description}</div>
       <div className={styles.cardArrow} style={{ color: accentVar }}>

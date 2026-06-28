@@ -33,18 +33,24 @@
   margin-bottom: 6px;
 }
 
-/* Style overrides for Mantine's Select. The default Mantine input is fine
-   on light backgrounds but blends in too much on our dark theme — bump
-   the contrast on the input border and dropdown background. */
-.selectInput {
-  background: #0a0a0a;
+/* Style overrides for Mantine's Select in dark zone.
+   Use bg-elevated (#131318) — not pure black — for the grey look.
+   Force background on every interaction state to prevent Mantine's
+   default focus style from flashing white. */
+.selectInput,
+.selectInput:focus,
+.selectInput[data-expanded],
+.selectInput[aria-expanded="true"] {
+  background: var(--bg-elevated);
   border: 1px solid var(--border-strong);
   color: rgba(255, 255, 255, 0.9);
   font-family: inherit;
   font-size: 14px;
+  outline: none;
 }
 
-.selectInput:hover {
+.selectInput:hover,
+.selectInput[data-expanded] {
   border-color: var(--orange);
 }
 
