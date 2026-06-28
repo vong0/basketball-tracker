@@ -8,7 +8,7 @@
 /* ── Filter bar ────────────────────────── */
 
 .filterBar {
-  background: var(--bg);
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   padding: 14px 24px 10px;
   position: sticky;

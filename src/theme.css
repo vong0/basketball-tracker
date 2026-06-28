@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Barlow+Condensed:wght@600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ─────────────────────────────────────────
    Light theme — all pages except dark zones
@@ -20,14 +20,14 @@
 
   /* Text */
   --text:       rgba(0, 0, 0, 0.87);
-  --text-dim:   rgba(0, 0, 0, 0.54);
-  --text-faint: rgba(0, 0, 0, 0.38);
+  --text-dim:   rgba(0, 0, 0, 0.60);
+  --text-faint: rgba(0, 0, 0, 0.45);
 
   /* Header / hero (always dark) */
   --header-bg:   #1a1a1a;
   --header-text: rgba(255, 255, 255, 0.90);
   --header-dim:  rgba(255, 255, 255, 0.55);
-  --hero-bg:     #1a1a1a;
+  --hero-bg:     linear-gradient(180deg, #1a1a1a 0%, #1e1e1e 100%);
 
   /* Accent */
   --accent: #2563eb;
@@ -55,9 +55,9 @@
   --radius-lg:   12px;
   --radius-pill: 999px;
 
-  /* Typography — DM Sans everywhere in light mode */
+  /* Typography — DM Sans body, Barlow Condensed for display/scores */
   --font-body:    'DM Sans', sans-serif;
-  --font-display: 'DM Sans', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
   --font-mono:    'DM Sans', sans-serif;
 }
 

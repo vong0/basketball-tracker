@@ -26,21 +26,29 @@
   text-decoration: none;
   color: var(--header-text);
   flex-shrink: 0;
-  padding: 4px 0;
-  margin-right: 8px;
+  padding: 6px 10px;
+  margin-right: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+@media (hover: hover) {
+  .brand:hover {
+    background: rgba(255, 255, 255, 0.09);
+  }
 }
 
 .wordmark {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 400;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--header-text);
 }
 
 @media (max-width: 640px) {
-  .wordmark { font-size: 16px; }
+  .wordmark { font-size: 18px; }
 }
 
 /* ── Nav ─────────────────────────────── */
@@ -66,21 +74,34 @@
   font-weight: 500;
   color: var(--header-dim);
   text-decoration: none;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  /* Underline under the text, not at the bottom of the 56px container */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  border-bottom: none;
+  transition: color 0.15s, background 0.15s, text-decoration-color 0.15s, font-weight 0.05s;
   white-space: nowrap;
   height: 56px;
+  border-radius: 0;
 }
 
 @media (hover: hover) {
   .navLink:hover {
-    color: var(--header-text);
+    background: rgba(255, 255, 255, 0.09);
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration-color: transparent;
   }
 }
 
 .navLinkActive {
-  color: var(--header-text);
-  border-bottom-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+  /* White underline directly under the text */
+  text-decoration-color: #ffffff;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
 }
 
 /* ── Hamburger (mobile only) ─────────── */
@@ -145,9 +166,9 @@
 
 .drawerWordmark {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -173,7 +194,7 @@
   color: rgba(255, 255, 255, 0.80);
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 0.12s;
+  transition: background 0.12s, color 0.12s;
 }
 
 @media (hover: hover) {
@@ -185,7 +206,8 @@
 
 .drawerLinkActive {
   color: #ffffff;
-  background: rgba(37, 99, 235, 0.15);
-  border-left: 3px solid var(--accent);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 3px solid #ffffff;
   padding-left: 17px;
 }

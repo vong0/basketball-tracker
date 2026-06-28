@@ -30,24 +30,30 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-faint);
+  color: var(--text-dim);
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: none;
+  /* Underline close to text, not at container bottom */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, text-decoration-color 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 @media (hover: hover) {
-  .tab:hover { color: var(--text-dim); }
+  .tab:hover { color: var(--text); }
 }
 
 .tabActive {
   color: var(--text);
-  border-bottom-color: var(--accent);
   font-weight: 600;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
 }
 
 .arrow {

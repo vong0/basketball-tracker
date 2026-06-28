@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   background: var(--bg-card);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   box-shadow: var(--shadow-card);
   overflow: hidden;
   transition: box-shadow 0.15s;
@@ -81,6 +81,8 @@
   padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 0;
 }
 
@@ -88,6 +90,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   margin-bottom: 10px;
 }
 
@@ -112,54 +115,67 @@
 .badgeLoss { background: var(--loss); color: #fff; }
 .badgeTie  { background: var(--text-faint); color: #fff; }
 
-/* ── Score row ─────────────────────────── */
+/* ── Score row — centered ──────────────── */
 
 .scoreRow {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.teamBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex: 1;
-}
-
-.teamBlockRight {
-  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .scoreNum {
-  font-size: 36px;
+  font-family: var(--font-display);
+  font-size: 40px;
   font-weight: 700;
   line-height: 1;
   color: var(--text);
+  letter-spacing: 0.02em;
 }
 
 .scoreNumFaded {
   color: var(--text-faint);
-  font-weight: 400;
+  font-weight: 600;
+}
+
+.scoreSep {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  align-self: center;
+  letter-spacing: 0.02em;
+}
+
+/* ── Team names row ────────────────────── */
+
+.teamNamesRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 8px;
 }
 
 .teamName {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-dim);
-  margin-top: 2px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.scoreSep {
-  font-size: 20px;
-  font-weight: 300;
+.teamNameWinner {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.teamSep {
+  font-size: 11px;
   color: var(--text-faint);
-  flex-shrink: 0;
-  align-self: center;
-  margin-bottom: 4px;
+  padding: 0 6px;
 }
 
 /* ── Date ─────────────────────────────── */
@@ -167,7 +183,6 @@
 .date {
   font-size: 12px;
   color: var(--text-faint);
-  margin-top: 8px;
   margin-bottom: 14px;
 }
 
@@ -184,7 +199,7 @@
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  border-radius: var(--radius-pill);
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: background 0.15s;

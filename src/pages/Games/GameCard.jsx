@@ -1,5 +1,12 @@
 import cardStyles from './GameCard.module.css';
 
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export default function GameCard({ game }) {
   const badgeClass =
     game.result === 'W' ? cardStyles.badgeWin :
@@ -34,25 +41,29 @@ export default function GameCard({ game }) {
         </div>
 
         <div className={cardStyles.scoreRow}>
-          <div className={cardStyles.teamBlock}>
-            <span className={`${cardStyles.scoreNum} ${spartansWon ? '' : cardStyles.scoreNumFaded}`}>
-              {game.teamScore}
-            </span>
-            <span className={cardStyles.teamName}>Spartans</span>
-          </div>
+          <span className={`${cardStyles.scoreNum} ${spartansWon ? '' : cardStyles.scoreNumFaded}`}>
+            {game.teamScore}
+          </span>
           <span className={cardStyles.scoreSep}>–</span>
-          <div className={`${cardStyles.teamBlock} ${cardStyles.teamBlockRight}`}>
-            <span className={`${cardStyles.scoreNum} ${spartansWon ? cardStyles.scoreNumFaded : ''}`}>
-              {game.opponentScore}
-            </span>
-            <span className={cardStyles.teamName}>{game.opponentName ?? 'Opponent'}</span>
-          </div>
+          <span className={`${cardStyles.scoreNum} ${spartansWon ? cardStyles.scoreNumFaded : ''}`}>
+            {game.opponentScore}
+          </span>
         </div>
 
-        <div className={cardStyles.date}>{game.date}</div>
+        <div className={cardStyles.teamNamesRow}>
+          <span className={`${cardStyles.teamName} ${spartansWon ? cardStyles.teamNameWinner : ''}`}>
+            Spartans
+          </span>
+          <span className={cardStyles.teamSep}>|</span>
+          <span className={`${cardStyles.teamName} ${spartansWon ? '' : cardStyles.teamNameWinner}`}>
+            {game.opponentName ?? 'Opponent'}
+          </span>
+        </div>
+
+        <div className={cardStyles.date}>{formatDate(game.date)}</div>
 
         <a href={`#/games/${game.id}`} className={cardStyles.overviewBtn}>
-          Overview
+          OVERVIEW
         </a>
       </div>
     </div>
