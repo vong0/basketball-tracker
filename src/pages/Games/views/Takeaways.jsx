@@ -36,7 +36,7 @@ function PlayerTakeawayBlock({ player }) {
     <div className={styles.takeawayStack}>
       {player.strengths?.length > 0 && (
         <div>
-          <div className={styles.takeawayLabel}>Strengths</div>
+          <div className={`${styles.takeawayLabel} ${styles.takeawayLabelStrength}`}>Strengths</div>
           <ul className={styles.takeawayList}>
             {player.strengths.map((s, i) => <li key={i}>{s}</li>)}
           </ul>
@@ -44,7 +44,7 @@ function PlayerTakeawayBlock({ player }) {
       )}
       {player.improvements?.length > 0 && (
         <div>
-          <div className={styles.takeawayLabel}>Improvements</div>
+          <div className={`${styles.takeawayLabel} ${styles.takeawayLabelImprovement}`}>Improvements</div>
           <ul className={styles.takeawayList}>
             {player.improvements.map((s, i) => <li key={i}>{s}</li>)}
           </ul>

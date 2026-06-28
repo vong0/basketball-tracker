@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Banner from '../../components/Banner/Banner'
 import TabBar from '../../components/TabBar/TabBar.jsx'
 import Overview from './views/Overview.jsx'
@@ -51,19 +51,51 @@ export default function GameDetailPage({ gameId, isMobile }) {
     return () => { cancelled = true }
   }, [gameId])
 
+  const suppressScroll = useRef(false)
+  const suppressTimer = useRef(null)
+
+  // When user clicks a tab: set immediately, then ignore scroll events for ~700ms
+  // so the smooth-scroll animation doesn't cause flicker
+  function handleTabChange(tab) {
+    setActiveTab(tab)
+    suppressScroll.current = true
+    clearTimeout(suppressTimer.current)
+    suppressTimer.current = setTimeout(() => { suppressScroll.current = false }, 700)
+  }
+
   useEffect(() => {
     if (!statsData) return
     const sections = TAB_IDS.map(id => document.getElementById(id)).filter(Boolean)
     if (!sections.length) return
-    const obs = new IntersectionObserver(
-      entries => {
-        const visible = entries.filter(e => e.isIntersecting)
-        if (visible.length) setActiveTab(TABS[TAB_IDS.indexOf(visible[0].target.id)])
-      },
-      { rootMargin: '-40% 0px -40% 0px', threshold: 0 }
-    )
-    sections.forEach(s => obs.observe(s))
-    return () => obs.disconnect()
+    const THRESHOLD = 120 // banner 56px + tabbar 44px + buffer
+
+    function onScroll() {
+      if (suppressScroll.current) return
+
+      // If near the bottom of the page, the last section is active regardless
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 60) {
+        setActiveTab(TABS[TABS.length - 1])
+        return
+      }
+
+      // Walk sections: last one whose top is at/above THRESHOLD wins
+      let active = sections[0]
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= THRESHOLD) {
+          active = section
+        } else {
+          break
+        }
+      }
+      setActiveTab(TABS[TAB_IDS.indexOf(active.id)])
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      clearTimeout(suppressTimer.current)
+    }
   }, [statsData])
 
   if (loading) {
@@ -152,7 +184,7 @@ export default function GameDetailPage({ gameId, isMobile }) {
         </div>
       </div>
 
-      <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} scrollMode={true} />
+      <TabBar tabs={TABS} active={activeTab} onChange={handleTabChange} scrollMode={true} />
 
       <div className={styles.content}>
         <div className={styles.contentInner}>

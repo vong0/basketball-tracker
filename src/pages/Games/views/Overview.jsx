@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { displayGameOverview } from '../../../lib/statsCore.js'
 import MetricRow from '../../../components/MetricRow/MetricRow.jsx'
 import GroupRow from '../../../components/GroupRow/GroupRow.jsx'
+import DataTable from '../../../components/DataTable/DataTable.jsx'
 import styles from './views.module.css'
 
 export default function Overview({ statsData, players }) {
@@ -41,33 +42,19 @@ export default function Overview({ statsData, players }) {
 
 function HalfSplitsTable({ halves }) {
   if (!halves.length) return null
-  // Columns = stat labels from first half's rows
   const cols = halves[0].rows.map(r => r.label)
-  return (
-    <div className={styles.halfSplitsWrap}>
-      <table className={styles.halfSplitsTable}>
-        <thead>
-          <tr>
-            <th className={styles.halfSplitsTh} style={{ textAlign: 'left' }}>Half</th>
-            {cols.map(col => (
-              <th key={col} className={styles.halfSplitsTh}>{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {halves.map((half, hi) => (
-            <tr key={half.title} className={hi % 2 === 1 ? styles.halfSplitsRowAlt : ''}>
-              <td className={styles.halfSplitsTdLabel}>{half.title}</td>
-              {half.rows.map((r, ci) => (
-                <td key={ci} className={styles.halfSplitsTd}>
-                  {r.value}
-                  {r.secondary && <span className={styles.halfSplitsSec}>{r.secondary}</span>}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+  const desc = {
+    columns: [
+      { key: '_half', type: 'name', label: 'Half' },
+      ...cols.map(label => ({ key: label, type: 'ratio', label })),
+    ],
+    rows: halves.map(half => ({
+      _half: half.title,
+      ...Object.fromEntries(half.rows.map(r => [
+        r.label,
+        r.secondary !== undefined ? { value: r.value, secondary: r.secondary } : r.value,
+      ])),
+    })),
+  }
+  return <DataTable desc={desc} />
 }

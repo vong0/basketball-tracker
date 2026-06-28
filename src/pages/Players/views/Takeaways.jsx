@@ -29,16 +29,16 @@ export default function Takeaways({ entries }) {
               <div className={styles.takeawayColumns}>
                 {p.strengths?.length > 0 && (
                   <div>
-                    <div className={styles.takeawayLabel}>Strengths</div>
-                    <ul className={`${styles.takeawayList} ${styles.takeawayGreen}`}>
+                    <div className={`${styles.takeawayLabel} ${styles.takeawayLabelStrength}`}>Strengths</div>
+                    <ul className={styles.takeawayList}>
                       {p.strengths.map((s, i) => <li key={i}>{s}</li>)}
                     </ul>
                   </div>
                 )}
                 {p.improvements?.length > 0 && (
                   <div>
-                    <div className={styles.takeawayLabel}>Improvements</div>
-                    <ul className={`${styles.takeawayList} ${styles.takeawayRed}`}>
+                    <div className={`${styles.takeawayLabel} ${styles.takeawayLabelImprovement}`}>Improvements</div>
+                    <ul className={styles.takeawayList}>
                       {p.improvements.map((s, i) => <li key={i}>{s}</li>)}
                     </ul>
                   </div>

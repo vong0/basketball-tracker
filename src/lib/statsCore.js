@@ -646,7 +646,7 @@ export function displayTeamAdvancedStats(data) {
             { label: 'Def Rtg', value: t.Def_Rtg?.toFixed(1) ?? '—' },
             { label: 'Net Rtg', value: t.Net_Rtg !== null ? netSign(t.Net_Rtg) : '—' },
           ]}]
-        : [{ title: 'Lineup Impact', rows: [{ label: 'Note', value: 'No lineup data recorded.' }] }]
+        : [{ title: 'Lineup Impact', placeholder: 'No lineup data recorded.' }]
       ),
     ],
   }
@@ -781,7 +781,7 @@ export function displayPlayerAdvancedStats(data, playerId) {
           { label: 'Poss For',        value: String(p.onPossFor) },
           { label: 'Poss Against',    value: String(p.onPossAgainst) },
         ]}]
-      : [{ title: 'Lineup Impact', rows: [{ label: 'Note', value: 'No lineup data recorded.' }] }],
+      : [{ title: 'Lineup Impact', placeholder: 'No lineup data recorded.' }],
   }
 }
 

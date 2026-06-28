@@ -17,7 +17,7 @@
   color: rgba(255, 255, 255, 0.75);
   padding-bottom: 10px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   text-transform: uppercase;
 }
 
@@ -29,20 +29,19 @@
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.12em;
-  color: var(--orange);
+  color: #ff5c1a;
   margin-bottom: 6px;
 }
 
 /* Style overrides for Mantine's Select in dark zone.
-   Use bg-elevated (#131318) — not pure black — for the grey look.
-   Force background on every interaction state to prevent Mantine's
-   default focus style from flashing white. */
+   Hardcoded dark colors because the Select dropdown renders in a portal
+   outside the dark-zone class, so CSS vars can't be relied on. */
 .selectInput,
 .selectInput:focus,
 .selectInput[data-expanded],
 .selectInput[aria-expanded="true"] {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.20);
   color: rgba(255, 255, 255, 0.9);
   font-family: inherit;
   font-size: 14px;
@@ -51,25 +50,25 @@
 
 .selectInput:hover,
 .selectInput[data-expanded] {
-  border-color: var(--orange);
+  border-color: #ff5c1a;
 }
 
 .selectDropdown {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
+  background: #1c1c24;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .footer {
   display: flex;
   justify-content: flex-end;
   padding-top: 10px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   margin-top: 4px;
 }
 
 .resetBtn {
   background: none;
-  border: 1px solid var(--border-strong);
+  border: 1px solid rgba(255, 255, 255, 0.20);
   color: rgba(255, 255, 255, 0.85);
   padding: 6px 12px;
   border-radius: 4px;
@@ -80,6 +79,6 @@
 }
 
 .resetBtn:hover {
-  color: var(--orange);
-  border-color: var(--orange);
+  color: #ff5c1a;
+  border-color: #ff5c1a;
 }

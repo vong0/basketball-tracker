@@ -95,7 +95,7 @@ export default function FilterPopover({
       title="FILTERS"
       centered
       size="sm"
-      classNames={{ title: styles.modalTitle, content: 'dark-zone', header: 'dark-zone' }}
+      classNames={{ title: styles.modalTitle }}
     >
       <FilterBody
         choice={choice}

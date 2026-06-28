@@ -134,7 +134,7 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   cursor: pointer;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .thumbImg {
