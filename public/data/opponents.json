@@ -148,6 +148,59 @@
           "defend": []
         }
       ]
+    },
+    {
+      "id": "johns-eight",
+      "name": "Johns Eight",
+      "photo": "data/photos/john/team.png",
+      "notes": [
+        "Mainly good from inside, but will take contested mid range/layups if guarded",
+        "Bad passing and catching -> turnovers"
+      ],
+      "players": [
+        {
+          "number": "8",
+          "name": "Big guy",
+          "photo": "data/photos/john/08.png",
+          "profile": "Main player, their big man",
+          "threat": [
+            "Good inside (good at quick push shot/layups) but if you contest will take wild shots",
+            "Good at contesting on defense"
+          ],
+          "defend": [
+            "Box out properly. collapse on him if the others cant shoot",
+            "Don't take contested shots against him"
+          ]
+        },
+        {
+          "number": "3",
+          "name": "Quick guy",
+          "photo": "data/photos/john/03.png",
+          "profile": "Second main player",
+          "threat": [
+            "Is quick and can drive and layup"
+          ],
+          "defend": [
+            "Don't be lazy on the contest or close out drive"
+          ]
+        },
+        {
+          "number": "2",
+          "name": "Maybe shooter?",
+          "photo": "data/photos/john/02.png",
+          "profile": "Maybe shooter?",
+          "threat": ["Can possibly shoot"],
+          "defend": ["Make sure to close out on him on 3"]
+        },
+        {
+          "number": "4",
+          "name": "Spinner",
+          "photo": "data/photos/john/04.png",
+          "profile": "Likes to spin in the post.",
+          "threat": [],
+          "defend": ["Beware of the spin and bump"]
+        }
+      ]
     }
   ]
 }

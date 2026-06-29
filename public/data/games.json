@@ -94,5 +94,27 @@
     "score": "42-46",
     "youtubeUrl": "https://youtu.be/PUPmgAXDk4M",
     "llc": "games/y26-s2-g03.llc"
+  },
+  "04": {
+    "name": "Game 4",
+    "opponents": "Johns Eight",
+    "score": "46-38",
+    "youtubeUrl": "https://youtu.be/rPThp5PLS7M",
+    "llc": "games/y26-s2-g04.llc",
+    "takeaways": {
+      "players": [
+        {
+          "name": "Mushi",
+          "strengths": [
+            
+          ],
+          "improvements": [
+            "Against man beware of spacing",
+            "Don't take contested pull up 3s early into the shot clock",
+            "Don't bring your man to the ball handler unless setting a screen or handoff"
+          ]
+        }
+      ]
+    }
   }
 }
