@@ -239,13 +239,7 @@
     {
       start: 2044.807809,
       end: 2048.375601,
-      name: 'UB(O) adam: bad spacing - more towards swing and closer to 3pt line',
-      selected: true,
-    },
-    {
-      start: 2264.14285,
-      end: 2266.958676,
-      name: "U(O) adam: don't always run to ball handler (give them space. either screen or shift down sometimes)",
+      name: 'UB(O) adam: bad spacing - more towards wing and closer to 3pt line',
       selected: true,
     },
     {
